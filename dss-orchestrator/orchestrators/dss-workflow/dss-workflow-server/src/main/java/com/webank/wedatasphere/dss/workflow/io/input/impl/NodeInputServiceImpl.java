@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableMap;
 import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.common.entity.Resource;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
+import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.utils.IoUtils;
 import com.webank.wedatasphere.dss.common.utils.MapUtils;
@@ -67,7 +68,8 @@ public class NodeInputServiceImpl implements NodeInputService {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Override
-    public String uploadResourceToBmlNew(String userName, String nodeJson, String nodePath, String projectName) throws IOException {
+    public String uploadResourceToBmlNew(String userName, String nodeJson, String nodePath,String nodeName, String projectName)
+            throws IOException {
         List<Resource> resources = nodeParser.getNodeResource(nodeJson);
         Map<String, Object> jobContent = nodeParser.getNodeJobContent(nodeJson);
         String scriptName = Optional.ofNullable(jobContent).map(e->e.get("script")).map(Object::toString).orElse(null);
@@ -77,7 +79,8 @@ public class NodeInputServiceImpl implements NodeInputService {
                     //需要区分代码节点和非代码节点。非代码节点直接根据filename上传即可
                     String fileName=resource.getFileName();
                     if(fileName.equals(scriptName)){
-                        fileName = fileName.substring(fileName.lastIndexOf('.'));
+                        String extensionName = fileName.substring(fileName.lastIndexOf('.'));
+                        fileName=Optional.ofNullable(nodeName).orElse("") + extensionName;
                     }
                     String filePath = IoUtils.addFileSeparator(nodePath, fileName);
                     InputStream resourceInputStream = bmlService.readLocalResourceFile(userName, filePath);
@@ -120,7 +123,7 @@ public class NodeInputServiceImpl implements NodeInputService {
     @Override
     public String uploadAppConnResourceNew(String userName, String projectName, DSSFlow dssFlow,
                                            String nodeJson, String flowContextId, String nodePath,
-                                           Workspace workspace, String orcVersion, List<DSSLabel> dssLabels) throws DSSErrorException, IOException {
+                                           Workspace workspace, String orcVersion, List<DSSLabel> dssLabels) throws IOException {
         Map<String, Object> nodeJsonMap = BDPJettyServerHelper.jacksonJson().readValue(nodeJson, Map.class);
         String nodeType = nodeJsonMap.get("jobType").toString();
         String nodeId = nodeJsonMap.get("id").toString();
@@ -155,10 +158,10 @@ public class NodeInputServiceImpl implements NodeInputService {
                 nodeExportContent = nodeService.importNode(userName, appConnNode, bmlResourceMap, streamResourceMap, orcVersion);
             } catch (ExternalOperationFailedException e) {
                 logger.error("failed to import node.", e);
-                throw new DSSErrorException(e.getErrCode(), e.getMessage());
+                throw new DSSRuntimeException(e.getErrCode(), e.getMessage());
             } catch (Exception e) {
                 logger.error("failed to import node.", e);
-                throw new DSSErrorException(90011, e.getMessage());
+                throw new DSSRuntimeException(90011, e.getMessage());
             }
             if (nodeExportContent != null) {
                 if (nodeExportContent.get("project_id") != null) {
@@ -220,10 +223,10 @@ public class NodeInputServiceImpl implements NodeInputService {
                 nodeExportContent = nodeService.importNode(userName, appConnNode, bmlResourceMap, streamResourceMap, orcVersion);
             } catch (ExternalOperationFailedException e) {
                 logger.error("failed to import node.", e);
-                throw new DSSErrorException(e.getErrCode(), e.getMessage());
+                throw new DSSRuntimeException(e.getErrCode(), e.getMessage());
             } catch (Exception e) {
                 logger.error("failed to import node.", e);
-                throw new DSSErrorException(90011, e.getMessage());
+                throw new DSSRuntimeException(90011, e.getMessage());
             }
             if (nodeExportContent != null) {
                 if (nodeExportContent.get("project_id") != null) {

@@ -39,6 +39,20 @@ public interface ProjectUpdateRequestRef<R extends ProjectUpdateRequestRef<R>>
         return (R) this;
     }
 
+
+    /**
+     * 新的项目owner，用于项目交接
+     * @return
+     */
+    default String getNewOwner() {
+        return (String) this.getParameter("newOwner");
+    }
+
+    default R setNewOwner(String newOwner) {
+        setParameter("newOwner", newOwner);
+        return (R) this;
+    }
+
     /**
      * 只包含本次移除的 DSS 工程相关权限用户
      * @return

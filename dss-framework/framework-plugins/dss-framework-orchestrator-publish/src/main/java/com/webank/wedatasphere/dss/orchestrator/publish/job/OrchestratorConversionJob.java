@@ -92,6 +92,8 @@ public final class OrchestratorConversionJob implements Runnable {
     public void run() {
         //1.从编排中心导出一次工作流,进行一次版本升级
         //2.进行发布到schedulis等调度系统
+        LOGGER.info("trace workflow publish,flowId:{},orchestratorId:{}.开始convert工作流 ",
+                conversionJobEntity.getOrchestrationIdMap().keySet(),conversionJobEntity.getOrcIdList() );
         LOGGER.info("Job {} begin to convert project {} for user {} to scheduler, the orchestrationIds is {}.", id,
             conversionJobEntity.getProject().getId(), conversionJobEntity.getUserName(), conversionJobEntity.getOrchestrationIdMap().keySet());
         conversionJobEntity.setResponse(ResponseOperateOrchestrator.running());
@@ -127,7 +129,12 @@ public final class OrchestratorConversionJob implements Runnable {
             consumer.accept(response);
             this.commonUpdateConvertJobStatus.toFailedStatus(this.orchestratorPublishJob, response.getMessage());
         }
+        String costTime =
+                ByteTimeUtils.msDurationToString(conversionJobEntity.getUpdateTime().getTime() - conversionJobEntity.getCreateTime().getTime());
+        LOGGER.info("trace workflow publish,flowId:{},orchestratorId:{}.convert工作流完成，耗时{} ",
+                conversionJobEntity.getOrchestrationIdMap().keySet(),conversionJobEntity.getOrcIdList(),costTime );
         LOGGER.info("Job {} convert project {} for user {} to Orchestrator {}, costs {}.", id, conversionJobEntity.getProject().getId(),
-            conversionJobEntity.getUserName(), conversionJobEntity.getResponse().getJobStatus(), ByteTimeUtils.msDurationToString(conversionJobEntity.getUpdateTime().getTime() - conversionJobEntity.getCreateTime().getTime()));
+            conversionJobEntity.getUserName(), conversionJobEntity.getOrcIdList(),costTime
+        );
     }
 }

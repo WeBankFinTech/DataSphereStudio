@@ -53,6 +53,7 @@ class ProjectReceiverChooser extends ReceiverChooser {
     case _: RequestProjectImportOrchestrator => receiver
     case _: RequestProjectUpdateOrcVersion => receiver
     case _: ProxyUserCheckRequest => receiver
+    case _: ProjectInfoRequest => receiver
     case _ => None
   }
 }

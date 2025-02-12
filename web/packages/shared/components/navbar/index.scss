@@ -18,11 +18,8 @@
 @import '~@dataspherestudio/shared/common/style/variables.scss';
 
 .we-file-navbar {
-    position: absolute;
     display: flex;
     justify-content: flex-end;
-    top: 0;
-    left: 0;
     width: 100%;
     // z-index: 100;
     @include bg-color($light-base-color, $dark-menu-base-color);
@@ -43,5 +40,6 @@
     @include border-color($border-color-base, $dark-menu-base-color);
     border-right: none;
     border-left: none;
+    border-top: none;
 }
 

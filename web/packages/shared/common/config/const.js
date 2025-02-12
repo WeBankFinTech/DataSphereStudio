@@ -11,5 +11,8 @@ const ORCHESTRATORMODES = {
   CONSTSTORCHESTRATOR: 'pom_consist_orchestrator'// 组合工作流
 }
 
-export { DEVPROCESS, ORCHESTRATORMODES }
+// 脚本执行终态
+const EXECUTE_COMPLETE_TYPE = ['Succeed', 'Failed', 'Cancelled', 'Timeout'];
+
+export { DEVPROCESS, ORCHESTRATORMODES, EXECUTE_COMPLETE_TYPE }
 

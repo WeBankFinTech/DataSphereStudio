@@ -11,6 +11,14 @@
         <Option value='3'>{{ $t('message.scripts.ordercreatetime') }}</Option>
         <Option value="4">{{ $t('message.scripts.orderaccesstime') }}</Option>
       </Select>
+      <Select v-model="usageHeat" clearable class="searce-item margin-right" placeholder="表使用热度">
+        <Option value="VISITED_IN_THREE_MONTHS">最近3个月访问</Option>
+        <Option value="VISITED_IN_SIX_MONTHS">最近6个月访问</Option>
+        <Option value="VISITED_IN_TWELVE_MONTHS">最近12个月访问</Option>
+        <Option value="NOT_VISITED_IN_THREE_MONTHS">最近3个月未访问</Option>
+        <Option value="NOT_VISITED_IN_SIX_MONTHS">最近6个月未访问</Option>
+        <Option value="NOT_VISITED_IN_TWELVE_MONTHS">最近12个月未访问</Option>
+      </Select>
       <Select v-model="isTableOwner" class="searce-item margin-right">
         <Option value="0">{{ $t('message.scripts.owntable') }}</Option>
         <Option value="1">{{ $t('message.scripts.tablecreateby') }}</Option>
@@ -46,6 +54,14 @@
         <Option value="0">{{ $t('message.scripts.owntable') }}</Option>
         <Option value="1">{{ $t('message.scripts.tablecreateby') }}</Option>
       </Select> -->
+      <Select v-model="usageHeat" class="searce-item margin-right" placeholder="表使用热度">
+        <Option value="VISITED_IN_THREE_MONTHS">最近3个月访问</Option>
+        <Option value="VISITED_IN_SIX_MONTHS">最近6个月访问</Option>
+        <Option value="VISITED_IN_TWELVE_MONTHS">最近12个月访问</Option>
+        <Option value="NOT_VISITED_IN_THREE_MONTHS">最近3个月未访问</Option>
+        <Option value="NOT_VISITED_IN_SIX_MONTHS">最近6个月未访问</Option>
+        <Option value="NOT_VISITED_IN_TWELVE_MONTHS">最近12个月未访问</Option>
+      </Select>
       <Input v-model="tableOwner" class="searce-item margin-right" :placeholder="$t('message.scripts.tableDetails.QSRBSZ')">
       </Input>
       <Button class="margin-right" type="primary" @click="handleGetTables">{{ $t('message.scripts.Search') }}</Button>
@@ -207,13 +223,13 @@
         </Form>
         <div slot="footer">
           <Button v-if="!saveTransing" type="text" size="large" @click="showTransferForm = false">{{
-            $t("message.workspaceManagement.cancel")
+            $t("message.scripts.cancel")
           }}</Button>
           <Button v-if="!saveTransing" type="text" size="large" @click="prevStep">{{
             $t("message.common.dss.prevstep")
           }}</Button>
           <Button type="primary" size="large" @click="saveTransfer" :loading="saveTransing">{{
-            $t("message.workspaceManagement.ok")
+            $t("message.scripts.ok")
           }}</Button>
         </div>
       </Modal>
@@ -232,7 +248,7 @@
         </div>
         <div slot="footer">
           <Button type="text" size="large" @click="renameClose">{{
-            $t("message.workspaceManagement.cancel")
+            $t("message.scripts.cancel")
           }}</Button>
           <Button v-if="!renameScript" type="primary" size="large" @click="handleRename('next')">{{
             $t("message.scripts.createTable.next")
@@ -303,13 +319,13 @@ export default {
     return {
       columns: [
         { title: this.$t('message.scripts.tablename'), key: 'tableName', width: '20%'},
-        { title: this.$t('message.scripts.tbalias'), key: 'tableAlias', width: '10%'},
+        // { title: this.$t('message.scripts.tbalias'), key: 'tableAlias', width: '10%'},
         { title: this.$t('message.scripts.createtime'), key: 'createTime', width: '10%'},
         { title: this.$t('message.scripts.tablesize'), key: 'tableSize', width: '8%'},
         { title: this.$t('message.scripts.tbowner'), key: 'tableOwner', width: '8%'},
         { title: this.$t('message.scripts.ispartition'), key: 'partitioned', type: 'booleanString', width: '8%'},
         { title: this.$t('message.scripts.iscompress'), key: 'compressed', type: 'boolean', width: '8%'},
-        { title: this.$t('message.scripts.compressformat'), key: 'compressedFormat', width: '8%'},
+        // { title: this.$t('message.scripts.compressformat'), key: 'compressedFormat', width: '8%'},
         { title: this.$t('message.scripts.lastaccess'), key: 'viewTime', width: '10%'},
         { title: this.$t('message.scripts.lastupdate'), key: 'modifyTime', width: '10%'},
       ],
@@ -328,6 +344,7 @@ export default {
       loading: false,
       tablesName: [],
       isTableOwner: '0',
+      usageHeat: '',
       selectAllConfirm: false,
       selectAll: false,
       showTransferForm: false,
@@ -404,6 +421,7 @@ export default {
         dbName: this.dbName,
         tableName: this.tableName,
         orderBy: this.orderBy,
+        usageHeat: this.usageHeat,
         pageSize: this.pageData.pageSize,
         currentPage: this.pageData.currentPage
       }
@@ -441,6 +459,7 @@ export default {
         dbName: this.dbName,
         orderBy: this.orderBy,
         tableName: this.tableName,
+        usageHeat: this.usageHeat,
       }
       if (this.isAdminMode) {
         params.tableOwner = this.tableOwner
@@ -471,6 +490,7 @@ export default {
         dbName: this.dbName,
         tableName: this.tableName,
         orderBy: this.orderBy,
+        usageHeat: this.usageHeat,
         exactTableName: false
       }
       if (this.isAdminMode) {
@@ -535,7 +555,8 @@ export default {
       }
     },
     saveTransfer() {
-      const tbs = this.selectedItems.filter(it => it.selected).map(item => item.tableName)
+      const selectedList = this.selectedItems.filter(it => it.selected)
+      const tbs = selectedList.map(item => item.tableName)
       const params = {
         approvalTitle: this.formState.title,
         dbName: this.dbName,
@@ -543,6 +564,9 @@ export default {
         newOwner: this.formState.owner,
         dataGovernanceAdmin: this.formState.admin,
         description: this.formState.desc
+      }
+      if (this.isAdminMode) {
+        params.oldOwner = selectedList[0].tableOwner || ''
       }
       if (this.saveTransing) return
       this.$refs.transferForm.validate((valid) => {

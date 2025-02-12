@@ -19,10 +19,18 @@
 .we-side-bar {
     height: 100%;
     overflow: hidden;
-    padding-top: 38px;
+    padding-top: 3px;
+    .datasource-select{
+        padding: 3px 10px 5px;
+        border-bottom: 1px solid #eee;
+        @include border-color($border-color-base, $dark-menu-base-color);
+        .ivu-select-selection {
+            border: none;
+        }
+    }
     @include bg-color($light-base-color, $dark-menu-base-color);
     .we-side-bar-content {
-        height: 100%;
+        height: calc(100% - 33px);
         overflow-y: auto;
         &::-webkit-scrollbar {
             width: 6px;
@@ -37,6 +45,9 @@
             border-radius: $border-radius-base;
             box-shadow: $shadow-inset;
             @include bg-color($light-base-color, $dark-menu-base-color);
+        }
+        &.v-hivedb-list {
+            height: calc(100% - 63px);
         }
     }
 }

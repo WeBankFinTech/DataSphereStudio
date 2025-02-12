@@ -17,10 +17,12 @@
 package com.webank.wedatasphere.dss.orchestrator.publish.impl;
 
 import com.webank.wedatasphere.dss.common.entity.BmlResource;
+import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.DSSLabelUtil;
+import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.common.utils.*;
 import com.webank.wedatasphere.dss.contextservice.service.ContextService;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
@@ -45,6 +47,9 @@ import com.webank.wedatasphere.dss.standard.app.development.ref.RefJobContentRes
 import com.webank.wedatasphere.dss.standard.app.development.service.RefImportService;
 import com.webank.wedatasphere.dss.standard.app.development.standard.DevelopmentIntegrationStandard;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
+import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
+import com.webank.wedatasphere.dss.workflow.lock.DSSFlowEditLockManager;
+import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -78,6 +83,8 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
     private ContextService contextService;
     @Autowired
     private OrchestratorManager orchestratorManager;
+    @Autowired
+    private DSSFlowService dssFlowService;
 
     @Autowired
     private AddOrchestratorVersionHook addOrchestratorVersionHook;
@@ -164,8 +171,10 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
         dssOrchestratorVersion.setValidFlag(valid);
 
         DSSOrchestratorVersion oldVersion  = orchestratorMapper.getLatestOrchestratorVersionByIdAndValidFlag(importDssOrchestratorInfo.getId(), 1);
+        Long oldAppId = null;
         if (oldVersion!=null) {
             dssOrchestratorVersion.setVersion(OrchestratorUtils.increaseVersion(oldVersion.getVersion()));
+            oldAppId = oldVersion.getAppId();
         } else {
             dssOrchestratorVersion.setVersion(OrchestratorUtils.generateNewVersion());
         }
@@ -214,6 +223,21 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
         orchestratorMapper.addOrchestratorVersion(dssOrchestratorVersion);
         addOrchestratorVersionHook.afterAdd(dssOrchestratorVersion, Collections.singletonMap(OrchestratorRefConstant.ORCHESTRATION_FLOWID_PARAMCONF_TEMPLATEID_TUPLES_KEY,paramConfTemplateIds));
         LOGGER.info("import orchestrator success,orcId:{},appId:{}",importDssOrchestratorInfo.getId(),orchestrationId);
+
+        // 更新flowJson
+        if (dssLabels.get(0).getValue().get(EnvDSSLabel.DSS_ENV_LABEL_KEY).equals("dev")) {
+            Long appId = dssOrchestratorVersion.getAppId();
+            Long versionOrchestratorId = dssOrchestratorVersion.getOrchestratorId();
+            DSSFlow flowByID = dssFlowService.getFlow(appId);
+            if (flowByID != null) {
+                dssFlowService.deleteFlowMetaData(versionOrchestratorId);
+                dssFlowService.saveAllFlowMetaData(appId, versionOrchestratorId);
+            }
+            DSSProject projectInfo = DSSFlowEditLockManager.getProjectInfo(projectId);
+            if (projectInfo.getAssociateGit()) {
+                dssFlowService.updateTOSaveStatus(projectInfo.getId(), appId, versionOrchestratorId);
+            }
+        }
 
         return dssOrchestratorVersion;
     }
@@ -325,6 +349,7 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
                     ImportRequestRef requestRef = (ImportRequestRef) developmentRequestRef;
                     requestRef.setResourceMap(MapUtils.newCommonMap(ImportRequestRef.RESOURCE_ID_KEY, orcResourceId, ImportRequestRef.RESOURCE_VERSION_KEY, orcBmlVersion));
                     requestRef.setNewVersion(dssOrchestratorVersion.getVersion());
+                    requestRef.setParameter("isOldPackageStruct","true");
                     return ((RefImportOperation) developmentOperation).importRef(requestRef);
                 }, "import");
         long orchestrationId = (Long) responseRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_ID_KEY);

@@ -35,6 +35,12 @@
               </template>
             </div>
           </div>
+          <div v-if="associateGit" @click="$emit('handleChangeButton', 'find')" style="width: 60px;cursor: pointer;">
+            <SvgIcon
+              icon-class="search"
+            />
+            <span>{{ $t('message.workflow.Find') }}</span>
+          </div>
         </slot>
       </div>
     </div>
@@ -75,6 +81,10 @@ export default {
     },
     modeOfKey: {
       type: String,
+    },
+    associateGit: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {

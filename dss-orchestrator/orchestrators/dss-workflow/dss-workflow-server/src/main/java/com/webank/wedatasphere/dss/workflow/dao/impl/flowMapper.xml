@@ -28,6 +28,13 @@
         SELECT * FROM `dss_workflow` WHERE id = #{id}
     </select>
 
+    <select id="selectFlowListByID" resultType="com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow">
+        SELECT * FROM `dss_workflow` WHERE id IN
+        <foreach collection="list" item="item" index="index" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+
     <insert id="insertFlow" useGeneratedKeys="true" keyProperty="id" parameterType="com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow">
         INSERT INTO dss_workflow (<include refid = "flow_main" />)
         VALUES
@@ -143,4 +150,19 @@
             <result property="flowID" column="flow_id"/>
         </collection>
     </resultMap>
+
+
+    <select id="selectFlowListByOrchestratorId" parameterType="java.util.List" resultType="com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow">
+        SELECT t1.id,t2.orchestrator_id as orchestratorId FROM `dss_workflow` t1
+        join
+        (
+          select app_id,orchestrator_id from dss_orchestrator_version_info
+          where orchestrator_id  in
+          <foreach collection="orchestratorIdList" item="item" index="index" separator="," open="(" close=")">
+             #{item}
+          </foreach>
+        ) t2 on t1.id = t2.app_id
+    </select>
+    
+    
 </mapper>

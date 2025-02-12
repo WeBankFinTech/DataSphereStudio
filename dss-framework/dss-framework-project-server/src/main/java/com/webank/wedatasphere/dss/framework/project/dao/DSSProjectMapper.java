@@ -68,4 +68,19 @@ public interface DSSProjectMapper extends BaseMapper<DSSProjectDO> {
      *
      */
     List<QueryProjectVo> getDeletedProjects(ProjectQueryRequest projectRequest);
+
+
+
+    List<QueryProjectVo> queryListByParam(ProjectQueryRequest projectRequest);
+
+
+    List<Integer> getProjectIdByUser(@Param("priv") Integer priv,@Param("userList") List<String> userList);
+
+    List<DSSProjectDO> getProjectByName(List<String> list);
+
+
+    List<String> queryProjectName(@Param("workspaceId") Long workspaceId,@Param("queryUser") String queryUser);
+
+
+    List<QueryProjectVo> queryProjectList(@Param("workspaceId") Long workspaceId,@Param("queryUser") String queryUser);
 }

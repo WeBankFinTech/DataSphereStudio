@@ -3,21 +3,44 @@ package com.webank.wedatasphere.dss.git.common.protocol.response;
 
 import com.webank.wedatasphere.dss.git.common.protocol.GitTree;
 
-public class GitDiffResponse {
-    private GitTree tree;
+import java.util.List;
 
-    public GitDiffResponse(GitTree tree) {
-        this.tree = tree;
+public class GitDiffResponse {
+    private List<GitTree> codeTree;
+    private List<GitTree> metaTree;
+    private String commitId;
+
+    public GitDiffResponse(List<GitTree> codeTree, List<GitTree> metaTree, String commitId) {
+        this.codeTree = codeTree;
+        this.metaTree = metaTree;
+        this.commitId = commitId;
     }
 
     public GitDiffResponse() {
     }
 
-    public GitTree getTree() {
-        return tree;
+
+    public List<GitTree> getCodeTree() {
+        return codeTree;
     }
 
-    public void setTree(GitTree tree) {
-        this.tree = tree;
+    public void setCodeTree(List<GitTree> codeTree) {
+        this.codeTree = codeTree;
+    }
+
+    public List<GitTree> getMetaTree() {
+        return metaTree;
+    }
+
+    public void setMetaTree(List<GitTree> metaTree) {
+        this.metaTree = metaTree;
+    }
+
+    public String getCommitId() {
+        return commitId;
+    }
+
+    public void setCommitId(String commitId) {
+        this.commitId = commitId;
     }
 }

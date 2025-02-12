@@ -84,12 +84,11 @@ public class DssProxyUserController {
                                       HttpServletRequest req,
                                       HttpServletResponse resp) {
         String username = SecurityFilter.getLoginUsername(req);
+        userRep.setUserName(username);
         if (StringUtils.isEmpty(userRep.getUserName())) {
             return Message.error("userName is null.");
         } else if (StringUtils.isEmpty(userRep.getProxyUserName())) {
             return Message.error("proxyUserName is null.");
-        } else if(!username.equals(userRep.getUserName()) && !username.equals(userRep.getProxyUserName())) {
-            return Message.error("The requested user name is not a login user.");
         }
         LOGGER.info("user {} try to add user proxy cookie, params:{}.", username, userRep);
         // 兼容linkis端直接为登陆用户名加_c后缀的场景

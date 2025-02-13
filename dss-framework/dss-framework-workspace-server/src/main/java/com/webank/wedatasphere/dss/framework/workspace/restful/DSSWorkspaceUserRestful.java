@@ -227,7 +227,7 @@ public class DSSWorkspaceUserRestful {
         List<Map<String, Boolean>> userStatus = new ArrayList<>(usernames.size());
         for (String username : usernames) {
             boolean isDismissed;
-            if (username.startsWith("hduser") || username.startsWith("WTSS_")) {
+            if (username.startsWith("hduser") || username.startsWith("WTSS_") || "hadoop".equalsIgnoreCase(username)) {
                 isDismissed = false;
             } else {
                 StaffInfo staffInfo = staffInfoGetter.getStaffInfoByUsername(username);

@@ -383,10 +383,9 @@ public class ApiServiceQueryServiceImpl implements ApiServiceQueryService {
 
                     InputStream inputStream = resource.inputStream();
 
-                    try (FileSource fileSource = FileSource.create(new FsPath(scriptPath), inputStream)) {
+                    try (FileSource fileSource = FileSource$.MODULE$.create(new FsPath(scriptPath), inputStream)) {
                         //todo   数组取了第一个
-                        Pair<Object, List<String[]>> sourcePair = fileSource.collect()[0];
-                        collect = new Pair<>(sourcePair.getKey(), new ArrayList<>(sourcePair.getValue()));
+                        collect = fileSource.collect()[0];
                         bmlCache.put(key, collect);
                     }
                 }

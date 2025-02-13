@@ -13,6 +13,7 @@ import com.webank.wedatasphere.dss.standard.app.development.utils.DevelopmentOpe
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstanceImpl;
+import com.webank.wedatasphere.dss.standard.common.exception.NoSuchAppInstanceException;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
 import org.slf4j.Logger;
@@ -41,7 +42,7 @@ public class AppConn2LinkisRefExecutionRestfulApi {
     private AppConnManagerRestfulApi appConnManagerRestfulApi;
 
     @RequestMapping(path = "execute", method = RequestMethod.POST)
-    public Message execute(HttpServletRequest request, @RequestBody Map<String, Object> json) {
+    public Message execute(HttpServletRequest request, @RequestBody Map<String, Object> json) throws NoSuchAppInstanceException {
         String userName = SecurityFilter.getLoginUsername(request);
         LOGGER.info("user {} try to transform jobContent to Linkis job with requestBody {}.", userName, json);
         String workspaceStr = (String) json.get("workspaceStr");

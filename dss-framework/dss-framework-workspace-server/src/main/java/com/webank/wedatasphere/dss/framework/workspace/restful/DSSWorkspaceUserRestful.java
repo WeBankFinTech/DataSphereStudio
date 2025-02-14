@@ -226,6 +226,11 @@ public class DSSWorkspaceUserRestful {
         List<String> usernames = body.get("usernames");
         List<Map<String, Boolean>> userStatus = new ArrayList<>(usernames.size());
         for (String username : usernames) {
+            // 如果传入的username为空，则跳过
+            if(StringUtils.isEmpty(username)){
+                continue;
+            }
+
             boolean isDismissed;
             if (username.startsWith("hduser") || username.startsWith("WTSS_") || "hadoop".equalsIgnoreCase(username)) {
                 isDismissed = false;

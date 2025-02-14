@@ -122,6 +122,4 @@ public interface DSSFlowService {
 
     void getRootFlowProxy(DSSFlow dssFlow);
 
-
-    boolean proxyUserIsDismissed(String proxyUser);
 }

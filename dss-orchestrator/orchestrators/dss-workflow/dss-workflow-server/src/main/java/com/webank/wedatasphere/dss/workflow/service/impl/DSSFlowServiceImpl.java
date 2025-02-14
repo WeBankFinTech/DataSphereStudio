@@ -350,12 +350,6 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             throw new DSSErrorException(80001, "It exists same flow.(存在相同的节点)");
         }
 
-        String proxyUser = getProxyUser(jsonFlow);
-        // 判断代理用户是否离职或不存在
-        if(proxyUserIsDismissed(proxyUser)){
-            throw new DSSErrorException(80001, String.format("%s 代理用户已离职或不存在",proxyUser));
-        }
-
         // 判断工作流中是否有子工作流未被保存
         List<String> unSaveNodes = checkIsSave(flowID, jsonFlow);
 
@@ -2643,64 +2637,6 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         return flowMap;
 
     }
-
-    private String getProxyUser(String jsonFlow){
-        String proxyUser = null;
-
-        if(StringUtils.isEmpty(jsonFlow)){
-            return proxyUser;
-        }
-
-        List<Map<String, Object>> props = DSSCommonUtils.getFlowAttribute(jsonFlow, "props");
-
-        if (CollectionUtils.isNotEmpty(props)) {
-            for (Map<String, Object> prop : props) {
-                if (prop.containsKey("user.to.proxy") && prop.get("user.to.proxy") != null) {
-                    proxyUser = prop.get("user.to.proxy").toString();
-                    break;
-                }
-            }
-
-            logger.info("props user.to.proxy value is {}", proxyUser);
-        }
-
-        if(StringUtils.isEmpty(proxyUser)){
-
-            // user.to.proxy 中未取到代理用户，则从scheduleParams 属性中获取
-            JsonParser jsonParser = new JsonParser();
-            JsonObject jsonObject = jsonParser.parse(jsonFlow).getAsJsonObject();
-            JsonObject scheduleParams = jsonObject.getAsJsonObject("scheduleParams");
-            if(scheduleParams != null && scheduleParams.get("proxyuser") != null){
-                proxyUser = scheduleParams.get("proxyuser").getAsString();
-            }
-
-            logger.info("scheduleParams proxyuser value is {}", proxyUser);
-        }
-
-        logger.info("get proxyUser value is {}", proxyUser);
-
-        return proxyUser;
-    }
-
-
-    @Override
-    public boolean proxyUserIsDismissed(String proxyUser){
-
-        // 允许hduser和hadoop 用户，WTSS开头的不行
-        if (StringUtils.isEmpty(proxyUser) || "hadoop".equalsIgnoreCase(proxyUser) || proxyUser.toLowerCase().startsWith("hduser")){
-            return  false;
-        }
-
-        List<StaffInfo> staffInfoList =  staffInfoGetter.getAllUsers();
-
-        StaffInfo staff = staffInfoList.stream().filter(staffInfo -> staffInfo.getEnglishName().equalsIgnoreCase(proxyUser)).findFirst().orElse(null);
-
-        // 离职或不存在用户返回
-        return staff == null || "2".equals(staff.getStatus());
-
-    }
-
-
 
 }
 

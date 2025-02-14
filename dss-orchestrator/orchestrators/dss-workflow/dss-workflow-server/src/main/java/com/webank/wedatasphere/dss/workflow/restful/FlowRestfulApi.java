@@ -408,15 +408,5 @@ public class FlowRestfulApi {
         return Message.ok("批量编辑成功");
     }
 
-    /**
-     * 判断proxyUser是否离职
-     *
-     * @return 离职返回true，未离职false
-     */
-    @RequestMapping(value = "proxyUserIsDismissed",method = RequestMethod.GET)
-    public Message proxyUserIsDismissed(@RequestParam("proxyUser") String proxyUser){
-
-        return Message.ok().data("isDismissed", dssFlowService.proxyUserIsDismissed(proxyUser));
-    }
 
 }

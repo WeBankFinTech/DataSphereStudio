@@ -231,7 +231,8 @@ public class DSSWorkspaceUserRestful {
                 isDismissed = false;
             } else {
                 StaffInfo staffInfo = staffInfoGetter.getStaffInfoByUsername(username);
-                isDismissed = staffInfo != null && "2".equals(staffInfo.getStatus());
+                // 离职或不存在用户返回True
+                isDismissed = staffInfo == null || "2".equals(staffInfo.getStatus());
             }
             Map<String, Boolean> tuple = Collections.singletonMap(username, isDismissed);
             userStatus.add(tuple);

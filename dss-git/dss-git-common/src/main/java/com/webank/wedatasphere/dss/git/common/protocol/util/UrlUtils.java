@@ -1,7 +1,5 @@
 package com.webank.wedatasphere.dss.git.common.protocol.util;
 
-import java.io.File;
-
 
 public class UrlUtils {
 

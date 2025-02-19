@@ -2,7 +2,6 @@ package com.webank.wedatasphere.dss.git.common.protocol.request;
 
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitFileContentResponse;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class GitDiffFileContentResponse {

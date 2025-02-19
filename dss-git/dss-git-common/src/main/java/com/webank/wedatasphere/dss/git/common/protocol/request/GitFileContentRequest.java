@@ -1,10 +1,6 @@
 package com.webank.wedatasphere.dss.git.common.protocol.request;
 
 
-import com.webank.wedatasphere.dss.common.entity.BmlResource;
-
-import java.util.Map;
-
 public class GitFileContentRequest extends GitBaseRequest{
     private String commitId;
     /**

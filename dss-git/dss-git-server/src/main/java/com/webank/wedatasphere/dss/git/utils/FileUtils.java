@@ -6,8 +6,6 @@ import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.common.service.BMLService;
 import com.webank.wedatasphere.dss.common.utils.ZipHelper;
-import com.webank.wedatasphere.dss.git.common.protocol.config.GitServerConfig;
-import com.webank.wedatasphere.dss.git.common.protocol.constant.GitConstant;
 import com.webank.wedatasphere.dss.git.constant.DSSGitConstant;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.util.IOUtils;

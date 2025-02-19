@@ -4,7 +4,6 @@ package com.webank.wedatasphere.dss.git.common.protocol.response;
 import com.webank.wedatasphere.dss.git.common.protocol.GitSearchResult;
 
 import java.util.List;
-import java.util.Map;
 
 public class GitSearchResponse{
     private List<GitSearchResult> result;

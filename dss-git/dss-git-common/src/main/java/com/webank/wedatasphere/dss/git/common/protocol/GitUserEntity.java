@@ -1,8 +1,6 @@
 package com.webank.wedatasphere.dss.git.common.protocol;
 
 
-import java.util.Date;
-
 public class GitUserEntity {
     private String gitUser;
     private String gitToken;

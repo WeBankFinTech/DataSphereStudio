@@ -115,8 +115,6 @@ class DefaultNodeRunner extends NodeRunner with Logging {
         return
       }
       this.linkisJob.getJobProps.put(LinkisJobExecutionConfiguration.LINKIS_VERSION_KEY, LinkisJobExecutionConfiguration.LINKIS_DEFAULT_VERSION.getValue)
-      this.linkisJob.getJobProps.put("ecConfTemplateId",node.getDSSNode.getEcConfTemplateId)
-      this.linkisJob.getJobProps.put("ecConfTemplateName",node.getDSSNode.getEcConfTemplateName)
       LinkisNodeExecutionImpl.getLinkisNodeExecution.runJob(this.linkisJob)
       info(s"Finished to run node of ${node.getName}")
     } catch {

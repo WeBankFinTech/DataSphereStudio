@@ -182,6 +182,8 @@ public class DSSNodeDefault implements DSSNode {
                 ", createTime=" + createTime +
                 ", modifyTime=" + modifyTime +
                 ", modifyUser=" + modifyUser +
+                ", ecConfTemplateId=" + ecConfTemplateId +
+                ", ecConfTemplateName=" + ecConfTemplateName +
                 ", desc='" + desc + '\'' +
                 '}';
     }
@@ -254,6 +256,7 @@ public class DSSNodeDefault implements DSSNode {
         this.businessTag = businessTag;
     }
 
+    @Override
     public String getEcConfTemplateId() {
         return ecConfTemplateId;
     }
@@ -262,6 +265,7 @@ public class DSSNodeDefault implements DSSNode {
         this.ecConfTemplateId = ecConfTemplateId;
     }
 
+    @Override
     public String getEcConfTemplateName() {
         return ecConfTemplateName;
     }

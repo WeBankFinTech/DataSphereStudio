@@ -152,7 +152,7 @@ public class BuildJobActionImpl implements BuildJobAction {
             labels.put("executeOnce", "");
         }
         Map<String, Object> paramMapCopy = (HashMap<String, Object>) SerializationUtils.clone(new HashMap<String, Object>(job.getParams()));
-        replaceSparkConfParams(paramMapCopy);
+        replaceSparkConfParams(paramMapCopy,job.getJobProps());
 
         JobSubmitAction.Builder builder = JobSubmitAction.builder()
                 .addExecuteCode(code)
@@ -210,7 +210,7 @@ public class BuildJobActionImpl implements BuildJobAction {
      * @param paramMapCopy
      * @throws LinkisJobExecutionErrorException
      */
-    private void replaceSparkConfParams(Map<String, Object> paramMapCopy) throws LinkisJobExecutionErrorException {
+    private void replaceSparkConfParams(Map<String, Object> paramMapCopy,Map<String,String> jobProps ) throws LinkisJobExecutionErrorException {
         Map<String, Object> startupMap = TaskUtils.getStartupMap(paramMapCopy);
         logger.info("try process keys in template");
         //如果节点指定了参数模板，则需要把节点内与模板相同的参数取消掉，保证模板优先级高于节点参数
@@ -225,6 +225,12 @@ public class BuildJobActionImpl implements BuildJobAction {
             startupMap.remove("spark.conf");
             startupMap.remove("mapreduce.job.running.map.limit");
             startupMap.remove("mapreduce.job.running.reduce.limit");
+            startupMap.put("ec.resource.name",jobProps.get("ecConfTemplateName"));
+
+            logger.info("ecConfTemplateName is {}, ecConfTemplateId is {}, startup templateId is {}",
+                    jobProps.get("ecConfTemplateName"), jobProps.get("ecConfTemplateId"),
+                    startupMap.get("ec.conf.templateId"));
+
             logger.info("after remove startup map:{}",startupMap.keySet());
         }
         Map<String, Object> configurationMap = TaskUtils.getMap(paramMapCopy, TaskConstant.PARAMS_CONFIGURATION);

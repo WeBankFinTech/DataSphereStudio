@@ -29,7 +29,6 @@ import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectUserAuthRequest;
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectUserAuthResponse;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
-import com.webank.wedatasphere.dss.common.utils.IoUtils;
 import com.webank.wedatasphere.dss.common.utils.MapUtils;
 import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.contextservice.service.ContextService;
@@ -37,7 +36,6 @@ import com.webank.wedatasphere.dss.framework.common.exception.DSSFrameworkErrorE
 import com.webank.wedatasphere.dss.git.common.protocol.config.GitServerConfig;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitAddMemberRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitRenameRequest;
-import com.webank.wedatasphere.dss.git.common.protocol.request.GitRevertRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitAddMemberResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitCommitResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.util.UrlUtils;
@@ -56,10 +54,8 @@ import com.webank.wedatasphere.dss.orchestrator.publish.utils.OrchestrationDevel
 import com.webank.wedatasphere.dss.orchestrator.server.conf.OrchestratorConf;
 import com.webank.wedatasphere.dss.orchestrator.server.constant.DSSOrchestratorConstant;
 import com.webank.wedatasphere.dss.orchestrator.server.constant.OrchestratorStatusEnum;
-import com.webank.wedatasphere.dss.orchestrator.server.entity.request.ModifyOrchestratorMetaRequest;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorModifyRequest;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorRequest;
-import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorSubmitRequest;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorBaseInfo;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorRollBackGitVo;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorStatusVo;
@@ -755,6 +751,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
     }
 
 
+    @Override
     public List<OrchestratorStatusVo> getOrchestratorGitStatus() {
 
         return OrchestratorStatusEnum.getOrchestratorGitStatus();

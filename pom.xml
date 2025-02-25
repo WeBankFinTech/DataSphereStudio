@@ -214,6 +214,13 @@
                     <artifactId>maven-jar-plugin</artifactId>
                     <version>2.6</version>
                 </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-gpg-plugin</artifactId>
+                    <version>3.0.1</version>
+                </plugin>
+
             </plugins>
         </pluginManagement>
         <plugins>
@@ -227,5 +234,29 @@
             </plugin>
         </plugins>
     </build>
+
+
+    <distributionManagement>
+        <repository>
+            <id>webank-releases</id>
+            <name>webank-releases</name>
+            <url>http://maven.weoa.com/nexus/content/repositories/releases</url>
+        </repository>
+        <snapshotRepository>
+            <id>webank-snapshots</id>
+            <name>webank-snapshots</name>
+            <url>http://maven.weoa.com/nexus/content/repositories/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+
+    <profiles>
+        <profile>
+            <id>product</id>
+            <properties>
+                <project.release.version>1.0.0-SNAPSHOT</project.release.version>
+            </properties>
+        </profile>
+    </profiles>
 
 </project>

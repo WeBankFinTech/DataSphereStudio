@@ -203,7 +203,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.linkis</groupId>
-            <artifactId>linkis-storage-script-dev-server</artifactId>
+            <artifactId>linkis-pes-publicservice</artifactId>
             <version>${linkis.version}</version>
             <exclusions>
                 <exclusion>

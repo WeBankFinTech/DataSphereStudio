@@ -1,5 +1,9 @@
 .idea
 .idea/*
+.metals
+.vscode
+.scalafmt.conf
+.bloop
 
 .DS_Store
 

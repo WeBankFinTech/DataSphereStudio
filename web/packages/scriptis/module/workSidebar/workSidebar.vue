@@ -1077,6 +1077,8 @@ export default {
         separator = '%5Ct';
       } else if (option.separator === '%20') {
         separator = ' ';
+      } else if (option.separator === '|') {
+        separator = '%5C%7C';
       }
       const encoding = type ? '' : option.chartset;
       const fieldDelimiter = type ? '' : separator;
@@ -1127,7 +1129,12 @@ export default {
       if (secondStep.partition && secondStep.partitionValue) {
         isPartition = true;
       }
-      const separator = firstStep.separator === '%20' ? ' ' : firstStep.separator;
+      let separator = firstStep.separator;
+      if (firstStep.separator === '%20') {
+        separator = ' ';
+      } else if (firstStep.separator === '|') {
+        separator = '\\|';
+      }
       if (firstStep.quote) {
         escapeQuotes = true;
         quote = firstStep.quote;

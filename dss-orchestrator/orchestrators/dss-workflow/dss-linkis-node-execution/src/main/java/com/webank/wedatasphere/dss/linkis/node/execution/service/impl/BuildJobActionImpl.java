@@ -25,6 +25,7 @@ import com.webank.wedatasphere.dss.linkis.node.execution.service.BuildJobAction;
 import com.webank.wedatasphere.dss.linkis.node.execution.utils.LinkisJobExecutionUtils;
 import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.linkis.common.conf.CommonVars;
 import org.apache.linkis.manager.label.constant.LabelKeyConstant;
 import org.apache.linkis.manager.label.entity.engine.EngineTypeLabel;
 import org.apache.linkis.manager.label.utils.EngineTypeLabelCreator;
@@ -48,6 +49,9 @@ public class BuildJobActionImpl implements BuildJobAction {
 
     private Logger logger = LoggerFactory.getLogger(BuildJobActionImpl.class);
     private static BuildJobAction buildJobAction = new BuildJobActionImpl();
+    private static final  String  NEBULA = "nebula";
+    private static final CommonVars<String> NEBULA_ENGINE_VERSION =
+            CommonVars.apply("wds.linkis.nebula.engine.version", "3.0.0");
 
     private BuildJobActionImpl() {
 
@@ -132,6 +136,10 @@ public class BuildJobActionImpl implements BuildJobAction {
         String code = parseExecutionCodeFor1X(job);
 
         EngineTypeLabel engineTypeLabel = EngineTypeLabelCreator.createEngineTypeLabel(parseAppConnEngineType(job.getEngineType(), job));
+        //TODO 升级linkis1.7.0版本之后，这段特殊的硬编码逻辑要去掉
+        if(NEBULA.equalsIgnoreCase( engineTypeLabel.getEngineType())){
+            engineTypeLabel.setVersion(NEBULA_ENGINE_VERSION.getValue());
+        }
 
         labels.put(LabelKeyConstant.ENGINE_TYPE_KEY, engineTypeLabel.getStringValue());
         labels.put(LabelKeyConstant.USER_CREATOR_TYPE_KEY, job.getUser() + "-" + LINKIS_JOB_CREATOR_1_X.getValue(job.getJobProps()));
@@ -139,7 +147,7 @@ public class BuildJobActionImpl implements BuildJobAction {
 
 
         //是否复用引擎，不复用就为空
-        if(!isReuseEngine(job.getParams())){
+        if(!isAppconnJob(job) && !isReuseEngine(job.getParams())){
             labels.put("executeOnce", "");
         }
         Map<String, Object> paramMapCopy = (HashMap<String, Object>) SerializationUtils.clone(new HashMap<String, Object>(job.getParams()));
@@ -190,6 +198,13 @@ public class BuildJobActionImpl implements BuildJobAction {
     }
 
     /**
+     * 是否为appconnjob
+     */
+    private boolean isAppconnJob(Job job){
+        return APPCONN.equals(job.getEngineType());
+    }
+
+    /**
      * spark自定义参数配置输入，例如spark.sql.shuffle.partitions=10。多个参数使用分号分隔。
      *
      * 如果节点指定了参数模板，则需要把节点内与模板相同的参数取消掉，保证模板优先级高于节点参数
@@ -210,6 +225,8 @@ public class BuildJobActionImpl implements BuildJobAction {
             startupMap.remove("spark.executor.instances");
             startupMap.remove("wds.linkis.engineconn.java.driver.memory");
             startupMap.remove("spark.conf");
+            startupMap.remove("mapreduce.job.running.map.limit");
+            startupMap.remove("mapreduce.job.running.reduce.limit");
             logger.info("after remove startup map:{}",startupMap.keySet());
         }
         Map<String, Object> configurationMap = TaskUtils.getMap(paramMapCopy, TaskConstant.PARAMS_CONFIGURATION);

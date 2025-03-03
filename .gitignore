@@ -101,6 +101,9 @@ dss-apps/dss-data-governance/dss-data-warehouse-dao/target
 dss-apps/dss-data-governance/dss-data-warehouse-service/target
 dss-apps/dss-data-governance/dss-data-warehouse-server/target
 
+#dss-git
+dss-git/dss-git-common/target
+dss-git/dss-git-server/target
 
 # plugins
 plugins/azkaban/linkis-jobtype/target

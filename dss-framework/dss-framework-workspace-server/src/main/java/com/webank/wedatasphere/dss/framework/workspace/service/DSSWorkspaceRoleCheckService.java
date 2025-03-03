@@ -14,4 +14,7 @@ public interface DSSWorkspaceRoleCheckService {
      */
     boolean checkRolesOperation(int workspaceId, String loginUser, String username, List<Integer> roles);
 
+
+    boolean checkUserRolesOperation(String username,List<Integer> roles);
+
 }

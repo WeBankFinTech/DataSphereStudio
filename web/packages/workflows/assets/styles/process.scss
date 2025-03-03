@@ -91,6 +91,7 @@
       }
       &.active {
         margin-top: -1px;
+        max-width: none;
         &:before {
           content: "";
           position: absolute;

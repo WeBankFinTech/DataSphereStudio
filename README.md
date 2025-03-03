@@ -168,7 +168,7 @@ English | [中文](README-ZH.md)
 
  &nbsp; &nbsp; &nbsp; &nbsp;You can scan the QR code below to join our WeChat to get more immediate response.
 
-![communication](images/en_US/readme/communication.png)
+![communication](images/en_US/readme/communication.jpg)
 
 ## Who is using DSS
 

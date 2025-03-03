@@ -62,12 +62,10 @@ public interface DSSProjectUserService {
      *            the db project
      * @param projectModifyRequest
      *            the project modify request
-     * @param loginuser
-     *            the loginuser
      * @throws Exception
      *             the exception
      */
-    void modifyProjectUser(DSSProjectDO dbProject, ProjectModifyRequest projectModifyRequest, String loginuser,Workspace workspace)throws Exception;
+    void modifyProjectUser(DSSProjectDO dbProject, ProjectModifyRequest projectModifyRequest);
 
 
     List<DSSProjectUser> getListByParam(Long workspaceId, String username);

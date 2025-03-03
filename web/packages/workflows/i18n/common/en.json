@@ -204,6 +204,7 @@
         "publish": "Publish",
         "mapMOdel": "Map",
         "stop": "Stop",
+        "submitgit": "Submit",
         "GZLKF": "Workflow",
         "params": "Parameter",
         "resource": "Resource",
@@ -379,6 +380,7 @@
           "WJYCZ": "Duplicated file, please choose another file or directory!",
           "WJMCBHF": "Invalid file name. Only alphanumeric characters, Chinese characters, underscore, hyphen are allowed with suffix followed!",
           "SCBCG100": "Files to upload cannot exceed 100M!",
+          "SCBCG200": "Files to upload cannot exceed 200M!",
           "SCCG": "Successfully uploaded file {name}!",
           "WJCCXE": "File size exceeds limit!",
           "WJBSC": "Successfully deleted resource file {name}!"
@@ -407,6 +409,7 @@
       "publish": {
         "desc": "Publish description:",
         "inputDesc": "Please enter publish description",
+        "submitDesc": "Please enter commit message",
         "error": "Failed to publish orchestrator {name}",
         "success": "Successfully published orchestrator {name}",
         "failed": "Failed to publish with error",
@@ -453,6 +456,8 @@
       "importflow": "Import workflow",
       "Nopermission": "No ops permission",
       "Configuration": "Configuration",
+      "Find": "Find",
+      "viewgit": "View Git",
       "Delete": "Delete",
       "Copy": "Copy",
       "Show": "Show version",

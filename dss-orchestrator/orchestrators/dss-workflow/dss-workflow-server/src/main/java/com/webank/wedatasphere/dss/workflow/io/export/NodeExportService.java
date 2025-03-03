@@ -25,4 +25,6 @@ import java.util.List;
 public interface NodeExportService {
     void downloadNodeResourceToLocal(String userName, DSSNode dwsNode, String savePath);
     void downloadAppConnResourceToLocal(String userName, Long projectId, String projectName, DSSNode dwsNode, String savePath, Workspace workspace, List<DSSLabel> dssLabels) throws Exception;
+    void downloadNodeResourceToLocalNew(String userName, DSSNode dwsNode, String flowCodePath);
+    void downloadAppConnResourceToLocalNew(String userName, Long projectId, String projectName, DSSNode dwsNode, String flowCodePath, Workspace workspace, List<DSSLabel> dssLabels) throws Exception;
 }

@@ -61,7 +61,9 @@
         last_update_time,
         last_update_user,
         workspace_type,
-        admin_permission
+        admin_permission,
+        enabled_flow_keywords_check as enabledFlowKeywordsCheck,
+        is_default_reference as isDefaultReference
         FROM
         dss_workspace WHERE id = #{workspaceId}
     </select>

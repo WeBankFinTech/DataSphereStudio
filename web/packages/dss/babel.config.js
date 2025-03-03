@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-const plugins = [];
+const plugins = ["@babel/plugin-proposal-class-properties", "@babel/plugin-transform-modules-commonjs"];
 // 开发环境下process.env.NODE_ENV === development
 if (['production', 'prod'].includes(process.env.NODE_ENV)) {
   plugins.push("transform-remove-console")

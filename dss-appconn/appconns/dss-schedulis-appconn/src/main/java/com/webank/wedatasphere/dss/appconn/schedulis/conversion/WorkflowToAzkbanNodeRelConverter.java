@@ -20,6 +20,7 @@ import com.google.gson.Gson;
 import com.webank.wedatasphere.dss.appconn.schedulis.constant.AzkabanConstant;
 import com.webank.wedatasphere.dss.appconn.schedulis.entity.AzkabanWorkflow;
 import com.webank.wedatasphere.dss.appconn.schedulis.linkisjob.LinkisJobConverter;
+import com.webank.wedatasphere.dss.appconn.schedulis.linkisjob.WTSSJobConverter;
 import com.webank.wedatasphere.dss.common.entity.Resource;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.utils.ClassUtils;
@@ -78,6 +79,11 @@ public class WorkflowToAzkbanNodeRelConverter implements WorkflowToRelConverter 
             FileUtils.forceMkdir(jobDirFile);
             File jobFile = new File(storePath,workflowNode.getName() + AzkabanConstant.AZKABAN_JOB_SUFFIX);
             jobFile.createNewFile();
+            if(workflowNode.getNodeType()!=null && workflowNode.getNodeType().startsWith(AzkabanConstant.WTSS_PREFIX)){
+                nodeConverter = ClassUtils.getInstanceOrDefault(NodeConverter.class, new WTSSJobConverter());
+            }else{
+                nodeConverter = ClassUtils.getInstanceOrDefault(NodeConverter.class, new LinkisJobConverter());
+            }
             String nodeString = nodeConverter.conversion(workflowNode);
             os = FileUtils.openOutputStream(jobFile,true);
             os.write(nodeString.getBytes());

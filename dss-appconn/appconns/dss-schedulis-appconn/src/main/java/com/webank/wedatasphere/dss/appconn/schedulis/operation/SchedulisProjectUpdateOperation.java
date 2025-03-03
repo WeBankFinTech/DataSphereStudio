@@ -43,9 +43,9 @@ public class SchedulisProjectUpdateOperation
 
     @Override
     public ResponseRef updateProject(ProjectUpdateRequestRef.ProjectUpdateRequestRefImpl projectRef) {
-        if (CollectionUtils.isNotEmpty(projectRef.getDSSProjectPrivilege().getReleaseUsers())) {
-            // 先校验运维用户是否存在于 Schedulis，如果不存在，则不能成功创建工程。
-            projectRef.getDSSProjectPrivilege().getReleaseUsers().forEach(releaseUser -> {
+        if (CollectionUtils.isNotEmpty(projectRef.getAddedDSSProjectPrivilege().getReleaseUsers())) {
+            // 先校验新增的运维用户是否存在于 Schedulis，如果不存在，则不能成功创建工程。
+            projectRef.getAddedDSSProjectPrivilege().getReleaseUsers().forEach(releaseUser -> {
                 if (!AzkabanUserService.containsUser(releaseUser, getBaseUrl(), ssoRequestOperation, projectRef.getWorkspace())) {
                     throw new ExternalOperationFailedException(100323, "当前设置的发布用户: " + releaseUser + ", 在 Schedulis 系统中不存在，请在Schedulis中创建该用户！");
                 }

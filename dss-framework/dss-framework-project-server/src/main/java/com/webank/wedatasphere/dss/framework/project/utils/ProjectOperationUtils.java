@@ -15,6 +15,8 @@ import com.webank.wedatasphere.dss.standard.app.structure.utils.StructureOperati
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.function.*;
 
@@ -24,6 +26,7 @@ import java.util.function.*;
  * @since 0.5.0
  */
 public class ProjectOperationUtils {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProjectOperationUtils.class);
 
     public static  <K extends StructureRequestRef, V extends ResponseRef> void tryProjectOperation(BiPredicate<AppConn, AppInstance> isTryOperation, Workspace workspace,
                                                                                             Function<ProjectService, StructureOperation> getProjectOperation,
@@ -45,6 +48,7 @@ public class ProjectOperationUtils {
             StructureIntegrationStandard structureStandard = ((OnlyStructureAppConn) appConn).getOrCreateStructureStandard();
             appConn.getAppDesc().getAppInstances().forEach(appInstance -> {
                 if(isTryOperation == null || isTryOperation.test(appConn, appInstance)) {
+                    long startTime = System.currentTimeMillis();
                     V responseRef = StructureOperationUtils.tryProjectOperation(() -> structureStandard.getProjectService(appInstance),
                             getProjectOperation,
                             dssProjectContentRequestRefConsumer,
@@ -56,6 +60,9 @@ public class ProjectOperationUtils {
                     if(dealResponseRefConsumer != null) {
                         dealResponseRefConsumer.accept(new ImmutablePair<>(appConn, appInstance), responseRef);
                     }
+                    long endTime = System.currentTimeMillis();
+                    String url =""+ appInstance.getBaseUrl() + appInstance.getHomepageUri();
+                    LOGGER.info("try project operation cost info.cost:{}ms url:{}", (endTime - startTime), url);
                 }
             });
         });

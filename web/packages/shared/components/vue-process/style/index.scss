@@ -627,6 +627,10 @@
      z-index: 999;
      display: none;
    }
+   .node-disabled {
+      background-color: #fafafa;
+      color: #cfd0d3;
+   }
    .node-selected {
      // box-shadow: 0 0 8px #3399ff;
      // background-color: rgba(0, 0, 0, .2) !important;

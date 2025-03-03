@@ -19,6 +19,7 @@ import { isEmpty } from 'lodash';
 import { getHiveList, getReturnList, getFormatProposalsList } from '../util';
 import storage from '@dataspherestudio/shared/common/helper/storage';
 
+
 const pyKeywordInfoProposals = [
   {
     label: 'False',

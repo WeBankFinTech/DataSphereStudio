@@ -16,6 +16,7 @@
 
 package com.webank.wedatasphere.dss.orchestrator.server.conf;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.webank.wedatasphere.dss.common.service.BMLService;
 import com.webank.wedatasphere.dss.contextservice.service.ContextService;
 import com.webank.wedatasphere.dss.contextservice.service.impl.ContextServiceImpl;
@@ -42,9 +43,9 @@ public class OrchestratorSpringConf {
     }
 
     @Bean
-    public ScheduledThreadPoolExecutor scheduledExecutorService() {
-        ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(3);
-        return executor;
+    public ScheduledThreadPoolExecutor dssDefaultScheduledExecutor() {
+        return new ScheduledThreadPoolExecutor(30,
+                new ThreadFactoryBuilder().setNameFormat("Dss-Default-Spring-Scheduler-Thread-%d").build());
     }
 
     @Bean

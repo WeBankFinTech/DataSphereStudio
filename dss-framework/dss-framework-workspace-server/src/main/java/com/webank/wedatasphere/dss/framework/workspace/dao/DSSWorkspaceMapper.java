@@ -36,6 +36,8 @@ public interface DSSWorkspaceMapper {
             @Result(property = "createTime", column = "create_time"),
             @Result(property = "lastUpdateTime", column = "last_update_time"),
             @Result(property = "lastUpdateUser", column = "last_update_user"),
+            @Result(property = "enabledFlowKeywordsCheck",column = "enabled_flow_keywords_check"),
+            @Result(property = "isDefaultReference",column = "is_default_reference")
     })
     DSSWorkspace getWorkspace(@Param("workspaceId") int workspaceId);
 
@@ -79,4 +81,9 @@ public interface DSSWorkspaceMapper {
 
     @Select("select * from dss_workspace_associate_departments")
     List<DSSWorkspaceAssociateDepartments> getWorkspaceAssociateDepartments();
+
+
+    void updateWorkSpace(DSSWorkspace dssWorkspace);
+
+    void updateWorkspaceInfo(DSSWorkspace dssWorkspace);
 }

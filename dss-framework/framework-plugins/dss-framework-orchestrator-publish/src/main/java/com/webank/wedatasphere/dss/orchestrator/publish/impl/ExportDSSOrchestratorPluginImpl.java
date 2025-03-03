@@ -64,6 +64,7 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
+import static com.webank.wedatasphere.dss.common.utils.ZipHelper.unzip;
 import static com.webank.wedatasphere.dss.common.utils.ZipHelper.zip;
 
 
@@ -88,6 +89,88 @@ public class ExportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
     AddOrchestratorVersionHook addOrchestratorVersionHook;
 
     @Override
+    public OrchestratorExportResult exportOrchestratorNew(String userName, Long orchestratorId, Long orcVersionId, String projectName,
+                                                          List<DSSLabel> dssLabels, boolean addOrcVersion, Workspace workspace) throws DSSErrorException {
+        //1、导出info信息
+        if (orcVersionId == null || orcVersionId < 0){
+            LOGGER.info("orchestratorVersionId is {}.", orcVersionId);
+            //最简单的就是通过orcId来找到最新的versionId
+            orcVersionId = orchestratorMapper.findLatestOrcVersionId(orchestratorId);
+        }
+        DSSOrchestratorVersion dssOrchestratorVersion = orchestratorMapper.getOrchestratorVersion(orcVersionId);
+        DSSOrchestratorInfo dssOrchestratorInfo = orchestratorMapper.getOrchestrator(dssOrchestratorVersion.getOrchestratorId());
+        String orcName = dssOrchestratorInfo.getName();
+        if (dssOrchestratorInfo != null) {
+
+            LOGGER.info("{} 开始导出Orchestrator: {} 版本ID为: {}.", userName, dssOrchestratorInfo.getName(), orcVersionId);
+
+            //2、导出第三方应用信息，如工作流、Visualis、Qualitis
+            DSSOrchestrator dssOrchestrator = orchestratorManager.getOrCreateOrchestrator(userName, workspace.getWorkspaceName(), dssOrchestratorInfo.getType(),
+                    dssLabels);
+            //定义操作结果处理器
+            BiFunction<DevelopmentOperation, DevelopmentRequestRef, ExportResponseRef> responseRefConsumer = (developmentOperation, developmentRequestRef) -> {
+                RefJobContentRequestRef requestRef = (RefJobContentRequestRef) developmentRequestRef;
+                requestRef.setRefJobContent(MapUtils.newCommonMap(OrchestratorRefConstant.ORCHESTRATION_ID_KEY, dssOrchestratorVersion.getAppId()));
+                return ((RefExportOperation) developmentOperation).exportRef(requestRef);
+            };
+            //定义项目相关的处理器，处着编排的RequestRef的项目相关信息
+            Consumer<ProjectRefRequestRef> projectRefRequestRefConsumer = projectRefRequestRef -> projectRefRequestRef.setProjectName(projectName).setRefProjectId(dssOrchestratorVersion.getProjectId());
+
+            ExportResponseRef responseRef = OrchestrationDevelopmentOperationUtils.tryOrchestrationOperation(
+                    dssOrchestratorInfo,
+                    dssOrchestrator,
+                    userName,
+                    workspace,
+                    dssLabels,
+                    //指明DevelopmentService是RefExportService
+                    DevelopmentIntegrationStandard::getRefExportService,
+                    //指明operation是ExportOperation
+                    developmentService -> ((RefExportService) developmentService).getRefExportOperation(),
+                    null,
+                    projectRefRequestRefConsumer,
+                    responseRefConsumer,
+                    "export");
+            // /appcom/tmp/dss/yyyyMMddHHmmssSSS/arionliu
+            String tmpPath = IoUtils.generateTempIOPath(userName);
+            // /appcom/tmp/dss/yyyyMMddHHmmssSSS/arionliu/projectxxx.zip
+            String flowZipPath = IoUtils.addFileSeparator(tmpPath, projectName + ".zip");
+
+            String resourceId = (String) responseRef.getResourceMap().get(ImportRequestRef.RESOURCE_ID_KEY);
+            String version = (String) responseRef.getResourceMap().get(ImportRequestRef.RESOURCE_VERSION_KEY);
+            bmlService.downloadToLocalPath(userName, resourceId, version, flowZipPath);
+            // /appcom/tmp/dss/yyyyMMddHHmmssSSS/arionliu/projectxxx
+            String projectPath = unzip(flowZipPath,true);
+            // /appcom/tmp/dss/yyyyMMddHHmmssSSS/arionliu/projectxxx/.flowmeta/flow_all_type_node/
+            String flowMetaPath = IoUtils.generateFlowMetaIOPath(projectPath, orcName);
+
+            try {
+                metaExportService.exportNew(dssOrchestratorInfo, flowMetaPath);
+            } catch (IOException e) {
+                LOGGER.error("Failed to export metaInfo in orchestrator server for orc({}) in version {}.", orchestratorId, orcVersionId, e);
+                DSSExceptionUtils.dealErrorException(60099, "Failed to export metaInfo in orchestrator server.", e, DSSOrchestratorErrorException.class);
+            }
+
+            //打包导出工程
+            String exportPath = zip(projectPath);
+
+            //3、打包新的zip包上传BML
+            InputStream inputStream = bmlService.readLocalResourceFile(userName, exportPath);
+            BmlResource uploadResult = bmlService.upload(userName, inputStream,
+                    dssOrchestratorInfo.getName() + ".OrcExport", projectName);
+
+            //4、判断导出后是否改变Orc的版本
+            if (addOrcVersion) {
+                orcVersionId = orchestratorVersionIncrease(dssOrchestratorInfo.getId(),
+                        userName, dssOrchestratorInfo.getComment(),
+                        workspace, dssOrchestratorInfo, projectName, dssLabels);
+            }
+            return new OrchestratorExportResult(uploadResult,String.valueOf(orcVersionId));
+            //4、返回BML存储信息
+        } else {
+            throw new DSSErrorException(90038, "该Orchestrator的版本号不存在，请检查版本号是否正确.");
+        }
+    }
+    @Override
     public OrchestratorExportResult exportOrchestrator(String userName, Long orchestratorId, Long orcVersionId, String projectName,
                                                        List<DSSLabel> dssLabels, boolean addOrcVersion, Workspace workspace) throws DSSErrorException {
         //1、导出info信息
@@ -99,6 +182,7 @@ public class ExportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
         DSSOrchestratorVersion dssOrchestratorVersion = orchestratorMapper.getOrchestratorVersion(orcVersionId);
         DSSOrchestratorInfo dssOrchestratorInfo = orchestratorMapper.getOrchestrator(dssOrchestratorVersion.getOrchestratorId());
         if (dssOrchestratorInfo != null) {
+            // /appcom/tmp/dss/yyyyMMddHHmmssSSS/arionliu/default_orc/
             String orcExportSaveBasePath = IoUtils.generateIOPath(userName, DEFAULT_ORC_NAME, "");
             try {
                 Files.createDirectories(Paths.get(orcExportSaveBasePath).toAbsolutePath().normalize());

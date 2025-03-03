@@ -16,9 +16,12 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.util;
 
+import cn.hutool.crypto.digest.DigestUtil;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
+import com.webank.wedatasphere.dss.framework.workspace.constant.ApplicationConf;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,6 +58,16 @@ public class WorkspaceUtils {
         if (workspace.getWorkspaceId() != workspaceId) {
             throw new DSSErrorException(80001, "请求参数的workspaceId和cookie中的workspaceId不一致，请切换至正确的workspace再操作。");
         }
+    }
+
+
+    // 鉴权方法
+    public static boolean validateAuth(String timestamp, String sign) {
+        // 计算签名
+        String calculatedSign = DigestUtil.sha256Hex(ApplicationConf.ITSM_SECRETKEY.getValue() + timestamp);
+
+        // 检查签名是否匹配，并且检查timestamp是否在5分钟内
+        return StringUtils.equals(calculatedSign, sign) && System.currentTimeMillis() - Long.parseLong(timestamp) <= 5 * 60 * 1000;
     }
 
 }

@@ -63,6 +63,7 @@
         @copy="copyProject"
         @addProject="addProject"
         @delete="deleteProject"
+        @gotoGit="gotoGit"
       ></project-content-item>
     </template>
     <ProjectForm
@@ -125,7 +126,6 @@
 <script>
 import ProjectForm from '@dataspherestudio/shared/components/projectForm/index.js'
 import copyForm from './module/copyForm.vue'
-import resource from './module/resource.vue'
 import storage from '@dataspherestudio/shared/common/helper/storage'
 import api from '@dataspherestudio/shared/common/service/api'
 import projectContentItem from './module/projectItem.vue'
@@ -142,7 +142,6 @@ export default {
     projectContentItem,
     ProjectForm,
     copyForm,
-    resource
   },
   data() {
     return {
@@ -160,7 +159,10 @@ export default {
         editUsers: [],
         accessUsers: [],
         releaseUsers: [],
-        devProcessList: []
+        devProcessList: [],
+        associateGit: false,
+        gitUser: '',
+        gitToken: ''
       },
       dataList: [
         {
@@ -174,8 +176,6 @@ export default {
       commonTitle: '',
       precentList: [],
       sortType: {},
-      showResourceView: false, // 是否展示资源文件上传
-      projectResources: [], // 工程级别资源文件
 
       // 个人工作流工程版本
       projectVersionId: '',
@@ -215,6 +215,7 @@ export default {
     // 当切换工作空间之后，重新获取数据
     '$route.query.workspaceId'() {
       this.viewState = 'owner'
+      this.searchTxt = ''
     }
   },
   created() {
@@ -374,7 +375,11 @@ export default {
           product: projectData.product,
           workspaceId: projectData.workspaceId,
           devProcessList: projectData.devProcessList,
-          orchestratorModeList: projectData.orchestratorModeList
+          orchestratorModeList: projectData.orchestratorModeList,
+          associateGit: projectData.associateGit,
+          dataSourceList: projectData.dataSourceList,
+          gitUser: projectData.gitUser,
+          gitToken:  projectData.gitToken
         }
         api
           .fetch(
@@ -470,7 +475,11 @@ export default {
         editUsers: [],
         accessUsers: [],
         releaseUsers: [],
-        devProcessList: []
+        devProcessList: [],
+        createBy: this.getUserName(),
+        associateGit: false,
+        gitUser: '',
+        gitToken: ''
       }
     },
     // 修改工程
@@ -549,9 +558,23 @@ export default {
     copyProject(classifyId, project) {
       this.init()
       this.currentForm = 'copyForm'
-      this.currentProjectData = project
+      this.currentProjectData = { ...project };
       this.commonTitle = this.$t('message.common.projectDetail.projectCopy')
       this.projectModelShow = true
+    },
+    async gotoGit(data) {
+      const workspaceData = storage.get("currentWorkspace");
+      try {
+        let res = await api.fetch(`${this.$API_PATH.ORCHESTRATOR_PATH}gitUrl`, {
+          projectName: data.name,
+          workspaceName: workspaceData.name,
+        }, 'get');
+        if (res && res.gitUrl) {
+          window.open(res.gitUrl, '_blank');
+        }
+      } catch (error) {
+        //
+      }
     },
     projectExport(classifyId, project) {
       this.init()
@@ -669,33 +692,13 @@ export default {
         if (!id || id === item.id) {
           item.dwsProjectList = item.dwsProjectList.sort((a, b) => {
             if (name === 'updateTime') {
-              return b[name] - a[name]
+              return new Date(b[name]) - new Date(a[name])
             } else {
               return this.charCompare(a[name], b[name])
             }
           })
         }
         return item
-      })
-    },
-    // 展示资源上传组件
-    showResourceViewAction(classifyId, project) {
-      this.showResourceView = true
-      /**
-       * 待确认问题
-       * 1.资源文件上传后存储位置
-       * 2.已上传的如何获取
-       */
-      this.projectResources = project.projectResources = []
-    },
-    // 资源上传后的回调
-    updateResources(res) {
-      this.projectResources = res.map(item => {
-        return {
-          fileName: item.fileName,
-          resourceId: item.resourceId,
-          version: item.version
-        }
       })
     },
     gotoScriptis() {

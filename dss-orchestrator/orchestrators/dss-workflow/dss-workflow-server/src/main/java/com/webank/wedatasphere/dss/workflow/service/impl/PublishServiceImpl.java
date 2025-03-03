@@ -18,31 +18,49 @@ package com.webank.wedatasphere.dss.workflow.service.impl;
 
 import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
 import com.webank.wedatasphere.dss.appconn.scheduler.SchedulerAppConn;
+import com.webank.wedatasphere.dss.common.auditlog.OperateTypeEnum;
+import com.webank.wedatasphere.dss.common.auditlog.TargetTypeEnum;
+import com.webank.wedatasphere.dss.common.constant.project.ProjectUserPrivEnum;
 import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
+import com.webank.wedatasphere.dss.common.label.DSSLabel;
+import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectInfoRequest;
+import com.webank.wedatasphere.dss.common.protocol.project.ProjectUserAuthRequest;
+import com.webank.wedatasphere.dss.common.protocol.project.ProjectUserAuthResponse;
+import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
-import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestFrameworkConvertOrchestration;
-import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestFrameworkConvertOrchestrationStatus;
-import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseConvertOrchestrator;
+import com.webank.wedatasphere.dss.git.common.protocol.request.GitCurrentCommitRequest;
+import com.webank.wedatasphere.dss.git.common.protocol.response.GitCommitResponse;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.*;
+import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConstant;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.common.parser.WorkFlowParser;
 import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
+import com.webank.wedatasphere.dss.workflow.dao.LockMapper;
+import com.webank.wedatasphere.dss.workflow.entity.DSSFlowEditLock;
+import com.webank.wedatasphere.dss.workflow.entity.request.BatchPublishWorkflowRequest;
+import com.webank.wedatasphere.dss.workflow.lock.DSSFlowEditLockManager;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
 import com.webank.wedatasphere.dss.workflow.service.PublishService;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.linkis.rpc.Sender;
+import org.apache.linkis.server.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
-import static com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant.DEFAULT_SCHEDULER_APP_CONN;
+import static com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant.*;
 
 public class PublishServiceImpl implements PublishService {
 
@@ -50,6 +68,10 @@ public class PublishServiceImpl implements PublishService {
     private DSSFlowService dssFlowService;
     @Autowired
     private WorkFlowParser workFlowParser;
+    @Autowired
+    private LockMapper lockMapper;
+    @Autowired
+    private DSSFlowService flowService;
 
     public void setDssFlowService(DSSFlowService dssFlowService) {
         this.dssFlowService = dssFlowService;
@@ -73,17 +95,9 @@ public class PublishServiceImpl implements PublishService {
         //2.进行提交
         DSSFlow dssFlow = null;
         try {
-            dssFlow = dssFlowService.getFlow(workflowId);
-            if (dssFlow == null) {
-                DSSExceptionUtils.dealErrorException(63325, "workflow " + workflowId + " is not exists.", DSSErrorException.class);
-                return null;
-            }
-            ProjectInfoRequest projectInfoRequest = new ProjectInfoRequest();
-            projectInfoRequest.setProjectId(dssFlow.getProjectId());
-            DSSProject dssProject = (DSSProject) DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender().ask(projectInfoRequest);
-            if (dssProject.getWorkspaceId() != workspace.getWorkspaceId()) {
-                DSSExceptionUtils.dealErrorException(63335, "工作流所在工作空间和cookie中不一致，请刷新页面后，再次发布！", DSSErrorException.class);
-            }
+            LOGGER.info("trace workflow publish,flowId:{}. start submit publish",workflowId);
+            dssFlow = checkFlowBeforeSubmit(workflowId, convertUser, workspace);
+            LOGGER.info("trace workflow publish,flowId:{}. 发布前校验完成",workflowId);
             String schedulerAppConnName = workFlowParser.getValueWithKey(dssFlow.getFlowJson(), DSSWorkFlowConstant.SCHEDULER_APP_CONN_NAME);
             if (StringUtils.isBlank(schedulerAppConnName)) {
                 // 向下兼容老版本
@@ -93,10 +107,11 @@ public class PublishServiceImpl implements PublishService {
             // 只是为了获取是否需要发布所有Orc，这里直接拿第一个AppInstance即可。
             AppInstance appInstance = schedulerAppConn.getAppDesc().getAppInstances().get(0);
             ResponseConvertOrchestrator response = requestConvertOrchestration(comment, workflowId, convertUser,
-                    workspace, schedulerAppConn, dssLabel, appInstance);
+                    workspace, schedulerAppConn, dssLabel, appInstance, null);
             if (response.getResponse().isFailed()) {
                 throw new DSSErrorException(50311, response.getResponse().getMessage());
             }
+
             return response.getId();
         } catch (DSSErrorException e) {
             throw e;
@@ -108,13 +123,126 @@ public class PublishServiceImpl implements PublishService {
         return null;
     }
 
+    private DSSFlow checkFlowBeforeSubmit(Long workflowId, String convertUser, Workspace workspace) throws Exception{
+        DSSFlow dssFlow = dssFlowService.getFlow(workflowId);
+        if (dssFlow == null) {
+            DSSExceptionUtils.dealErrorException(63325, "workflow " + workflowId + " is not exists.", DSSErrorException.class);
+            return null;
+        }
+        LOGGER.info("User {} begins to convert workflow {}.", convertUser, dssFlow.getName());
+        Long projectId = dssFlow.getProjectId();
+        ProjectInfoRequest projectInfoRequest = new ProjectInfoRequest();
+        projectInfoRequest.setProjectId(projectId);
+        // 校验发布权限
+        ProjectUserAuthResponse projectUserAuthResponse = RpcAskUtils.processAskException(DSSSenderServiceFactory.getOrCreateServiceInstance()
+                        .getProjectServerSender().ask(new ProjectUserAuthRequest(projectId, convertUser)),
+                ProjectUserAuthResponse.class, ProjectUserAuthRequest.class);
+        boolean isReleasable = false;
+        if (!CollectionUtils.isEmpty(projectUserAuthResponse.getPrivList())) {
+            isReleasable = projectUserAuthResponse.getPrivList().contains(ProjectUserPrivEnum.PRIV_RELEASE.getRank());
+        }
+        isReleasable = isReleasable || projectUserAuthResponse.getProjectOwner().equals(convertUser);
+
+
+
+        DSSProject dssProject = (DSSProject) DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender().ask(projectInfoRequest);
+        if (!isReleasable) {
+            throw new DSSErrorException(800001, "用户" + convertUser + "没有项目" + dssProject.getName() + "发布权限，请检查后重新发布");
+        }
+
+        if (dssProject.getWorkspaceId() != workspace.getWorkspaceId()) {
+            DSSExceptionUtils.dealErrorException(63335, "工作流所在工作空间和cookie中不一致，请刷新页面后，再次发布！", DSSErrorException.class);
+        }
+        //仅对接入Git的项目更新状态为 发布-publish
+        GitCommitResponse gitCommitResponse = null;
+        OrchestratorVo orchestratorVo = null;
+        Long orchestratorId = null;
+        if (dssProject.getAssociateGit() != null && dssProject.getAssociateGit()) {
+            orchestratorVo = RpcAskUtils.processAskException(getOrchestratorSender().ask(new RequestQuertByAppIdOrchestrator(workflowId)),
+                    OrchestratorVo.class, RequestQueryByIdOrchestrator.class);
+            if (orchestratorVo == null) {
+                throw new DSSErrorException(800001, "编排不存在");
+            }
+            orchestratorId = orchestratorVo.getDssOrchestratorInfo().getId();
+            String status = lockMapper.selectOrchestratorStatus(orchestratorId);
+            if (OrchestratorRefConstant.FLOW_STATUS_SAVE.equals(status)) {
+                throw new DSSErrorException(800001, "发布前请先提交工作流");
+            }
+
+            try {
+                // 获取当前文件Commit
+                Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
+                GitCurrentCommitRequest currentCommitRequest = new GitCurrentCommitRequest(workspace.getWorkspaceId(), dssProject.getName(), convertUser, dssFlow.getName());
+                gitCommitResponse = RpcAskUtils.processAskException(sender.ask(currentCommitRequest), GitCommitResponse.class, GitCurrentCommitRequest.class);
+                // 更新commitId
+                lockMapper.updateOrchestratorVersionCommitId(gitCommitResponse.getCommitId(), orchestratorId);
+                // 更新工作流状态
+                lockMapper.updateOrchestratorStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_PUBLISH);
+            } catch (Exception e) {
+                throw new DSSErrorException(800001, "获取工作流CommitId失败，请检查工作流是否为空或git服务是否异常");
+            }
+        }
+        return dssFlow;
+    }
+
+    @Override
+    public void batchPublish(BatchPublishWorkflowRequest publishWorkflowRequest, Workspace workspace, String convertUser, Map<String, Object> dssLabel) throws Exception{
+        List<Long> orcIds = publishWorkflowRequest.getOrchestratorList();
+        String labelStr = publishWorkflowRequest.getLabels().getRoute();
+        Map<String, Object> labels = new HashMap<>();
+        labels.put(EnvDSSLabel.DSS_ENV_LABEL_KEY, labelStr);
+        String comment = publishWorkflowRequest.getComment();
+
+        List<DSSLabel> dssLabelList = Arrays.asList(new EnvDSSLabel(labelStr));
+        Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getOrcSender(dssLabelList);
+        RequestQueryOrchestrator queryRequest = new RequestQueryOrchestrator(orcIds);
+        List<Long> workflowIdList = new ArrayList<>();
+
+
+        try {
+            ResponseQueryOrchestrator queryResponse = RpcAskUtils.processAskException(sender.ask(queryRequest), ResponseQueryOrchestrator.class, RequestQueryOrchestrator.class);
+            if (queryResponse == null) {
+                LOGGER.error("query response is null, it is a fatal error");
+                throw new DSSErrorException(80001, "查询编排失败，请确认编排是否存在") ;
+            }
+            Set<DSSOrchestratorVersion> orchestratorVersions = queryResponse.getOrchestratorVoes().stream().map(OrchestratorVo::getDssOrchestratorVersion).collect(Collectors.toSet());
+            workflowIdList = orchestratorVersions.stream().map(DSSOrchestratorVersion::getAppId).collect(Collectors.toList());
+        } catch (Exception e) {
+            DSSExceptionUtils.dealErrorException(60015, "query orchestrator ref failed",
+                    DSSErrorException.class);
+        }
+
+        List<DSSFlow> dssFlowList = new ArrayList<>();
+        for (Long flowId : workflowIdList) {
+            DSSFlow dssFlow = checkFlowBeforeSubmit(flowId, convertUser, workspace);
+            dssFlowList.add(dssFlow);
+        }
+
+        String schedulerAppConnName = workFlowParser.getValueWithKey(dssFlowList.get(0).getFlowJson(), DSSWorkFlowConstant.SCHEDULER_APP_CONN_NAME);
+        if (StringUtils.isBlank(schedulerAppConnName)) {
+            // 向下兼容老版本
+            schedulerAppConnName = DEFAULT_SCHEDULER_APP_CONN.getValue();
+        }
+        SchedulerAppConn schedulerAppConn = (SchedulerAppConn) AppConnManager.getAppConnManager().getAppConn(schedulerAppConnName);
+        // 只是为了获取是否需要发布所有Orc，这里直接拿第一个AppInstance即可。
+        AppInstance appInstance = schedulerAppConn.getAppDesc().getAppInstances().get(0);
+        ResponseConvertOrchestrator response = requestConvertOrchestration(comment, null, convertUser,
+                workspace, schedulerAppConn, dssLabel, appInstance, workflowIdList);
+
+        if (response.getResponse().isFailed()) {
+            throw new DSSErrorException(50311, response.getResponse().getMessage());
+        }
+
+        return ;
+    }
+
     /**
      * 可覆写该方法自定义实现request对象
      *
      * @return
      */
     protected ResponseConvertOrchestrator requestConvertOrchestration(String comment, Long workflowId, String convertUser, Workspace workspace,
-                                                                      SchedulerAppConn schedulerAppConn, Map<String, Object> dssLabel, AppInstance appInstance) {
+                                                                      SchedulerAppConn schedulerAppConn, Map<String, Object> dssLabel, AppInstance appInstance, List<Long> flowIdList) {
         RequestFrameworkConvertOrchestration requestFrameworkConvertOrchestration = new RequestFrameworkConvertOrchestration();
         requestFrameworkConvertOrchestration.setComment(comment);
         requestFrameworkConvertOrchestration.setOrcAppId(workflowId);

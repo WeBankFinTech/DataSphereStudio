@@ -10,9 +10,11 @@ export default {
   },
   mounted() {
     document.addEventListener('copy', this.copyAction, false);
+    document.addEventListener('cut', this.copyAction, false);
   },
   beforeDestroy() {
     document.removeEventListener('copy', this.copyAction, false);
+    document.removeEventListener('cut', this.copyAction, false);
   },
   methods: {
     copyAction(event) {

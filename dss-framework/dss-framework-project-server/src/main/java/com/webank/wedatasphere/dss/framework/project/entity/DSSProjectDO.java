@@ -16,10 +16,7 @@
 
 package com.webank.wedatasphere.dss.framework.project.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -103,6 +100,18 @@ public class DSSProjectDO implements Serializable {
     private String orchestratorMode;
 
     private Integer visible;
+
+    /**
+     * 1-接入git 0-不接入（默认）
+     */
+    private Boolean associateGit;
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
+    private String dataSourceListJson;
+
+    /**
+     * 标签
+     */
+    private String label;
 
     public Long getId() {
         return id;
@@ -320,6 +329,22 @@ public class DSSProjectDO implements Serializable {
         this.visible = visible;
     }
 
+    public String getDataSourceListJson() {
+        return dataSourceListJson;
+    }
+
+    public void setDataSourceListJson(String dataSourceListJson) {
+        this.dataSourceListJson = dataSourceListJson;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
     @Override
     public String toString() {
         return "DSSProjectDO{" +
@@ -350,6 +375,15 @@ public class DSSProjectDO implements Serializable {
                 ", devProcess='" + devProcess + '\'' +
                 ", orchestratorMode='" + orchestratorMode + '\'' +
                 ", visible=" + visible +
+                ", associateGit=" + associateGit +
                 '}';
+    }
+
+    public Boolean getAssociateGit() {
+        return associateGit;
+    }
+
+    public void setAssociateGit(Boolean associateGit) {
+        this.associateGit = associateGit;
     }
 }

@@ -377,7 +377,8 @@
       "config": "config",
       "deleteSuccess": "{ name } Delete Success",
       "paramsTemplate": "Params Template",
-      "defaultTemplate": "Default Template"
+      "defaultTemplate": "Default Template",
+      "defaultResTemplate": "Default Res Template"
     },
     "permissions": {
       "departManagement": "Department management",

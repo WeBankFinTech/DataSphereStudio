@@ -105,9 +105,6 @@ public class WorkflowToAzkbanRelConverter implements WorkflowToRelConverter {
 
     private void writeFlowPropertiesToLocal(AzkabanWorkflow flow) throws DSSErrorException {
         List<Map<String, Object>> flowProperties = flow.getFlowProperties();
-        if (flowProperties == null || flowProperties.isEmpty()) {
-            return;
-        }
         FileOutputStream os = null;
         try {
             String storePath = flow.getStorePath();
@@ -115,9 +112,11 @@ public class WorkflowToAzkbanRelConverter implements WorkflowToRelConverter {
             flowPrpsFile.createNewFile();
             os = FileUtils.openOutputStream(flowPrpsFile, true);
             StringBuilder stringBuilder = new StringBuilder();
-            flowProperties.forEach(p -> p.forEach((k, v) -> {
-                stringBuilder.append(AzkabanConstant.LINKIS_FLOW_VARIABLE_KEY + k + "=" + v + "\n");
-            }));
+            if(flowProperties != null) {
+                flowProperties.forEach(p -> p.forEach((k, v) -> {
+                    stringBuilder.append(AzkabanConstant.LINKIS_FLOW_VARIABLE_KEY + k + "=" + v + "\n");
+                }));
+            }
             // update by peaceWong add contextID to Flow properties
             String contextID = flow.getContextID();
             if (StringUtils.isNotBlank(contextID)) {

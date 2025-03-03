@@ -398,61 +398,14 @@ public class DSSMigrateRestful {
             // 解压下载文件
             ZipHelper.unzip(zipFilePath);
             // 解压后工程文件夹路径
-            String projectBasePath = pathRoot + "default_orc";
-            // 解压工作流zip文件
-            String orcFlowZipFile = projectBasePath + File.separator + "orc_flow.zip";
-            ZipHelper.unzip(orcFlowZipFile);
-            // 解压后工作流文件夹路径
-            String flowBasePath = projectBasePath + File.separator + projectName;
-            // 读取工作流信息
-            List<DSSFlow> dssFlows = metaService.readFlow(flowBasePath);
-            // 获取工作流节点解析对象
-            JsonToFlowParser jsonToFlowParser = WorkflowFactory.INSTANCE.getJsonToFlowParser();
-            List<String> uploadResourceNewFileNameList = new ArrayList<>();
-            for (DSSFlow dssFlow : dssFlows) {
-                String workflowPath = flowBasePath + File.separator + dssFlow.getName() + File.separator;
-                String flowJsonFile = workflowPath + dssFlow.getName() + ".json";
-                String jsonContent = FileHelper.readFile(flowJsonFile);
-
-                if (StringUtils.isNotBlank(jsonContent)) {
-                    //将json读取为string，存入workflow
-                    dssFlow.setFlowJson(jsonContent);
-                    // 获取工作流节点信息
-                    Workflow workflow = jsonToFlowParser.parse(dssFlow);
-                    // 替换用户上传的资源文件名称
-                    List<Resource> uploadResources = workflow.getFlowResources();
-                    if (uploadResources != null && uploadResources.size() > 0) {
-                        for (Resource uploadResource : uploadResources) {
-                            String oldUploadResourceName = workflowPath + "resource" + File.separator + uploadResource.getResourceId() + ".re";
-                            String newUploadResourceName = workflowPath + "resource" + File.separator + uploadResource.getFileName();
-                            FileUtils.getFile(oldUploadResourceName).renameTo(new File(newUploadResourceName));
-                            uploadResourceNewFileNameList.add(newUploadResourceName);
-                        }
-                    }
-                    // 替换脚本sql文件名称为节点名称
-                    workflow.getWorkflowNodes().forEach(workflowNode -> {
-                        List<Resource> resources = workflowNode.getDSSNode().getResources();
-                        if (resources != null && resources.size() > 0) {
-                            for (Resource resource : resources) {
-                                String oldSqlFilePath = workflowPath + "resource" + File.separator + resource.getResourceId() + "_" + resource.getVersion() + ".re";
-                                String newSqlFilePath = workflowPath + "resource" + File.separator + workflowNode.getDSSNode().getName() + "_" + resource.getVersion() + ".re";
-                                FileUtils.getFile(oldSqlFilePath).renameTo(new File(newSqlFilePath));
-                            }
-                        }
-                    });
-                }
+            String flowBasePath = pathRoot + File.separator + projectName;
+            // 删除 .metaconf文件夹
+            String flowMetaPath = flowBasePath + File.separator + ".metaConf";
+            File metaFile = new File(flowMetaPath);
+            if (metaFile.exists()) {
+                FileUtils.deleteDirectory(metaFile);
             }
-            //删除掉无用文件，包括zip包,.json,.txt,.properties
-            List<String> fileNameList = new ArrayList<>();
-            FileHelper.getAllFileNames(pathRoot, fileNameList);
-            fileNameList.forEach(fileName -> {
-                if (fileName.endsWith(".zip") || fileName.endsWith(".json") || fileName.endsWith(".txt") || fileName.endsWith(".properties")) {
-                    // 上传的资源文件不能删除
-                    if (uploadResourceNewFileNameList.stream().noneMatch(fileName::equals)) {
-                        new File(fileName).delete();
-                    }
-                }
-            });
+
             //将文件打成zip包并输出
             String orcZipPath = ZipHelper.zip(flowBasePath, true);
             try (InputStream inputStream = new FileInputStream(orcZipPath)) {

@@ -16,6 +16,7 @@
 
 package com.webank.wedatasphere.dss.orchestrator.db.dao;
 
+import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.*;
 import org.apache.ibatis.annotations.*;
 
@@ -32,6 +33,10 @@ public interface OrchestratorMapper {
     DSSOrchestratorInfo getOrchestratorByUUID(String uuid);
 
     void updateOrchestrator(DSSOrchestratorInfo dssOrchestratorInfo);
+
+    void updateOrchestratorBmlVersion(@Param("id") Long id, @Param("resourceId") String resourceId, @Param("bmlVersion") String bmlVersion);
+
+    BmlResource getOrchestratorBmlVersion(@Param("id") Long id);
 
     void deleteOrchestrator(Long id);
 
@@ -73,6 +78,8 @@ public interface OrchestratorMapper {
     DSSOrchestratorVersion getLatestOrchestratorVersionByIdAndValidFlag(@Param("orchestratorId") Long orchestratorId, @Param("validFlag") Integer validFlag);
 
     void updateOrchestratorVersion(DSSOrchestratorVersion dssOrchestratorVersion);
+
+    void updateOrchestratorVersionUpdateTime(@Param("id") Long id);
 
     void deleteOrchestratorVersion(Long versionId);
 
@@ -126,4 +133,48 @@ public interface OrchestratorMapper {
     List<DSSOrchestratorVersion> getHistoryOrcVersion(@Param("remainVersion") int remainVersion);
 
     void batchUpdateOrcInfo(@Param("list") List<DSSOrchestratorVersion> historyOrcVersion);
+
+    void updateOrchestratorSubmitJobStatus(@Param("id") Long id, @Param("status") String status, @Param("errMsg") String errMsg);
+
+    Long getLatestOrchestratorSubmitJobId(@Param("orchestratorId") Long orchestratorId);
+
+    void updateOrchestratorSubmitResult(@Param("id") Long id, @Param("status") String status, @Param("result") String result);
+
+    void batchUpdateOrchestratorSubmitJobStatus(@Param("list") List<Long> list, @Param("status") String status, @Param("errMsg") String errMsg);
+
+    void insertOrchestratorSubmitJob(OrchestratorSubmitJob orchestratorSubmitJob);
+
+    OrchestratorSubmitJob selectSubmitJobStatus(@Param("orchestratorId") Long orchestratorId);
+
+    OrchestratorSubmitJob selectSubmitJobStatusById(@Param("id") Long id);
+
+    String selectResult(@Param("id") Long id);
+
+    List<OrchestratorMeta> getAllOrchestratorMeta(OrchestratorMetaRequest orchestratorMetaRequest);
+
+    OrchestratorMeta getOrchestratorMeta(@Param("orchestratorId") Long orchestratorId);
+
+    List<String> getOrchestratorName(List<Long> list);
+
+    List<OrchestratorReleaseVersionInfo> getOrchestratorReleaseVersionInfo(@Param("orchestratorIdList") List<Long> orchestratorIdList);
+
+    List<OrchestratorTemplateInfo> getOrchestratorDefaultTemplateInfo(@Param("orchestratorIdList")List<Long> orchestratorIdList);
+
+
+    List<String> getAllOrchestratorName(@Param("workspaceId") Long workspaceId,@Param("projectName") String projectName);
+
+
+    OrchestratorReleaseVersionInfo getOrchestratorVersionById(@Param("orchestratorId") Long orchestratorId);
+
+
+    List<OrchestratorSubmitJob> getSubmitJobStatus(@Param("orchestratorIdList") List<Long> orchestratorIdList);
+
+
+    void updateOrchestratorNotContainsKeywordsNode(@Param("orchestratorId") Long orchestratorId, @Param("notContainsKeywordsNode") String notContainsKeywordsNode);
+
+    DSSOrchestratorInfo getOrchestratorNotContainsKeywordsNode(@Param("orchestratorId") Long orchestratorId);
+
+    List<DSSOrchestratorInfo> getOrchestratorListById(@Param("orchestratorIdList") List<Long> orchestratorIdList);
+
+
 }

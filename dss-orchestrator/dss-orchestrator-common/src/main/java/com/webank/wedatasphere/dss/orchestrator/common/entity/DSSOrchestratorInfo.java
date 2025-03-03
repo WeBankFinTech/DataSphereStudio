@@ -86,6 +86,25 @@ public class DSSOrchestratorInfo implements DSSOrchestration {
      */
     private Date updateTime;
 
+    /**
+     * 是否默认引用资源参数模板
+     */
+    private String isDefaultReference;
+
+    /**
+     * 工作流状态：save-已保存 push-已提交 publish-已发布
+     */
+    private String status;
+
+    /** 不包含关键字的节点**/
+    private String notContainsKeywordsNode;
+
+    private String projectName;
+
+
+     /**所属项目是否接入git**/
+     private Boolean associateGit;
+
     public DSSOrchestratorInfo() {
 
     }
@@ -277,6 +296,14 @@ public class DSSOrchestratorInfo implements DSSOrchestration {
         this.updateTime = updateTime;
     }
 
+    public String getIsDefaultReference() {
+        return isDefaultReference;
+    }
+
+    public void setIsDefaultReference(String isDefaultReference) {
+        this.isDefaultReference = isDefaultReference;
+    }
+
     @Override
     public String toString() {
         return "DSSOrchestratorInfo{" +
@@ -293,6 +320,44 @@ public class DSSOrchestratorInfo implements DSSOrchestration {
                 ", secondaryType='" + secondaryType + '\'' +
                 ", linkedAppConnNames=" + linkedAppConnNames +
                 ", comment='" + comment + '\'' +
+                ", status='" + status + '\'' +
                 '}';
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getNotContainsKeywordsNode() {
+        return notContainsKeywordsNode;
+    }
+
+    public void setNotContainsKeywordsNode(String notContainsKeywordsNode) {
+        this.notContainsKeywordsNode = notContainsKeywordsNode;
+    }
+
+    public void setProjectId(Long projectId) {
+        this.projectId = projectId;
+    }
+
+
+    public String getProjectName() {
+        return projectName;
+    }
+
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
+    }
+
+    public Boolean getAssociateGit() {
+        return associateGit;
+    }
+
+    public void setAssociateGit(Boolean associateGit) {
+        this.associateGit = associateGit;
     }
 }

@@ -18,6 +18,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.webank.wedatasphere.dss.framework.workspace.dao.DSSMenuRoleMapper">
 
+
     <insert id="insertBatch" parameterType="java.util.List">
         insert into dss_workspace_menu_role (workspace_id,menu_id,role_id,priv, update_time,updateby)
         values
@@ -27,5 +28,22 @@
         </foreach>
     </insert>
 
+    <select id="queryWorkspaceMenuRole" resultType="com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceMenuRole">
+        select id           as id
+              ,workspace_id as workspaceId
+              ,menu_id      as menuId
+              ,role_id      as roleId
+              ,update_time  as updateTime
+              ,updateby     as updateBy
+        from dss_workspace_menu_role
+        where workspace_id = #{workspaceId} and updateby=#{updateBy}
+    </select>
+    
+    <update id="updateWorkspaceMenuRoleById">
+        update dss_workspace_menu_role set update_time = now(),updateby=#{updateBy}  where id in
+        <foreach collection="list" index="index" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </update>
 
 </mapper>

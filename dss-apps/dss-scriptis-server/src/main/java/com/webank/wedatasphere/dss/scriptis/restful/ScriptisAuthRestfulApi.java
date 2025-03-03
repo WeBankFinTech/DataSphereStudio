@@ -2,6 +2,7 @@ package com.webank.wedatasphere.dss.scriptis.restful;
 
 import com.webank.wedatasphere.dss.common.conf.DSSCommonConf;
 import com.webank.wedatasphere.dss.common.utils.GlobalLimitsUtils;
+import com.webank.wedatasphere.dss.scriptis.config.DSSScriptisConfiguration;
 import com.webank.wedatasphere.dss.scriptis.service.ScriptisAuthService;
 import org.apache.linkis.common.conf.BDPConfiguration;
 import org.apache.linkis.server.Message;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.Map;
 
 import static com.webank.wedatasphere.dss.scriptis.config.DSSScriptisConfiguration.GLOBAL_LIMITS_PREFIX;

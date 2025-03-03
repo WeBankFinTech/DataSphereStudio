@@ -114,7 +114,7 @@ public class OrchestratorIERestful {
             RequestImportOrchestrator importRequest = new RequestImportOrchestrator(userName, projectName,
                     projectID, resultMap.getResourceId(),
                     resultMap.getVersion(), null, dssLabelList, workspace);
-            dssOrchestratorVersion = orchestratorContext.getDSSOrchestratorPlugin(ImportDSSOrchestratorPlugin.class).importOrchestrator(importRequest);
+            dssOrchestratorVersion = orchestratorContext.getDSSOrchestratorPlugin(ImportDSSOrchestratorPlugin.class).importOrchestratorNew(importRequest);
             AuditLogUtils.printLog(userName, workspace.getWorkspaceId(), workspace.getWorkspaceName(), TargetTypeEnum.ORCHESTRATOR,
                     projectID, projectName, OperateTypeEnum.CREATE, importRequest);
         } catch (Exception e) {
@@ -153,7 +153,7 @@ public class OrchestratorIERestful {
         OrchestratorFrameworkServiceImpl.validateOperation(orchestratorVo.getDssOrchestratorInfo().getProjectId(), userName);
         logger.info("export orchestrator orchestratorId " + orchestratorId + ",orcVersionId:" + orcVersionId);
         try {
-            res = orchestratorContext.getDSSOrchestratorPlugin(ExportDSSOrchestratorPlugin.class).exportOrchestrator(userName,
+            res = orchestratorContext.getDSSOrchestratorPlugin(ExportDSSOrchestratorPlugin.class).exportOrchestratorNew(userName,
                     orchestratorId, orcVersionId, projectName, dssLabelList, addOrcVersion, workspace).getBmlResource();
             AuditLogUtils.printLog(userName, workspace.getWorkspaceId(), workspace.getWorkspaceName(), TargetTypeEnum.ORCHESTRATOR,
                     orcVersionId, orchestratorVo.getDssOrchestratorInfo().getName(), OperateTypeEnum.UPDATE, orchestratorVo);

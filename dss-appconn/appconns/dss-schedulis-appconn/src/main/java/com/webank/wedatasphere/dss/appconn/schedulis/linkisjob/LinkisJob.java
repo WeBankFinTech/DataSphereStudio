@@ -23,6 +23,8 @@ public class LinkisJob {
     private String type;
     private String linkistype;
     private String proxyUser;
+
+    private String autoDisabled;
     private String dependencies;
     private Map<String, String> conf;
     private String command;
@@ -58,6 +60,14 @@ public class LinkisJob {
 
     public void setProxyUser(String proxyUser) {
         this.proxyUser = proxyUser;
+    }
+
+    public String getAutoDisabled() {
+        return autoDisabled;
+    }
+
+    public void setAutoDisabled(String autoDisabled) {
+        this.autoDisabled = autoDisabled;
     }
 
     public String getDependencies() {

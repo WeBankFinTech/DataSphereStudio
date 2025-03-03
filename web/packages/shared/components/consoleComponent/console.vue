@@ -34,6 +34,17 @@
             <span>{{ $t('message.common.tabs.history') }}</span>
           </div>
         </div>
+        <div v-if="script.result && scriptViewState.showPanel == 'result' && script.result.totalColumn <= 10000 && script.result.totalColumn > 500" class="column-pagination">
+          <span>列分页：500列 / 页，共{{ script.result.totalColumn }}列</span>
+          <Page
+            :total="script.result.totalColumn"
+            :current="scriptViewState.columnPageNow || 1"
+            :page-size="500"
+            :simple="true"
+            size="small"
+            @on-change="onChangeColPage"
+          />
+        </div>
       </div>
       <div
         class="workbench-container">
@@ -47,7 +58,6 @@
         <result
           v-if="scriptViewState.showPanel == 'result'"
           ref="result"
-          :result="script.result"
           :script="script"
           :dispatch="dispatch"
           :getResultUrl="getResultUrl"
@@ -104,6 +114,9 @@ export default {
       type: Function,
       required: true
     },
+    getClient: {
+      type: Function,
+    },
     getResultUrl: {
       type: String,
       defalut: `filesystem`
@@ -121,11 +134,11 @@ export default {
     return {
       execute: null,
       scriptViewState: {
-        showPanel: this.isHistory ? 'result' : 'progress',
+        showPanel: this.isHistory ? '' : 'progress',
         cacheLogScroll: 0,
+        columnPageNow: 1,
         bottomContentHeight: this.height || '250'
       },
-      isBottomPanelFull: false,
       isLogShow: false,
       localLog: {
         log: { all: '', error: '', warning: '', info: '' },
@@ -138,6 +151,7 @@ export default {
         log: { all: '', error: '', warning: '', info: '' },
         logLine: 1,
         resultList: null,
+        resultSet: 0,
         history: []
       },
     }
@@ -162,8 +176,20 @@ export default {
     }
   },
   mounted() {
+    window.addEventListener('resize', this.resultResize)
+    this.resultResize()
   },
   methods: {
+    resultResize: debounce(function () {
+      if (this.getClient) {
+        this.scriptViewState.bottomContentHeight = this.getClient();
+      } else {
+        this.scriptViewState.bottomContentHeight = this.$el.parentElement.clientHeight - this.$el.parentElement.firstChild.clientHeight
+      }
+    }, 500),
+    onChangeColPage(v) {
+      this.scriptViewState = {...this.scriptViewState, columnPageNow: v}
+    },
     viewHistory(...rest) {
       this.$emit('viewHistory', ...rest)
     },
@@ -241,12 +267,12 @@ export default {
         }
       });
       this.execute.on('result', (ret) => {
-        this.showPanelTab('result');
         const storeResult = {
           'headRows': ret.metadata,
           'bodyRows': ret.fileContent,
           'total': ret.totalLine,
           'type': ret.type,
+          'totalColumn': ret.totalColumn,
           'cache': {
             offsetX: 0,
             offsetY: 0,
@@ -268,6 +294,7 @@ export default {
         if (this.script.progress.current) {
           this.script.progress.current = 1;
         }
+        this.showPanelTab('result');
       });
       this.execute.on('progress', ({ progress, progressInfo, waitingSize }) => {
         // 这里progressInfo可能只是个空数组，或者数据第一个数据是一个空对象
@@ -378,7 +405,7 @@ export default {
       })
     },
     resetQuery() {
-      this.showPanelTab(this.isHistory ? 'result' : 'progress');
+      this.showPanelTab(this.isHistory ? '' : 'progress');
       this.isLogShow = false;
       this.localLog = {
         log: { all: '', error: '', warning: '', info: '' },
@@ -424,75 +451,8 @@ export default {
     },
     changeResultSet(data, cb) {
       const resultSet = isUndefined(data.currentSet) ? this.script.resultSet : data.currentSet;
-      const findResult = this.script.resultList[resultSet];
-      const resultPath = findResult && findResult.path;
-      const hasResult = Object.prototype.hasOwnProperty.call(this.script.resultList[resultSet], 'result');
-      if (!hasResult) {
-        const pageSize = 5000;
-        const url = `/${this.getResultUrl}/openFile`;
-        let params = {
-          path: resultPath,
-          pageSize,
-        }
-        // 如果是api执行需要带上taskId
-        if (this.getResultUrl !== 'filesystem') {
-          params.taskId = this.work.taskID
-        }
-        api.fetch(url, {
-          ...params
-        }, 'get')
-          .then((ret) => {
-            let result = {}
-            if (ret.display_prohibited) {
-              result = {
-                'headRows': [],
-                'bodyRows': [],
-                'total': ret.totalLine,
-                'type': ret.type,
-                'path': resultPath,
-                hugeData: true,
-                tipMsg: localStorage.getItem("locale") === "en" ? ret.en_msg : ret.zh_msg
-              };
-            } else if (ret.metadata && ret.metadata.length >= 500) {
-              result = {
-                'headRows': [],
-                'bodyRows': [],
-                'total': ret.totalLine,
-                'type': ret.type,
-                'path': resultPath,
-                hugeData: true
-              };
-            } else {
-              result = {
-                'headRows': ret.metadata,
-                'bodyRows': ret.fileContent,
-                // 如果totalLine是null，就显示为0
-                'total': ret.totalLine ? ret.totalLine : 0,
-                // 如果内容为null,就显示暂无数据
-                'type': ret.fileContent ? ret.type : 0,
-                'cache': {
-                  offsetX: 0,
-                  offsetY: 0,
-                },
-                'path': resultPath,
-                'current': 1,
-                'size': 20,
-              };
-            }
-            this.$set(this.script.resultList[resultSet], 'result', result);
-            this.$set(this.script, 'resultSet', resultSet);
-            this.script.result = result;
-            this.script.resultSet = resultSet;
-            this.script.showPanel = 'result';
-            cb();
-          }).catch(() => {
-            cb();
-          });
-      } else {
-        this.script.result = this.script.resultList[resultSet].result;
-        this.$set(this.script, 'resultSet', resultSet);
-        this.script.resultSet = resultSet;
-        this.script.showPanel = 'result';
+      this.script.resultSet = resultSet;
+      if (cb) {
         cb();
       }
     },
@@ -548,7 +508,10 @@ export default {
       });
       return tmpLogs;
     }
-  }
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.resultResize)
+  },
 }
 </script>
 <style lang="scss" scoped>
@@ -585,20 +548,6 @@ export default {
           @include bg-color($light-base-color, $dark-base-color);
           width: calc(100% - 45px);
           overflow: hidden;
-          &.work-list-tab {
-            overflow-x: auto;
-            overflow-y: hidden;
-            &::-webkit-scrollbar {
-              width: 0;
-              height: 0;
-              background-color: transparent;
-            }
-            .list-group>span {
-              white-space: nowrap;
-              display: block;
-              height: 0;
-            }
-          }
           .workbench-tab-item {
             text-align: center;
             border-top: none;
@@ -654,12 +603,15 @@ export default {
                 cursor: pointer;
             }
         }
+        .column-pagination {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          padding-right: 8px;
+        }
       }
       .workbench-container {
         height: calc(100% - 36px);
-        &.node {
-            height: 100%;
-        }
         flex: 1;
         @keyframes ivu-progress-active {
             0% {

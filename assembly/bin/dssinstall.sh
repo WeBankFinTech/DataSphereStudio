@@ -105,7 +105,7 @@ function changeCommonConf(){
   sed -i "s#hostname:.*#hostname: $SERVER_IP#g" $CONF_APPLICATION_YML
   sed -i "s#wds.linkis.server.mybatis.datasource.url.*#wds.linkis.server.mybatis.datasource.url=jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT}/${MYSQL_DB}?characterEncoding=UTF-8#g" $CONF_DSS_PROPERTIES
   sed -i "s#wds.linkis.server.mybatis.datasource.username.*#wds.linkis.server.mybatis.datasource.username=$MYSQL_USER#g" $CONF_DSS_PROPERTIES
-  sed -i "s#wds.linkis.server.mybatis.datasource.password.*#***REMOVED***$MYSQL_PASSWORD#g" $CONF_DSS_PROPERTIES
+  sed -i "s#wds.linkis.server.mybatis.datasource.password.*#wds.linkis.server.mybatis.datasource.password=$MYSQL_PASSWORD#g" $CONF_DSS_PROPERTIES
   sed -i "s#wds.linkis.gateway.ip.*#wds.linkis.gateway.ip=$GATEWAY_INSTALL_IP#g" $CONF_DSS_PROPERTIES
   sed -i "s#wds.linkis.gateway.port.*#wds.linkis.gateway.port=$GATEWAY_PORT#g" $CONF_DSS_PROPERTIES
   sed -i "s#wds.linkis.gateway.url.*#wds.linkis.gateway.url=http://$GATEWAY_INSTALL_IP:$GATEWAY_PORT/#g" $CONF_DSS_PROPERTIES

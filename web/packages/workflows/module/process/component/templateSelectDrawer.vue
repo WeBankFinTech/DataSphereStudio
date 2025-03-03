@@ -7,11 +7,15 @@
     v-model="showDrawer"
     @on-close="submitCancel"
   >
-    <Collapse v-model="activePanelArray" @on-change="handlePanelChange">
-      <Panel :name="item.templateId" v-for="(item,index) in templateList" :key="item.templateId">
-        <Radio v-model="radioData[index]" :true-value="true" :false-value="false" @on-change="handleRadioChange" style="width:85%;overflow: hidden;text-overflow: ellipsis;">
-          <span :title="item.templateName">{{item.templateName}}</span>
-        </Radio>
+    <Collapse :value="activePanelArray" @on-change="handlePanelChange" class="collapse-panel">
+      <Panel hide-arrow :name="item.templateId" v-for="(item,index) in templateList" :key="item.templateId">
+        <div class="tpl-item" @click.stop="()=>{}">
+          <Icon type="ios-arrow-down" class="tpl-item-icon" @click.stop="handlePanelChange([item.templateId], 'expand')" ></Icon>
+          <Radio v-model="radioData[index]" :true-value="true" :false-value="false" @on-change="handleRadioChange" style="width:85%;overflow: hidden;text-overflow: ellipsis;">
+            <span :title="item.templateName">{{item.templateName}}</span>
+          </Radio>
+        </div>
+
         <div slot="content">
           <div v-for="(confItem,confIndex) in item.conf" :key="confIndex">
             <span>{{confItem.key}}</span>:&nbsp;<span style="color: black">{{confItem.configValue}}</span>
@@ -78,7 +82,14 @@ export default {
       })
       this.cacheRadioData = JSON.parse(JSON.stringify(this.radioData))
     },
-    async handlePanelChange(vArray) {
+    async handlePanelChange(vArray, type) {
+      if (type == 'expand') {
+        if (this.activePanelArray.indexOf(vArray[0]) > -1) {
+          this.activePanelArray.splice(this.activePanelArray.indexOf(vArray[0]), 1)
+        } else {
+          this.activePanelArray.push(vArray[0])
+        }
+      }
       vArray.forEach(async (v)=> {
         const index = this.templateList.findIndex(item => {
           return item.templateId == v
@@ -126,4 +137,19 @@ export default {
         text-align: right;
         background: #fff;
     }
+    .tpl-item {
+      width: 100%;
+      .tpl-item-icon {
+        margin-right: 5px;
+        opacity: 0;
+        &:hover {
+          opacity: 1;
+        }
+      }
+    }
+    ::v-deep .collapse-panel .ivu-collapse-header {
+      padding-left: 8px;
+    }
+    
+
 </style>

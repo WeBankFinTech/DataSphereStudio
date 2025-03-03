@@ -28,6 +28,9 @@ public class DSSSenderServiceConf {
     public static final CommonVars<String> PROJECT_SERVER_NAME =
             CommonVars.apply("wds.dss.project.sever.name", "dss-framework-project-server");
 
+    public static final CommonVars<String> GIT_SERVER_NAME =
+            CommonVars.apply("wds.dss.git.sever.name", "dss-framework-git-server");
+
     public static final CommonVars<String> DSS_SERVER_NAME =
             CommonVars.apply("wds.dss.sever.name.dev", "dss-server-dev");
 

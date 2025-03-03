@@ -48,7 +48,8 @@ public class WorkflowRefExportOperation
                 projectId,
                 projectName,
                 toJson(requestRef.getWorkspace()),
-                requestRef.getDSSLabels());
+                requestRef.getDSSLabels(),
+                true);
         Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getWorkflowSender(requestRef.getDSSLabels());
         ResponseExportWorkflow responseExportWorkflow = RpcAskUtils.processAskException(sender.ask(requestExportWorkflow),
                 ResponseExportWorkflow.class, RequestExportWorkflow.class);

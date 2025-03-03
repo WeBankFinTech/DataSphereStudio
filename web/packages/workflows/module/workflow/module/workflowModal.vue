@@ -115,7 +115,8 @@ export default {
         orchestratorMode: '',
         orchestratorWays: null,
         projectId: String(this.currentTreeProject ? this.currentTreeProject.id : this.$route.query.projectID),
-        workspaceId: this.$route.query.workspaceId
+        workspaceId: this.$route.query.workspaceId,
+        isDefaultReference: "0"
       };
     },
     initUpload() {

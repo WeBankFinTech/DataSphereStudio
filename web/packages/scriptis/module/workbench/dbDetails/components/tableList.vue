@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="search-header">
+    <div class="search-header" v-if="!isAdminMode">
       <!-- <Input v-model="tableOwner" class="searce-item margin-right" placeholder="请输入用户名">
       </Input> -->
       <Input v-model="tableName" class="searce-item margin-right" :placeholder="$t('message.scripts.plstablename')">
@@ -11,17 +11,24 @@
         <Option value='3'>{{ $t('message.scripts.ordercreatetime') }}</Option>
         <Option value="4">{{ $t('message.scripts.orderaccesstime') }}</Option>
       </Select>
+      <Select v-model="usageHeat" clearable class="searce-item margin-right" placeholder="表使用热度">
+        <Option value="VISITED_IN_THREE_MONTHS">最近3个月访问</Option>
+        <Option value="VISITED_IN_SIX_MONTHS">最近6个月访问</Option>
+        <Option value="VISITED_IN_TWELVE_MONTHS">最近12个月访问</Option>
+        <Option value="NOT_VISITED_IN_THREE_MONTHS">最近3个月未访问</Option>
+        <Option value="NOT_VISITED_IN_SIX_MONTHS">最近6个月未访问</Option>
+        <Option value="NOT_VISITED_IN_TWELVE_MONTHS">最近12个月未访问</Option>
+      </Select>
       <Select v-model="isTableOwner" class="searce-item margin-right">
         <Option value="0">{{ $t('message.scripts.owntable') }}</Option>
         <Option value="1">{{ $t('message.scripts.tablecreateby') }}</Option>
       </Select>
       <Button class="margin-right" type="primary" @click="handleGetTables">{{ $t('message.scripts.Search') }}</Button>
-      <Button class="margin-right" type="primary" :title="$t('message.scripts.realsearchTip')" @click="handleGetTables(true)">{{ $t('message.scripts.searchnow') }}</Button>
       <Button class="margin-right" type="success" @click="copyTableName">{{ $t('message.scripts.copytbanme') }}</Button>
       <Button class="margin-right" type="error" @click="deleteSome">{{ $t('message.scripts.batchdel') }}</Button>
-      <Dropdown @on-click="dropdownClick">
+      <Dropdown class="margin-right" @on-click="dropdownClick">
         <Button type="primary">
-          {{ $t('message.apiServices.query.more') }}
+          {{ $t('message.scripts.query.more') }}
           <Icon type="ios-arrow-down"></Icon>
         </Button>
         <template #list>
@@ -32,6 +39,46 @@
           </DropdownMenu>
         </template>
       </Dropdown>
+      <Button v-if="isWorkspaceAdmin && isContainDb" type="text" @click="changeViewMode(true)">{{ $t('message.scripts.tableDetails.QHGLYST') }}</Button>
+    </div>
+    <div class="search-header" v-else>
+      <Input v-model="tableName" class="searce-item margin-right" :placeholder="$t('message.scripts.plstablename')">
+      </Input>
+      <Select v-model="orderBy" class="searce-item margin-right">
+        <Option value="1">{{ $t('message.scripts.defaultsort') }}</Option>
+        <Option value="2">{{ $t('message.scripts.ordersize') }}</Option>
+        <Option value='3'>{{ $t('message.scripts.ordercreatetime') }}</Option>
+        <Option value="4">{{ $t('message.scripts.orderaccesstime') }}</Option>
+      </Select>
+      <!-- <Select v-model="isTableOwner" class="searce-item margin-right">
+        <Option value="0">{{ $t('message.scripts.owntable') }}</Option>
+        <Option value="1">{{ $t('message.scripts.tablecreateby') }}</Option>
+      </Select> -->
+      <Select v-model="usageHeat" class="searce-item margin-right" placeholder="表使用热度">
+        <Option value="VISITED_IN_THREE_MONTHS">最近3个月访问</Option>
+        <Option value="VISITED_IN_SIX_MONTHS">最近6个月访问</Option>
+        <Option value="VISITED_IN_TWELVE_MONTHS">最近12个月访问</Option>
+        <Option value="NOT_VISITED_IN_THREE_MONTHS">最近3个月未访问</Option>
+        <Option value="NOT_VISITED_IN_SIX_MONTHS">最近6个月未访问</Option>
+        <Option value="NOT_VISITED_IN_TWELVE_MONTHS">最近12个月未访问</Option>
+      </Select>
+      <Input v-model="tableOwner" class="searce-item margin-right" :placeholder="$t('message.scripts.tableDetails.QSRBSZ')">
+      </Input>
+      <Button class="margin-right" type="primary" @click="handleGetTables">{{ $t('message.scripts.Search') }}</Button>
+      <Button class="margin-right" type="success" @click="copyTableName">{{ $t('message.scripts.copytbanme') }}</Button>
+      <Dropdown class="margin-right" @on-click="dropdownClick">
+        <Button type="primary">
+          {{ $t('message.scripts.query.more') }}
+          <Icon type="ios-arrow-down"></Icon>
+        </Button>
+        <template #list>
+          <DropdownMenu>
+            <DropdownItem v-if="canTransfer" name="transfer">{{ $t('message.scripts.transfer') }}</DropdownItem>
+            <DropdownItem name="download">{{ $t('message.scripts.download') }}</DropdownItem>
+          </DropdownMenu>
+        </template>
+      </Dropdown>
+      <Button type="text" @click="changeViewMode(false)">{{ $t('message.scripts.tableDetails.QHPTST') }}</Button>
     </div>
     <div class="table-data" style="position:relative">
       <div class="field-list-header" id="dbtbheader" :class="{'ovy': searchColList.length > maxSize}">
@@ -70,7 +117,7 @@
             <Checkbox
               v-model="item.selected"
               @on-change="changeCheckList"
-              :disabled="item.tableOwner !== getUserName()"
+              :disabled="!isAdminMode && item.tableOwner !== getUserName()"
             /></div>
           <div class="field-list-item" style="width: 50px">{{ pageData.pageSize * (pageData.currentPage - 1) + index + 1 }}</div>
           <div
@@ -176,13 +223,13 @@
         </Form>
         <div slot="footer">
           <Button v-if="!saveTransing" type="text" size="large" @click="showTransferForm = false">{{
-            $t("message.workspaceManagement.cancel")
+            $t("message.scripts.cancel")
           }}</Button>
           <Button v-if="!saveTransing" type="text" size="large" @click="prevStep">{{
             $t("message.common.dss.prevstep")
           }}</Button>
           <Button type="primary" size="large" @click="saveTransfer" :loading="saveTransing">{{
-            $t("message.workspaceManagement.ok")
+            $t("message.scripts.ok")
           }}</Button>
         </div>
       </Modal>
@@ -201,7 +248,7 @@
         </div>
         <div slot="footer">
           <Button type="text" size="large" @click="renameClose">{{
-            $t("message.workspaceManagement.cancel")
+            $t("message.scripts.cancel")
           }}</Button>
           <Button v-if="!renameScript" type="primary" size="large" @click="handleRename('next')">{{
             $t("message.scripts.createTable.next")
@@ -246,8 +293,11 @@ export default {
       })
       return list
     },
+    isContainDb() {
+      return /(_bak|_work)$/.test(this.dbName)
+    },
     canTransfer() {
-      return this.$APP_CONF.table_transfer && /(_bak|_work)$/.test(this.dbName)
+      return this.$APP_CONF.table_transfer && this.isContainDb
     },
     columnCalc() {
       return this.columns.map((item, index) => {
@@ -269,13 +319,13 @@ export default {
     return {
       columns: [
         { title: this.$t('message.scripts.tablename'), key: 'tableName', width: '20%'},
-        { title: this.$t('message.scripts.tbalias'), key: 'tableAlias', width: '10%'},
+        // { title: this.$t('message.scripts.tbalias'), key: 'tableAlias', width: '10%'},
         { title: this.$t('message.scripts.createtime'), key: 'createTime', width: '10%'},
         { title: this.$t('message.scripts.tablesize'), key: 'tableSize', width: '8%'},
         { title: this.$t('message.scripts.tbowner'), key: 'tableOwner', width: '8%'},
         { title: this.$t('message.scripts.ispartition'), key: 'partitioned', type: 'booleanString', width: '8%'},
         { title: this.$t('message.scripts.iscompress'), key: 'compressed', type: 'boolean', width: '8%'},
-        { title: this.$t('message.scripts.compressformat'), key: 'compressedFormat', width: '8%'},
+        // { title: this.$t('message.scripts.compressformat'), key: 'compressedFormat', width: '8%'},
         { title: this.$t('message.scripts.lastaccess'), key: 'viewTime', width: '10%'},
         { title: this.$t('message.scripts.lastupdate'), key: 'modifyTime', width: '10%'},
       ],
@@ -294,6 +344,7 @@ export default {
       loading: false,
       tablesName: [],
       isTableOwner: '0',
+      usageHeat: '',
       selectAllConfirm: false,
       selectAll: false,
       showTransferForm: false,
@@ -348,6 +399,8 @@ export default {
       showRename: false,
       databaseList: [],
       renameScript: '',
+      isAdminMode: false,
+      isWorkspaceAdmin: false, // 工作空间管理员
     }
   },
   mounted() {
@@ -357,27 +410,31 @@ export default {
     formatValue(item, field) {
       return utils.formatValue(item, field);
     },
-    handleGetTables(isreal) {
+    handleGetTables() {
       this.selectAll = false;
       this.pageData.currentPage = 1;
-      this.isRealTime = isreal === true
       this.getDbTables();
     },
     // 获取库表
     getDbTables() {
       const params = {
         dbName: this.dbName,
-        isTableOwner: this.isTableOwner,
         tableName: this.tableName,
         orderBy: this.orderBy,
+        usageHeat: this.usageHeat,
         pageSize: this.pageData.pageSize,
         currentPage: this.pageData.currentPage
       }
-      if (this.isRealTime) params.isRealTime = true
+      if (this.isAdminMode)  {
+        params.tableOwner = this.tableOwner
+      } else {
+        params.isTableOwner = this.isTableOwner
+      }
       this.loading = true;
       api.fetch('/dss/datapipe/datasource/getTableMetaDataInfo', params, 'get').then((rst) => {
         this.searchColList = rst.tableList;
         this.pageData.total = rst.total;
+        this.isWorkspaceAdmin = rst.isWorkspaceAdmin;
         this.loading = false;
         this.$emit('tableListChange', this.searchColList)
       }).catch(() => {
@@ -402,9 +459,13 @@ export default {
         dbName: this.dbName,
         orderBy: this.orderBy,
         tableName: this.tableName,
-        isTableOwner: this.isTableOwner
+        usageHeat: this.usageHeat,
       }
-      if (this.isRealTime) params.isRealTime = true
+      if (this.isAdminMode) {
+        params.tableOwner = this.tableOwner
+      } else {
+        params.isTableOwner = this.isTableOwner
+      }
       api.fetch('/dss/datapipe/datasource/getTablesName', params, 'get').then((rst) => {
         let tablesName = rst.tablesName;
         this.loading = false;
@@ -427,12 +488,16 @@ export default {
     download() {
       const params = {
         dbName: this.dbName,
-        isTableOwner: this.isTableOwner,
         tableName: this.tableName,
         orderBy: this.orderBy,
+        usageHeat: this.usageHeat,
         exactTableName: false
       }
-      if (this.isRealTime) params.isRealTime = true
+      if (this.isAdminMode) {
+        params.tableOwner = this.tableOwner
+      } else {
+        params.isTableOwner = this.isTableOwner
+      }
       const paramsStr = qs.stringify(params)
       window.open("/api/rest_j/v1/dss/datapipe/datasource/downloadTableMetaData?" + paramsStr, '_blank');
     },
@@ -458,6 +523,11 @@ export default {
         return
       }
       if (this.confirmModalType == 'transfer') {
+        const tableOwners = [...new Set(toDeleted.map(item => item.tableOwner))];
+        if (this.isAdminMode && tableOwners.length > 1) {
+          this.$Message.warning({ content: this.$t('message.scripts.tableDetails.MCJZCZYYWYH')  });
+          return
+        }
         // 批量转移
         this.showTransferForm = true
         this.showConfirmModal = false
@@ -485,7 +555,8 @@ export default {
       }
     },
     saveTransfer() {
-      const tbs = this.selectedItems.filter(it => it.selected).map(item => item.tableName)
+      const selectedList = this.selectedItems.filter(it => it.selected)
+      const tbs = selectedList.map(item => item.tableName)
       const params = {
         approvalTitle: this.formState.title,
         dbName: this.dbName,
@@ -493,6 +564,9 @@ export default {
         newOwner: this.formState.owner,
         dataGovernanceAdmin: this.formState.admin,
         description: this.formState.desc
+      }
+      if (this.isAdminMode) {
+        params.oldOwner = selectedList[0].tableOwner || ''
       }
       if (this.saveTransing) return
       this.$refs.transferForm.validate((valid) => {
@@ -519,10 +593,16 @@ export default {
         item.selected = v
       })
     },
+    changeViewMode(val) {
+      this.changeCheckAll(false);
+      this.isAdminMode = val;
+      this.tableOwner = '';
+      this.handleGetTables();
+    },
     changeCheckAll(v) {
       const u = this.getUserName()
       this.searchColList = this.searchColList.map(item => {
-        item.selected = v && item.tableOwner === u
+        item.selected = v && (this.isAdminMode || item.tableOwner === u)
         return item
       })
     },

@@ -22,7 +22,7 @@ export default {
   dispatchs: {
     Workbench: ['add', 'openFile', 'run', 'remove', 'updateTab', 'checkExist', 'deleteDirOrFile'],
     WorkSidebar: ['showTree'],
-    HiveSidebar: ['showHive', 'getDatabase', 'getTables', 'getTablePartitions'],
+    HiveSidebar: ['showHive'],
     IndexedDB: ['getTabs', 'getTree', 'appendTree'],
   },
   data: {

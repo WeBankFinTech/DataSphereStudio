@@ -6,15 +6,18 @@
       请耐心等待，数据正在加载中... <Spin />
     </div>
     <result
+      v-if="script.result.path || script.resultList.length > 0"
       ref="result"
       getResultUrl="filesystem"
       :script="script"
       :dispatch="dispatch"
-      :script-view-state="scriptViewState" />
+      :script-view-state="scriptViewState"
+      @loadDataDone="loading=false"
+      @on-set-change="changeResultSet"/>
   </div>
 </template>
 <script>
-import api from '@dataspherestudio/shared/common/service/api';
+import api from '@dataspherestudio/shared/common/service/api'
 import result from '@dataspherestudio/shared/components/consoleComponent/result.vue';
 import SUPPORTED_LANG_MODES from '@dataspherestudio/shared/common/config/scriptis';
 import { find, debounce } from 'lodash'
@@ -34,35 +37,28 @@ export default {
         cacheLogScroll: 0,
       },
       script: {
+        id: '',
         fileName: this.$route.query.fileName || '',
-        runType: this.getRunType() || 'hql',
+        runType: this.getRunType().runType || 'hql',
+        scriptType: this.getRunType().scriptType || 'hive',
         data: '',
         oldData: '',
-        result: {},
+        result: {
+          headRows: [],
+          bodyRows: [],
+          type: 'RES_EMPTY',
+          total: 0,
+          cache: {},
+        },
+        resultList: [],
+        resultSet: 0,
         steps: [],
         progress: {},
-        resultList: null,
-        resultSet: 0,
         params: {},
         readOnly: false
       },
-      loading: true
+      loading: false
     }
-  },
-  computed: {
-    scriptResult() {
-      let res = {
-        headRows: [],
-        bodyRows: [],
-        type: 'EMPTY',
-        total: 0,
-        path: ''
-      };
-      if (this.script.resultList) {
-        res = this.script.resultList[this.script.resultSet || 0].result || res
-      }
-      return res
-    },
   },
   beforeDestroy() {
     window.removeEventListener('resize', this.getHeight);
@@ -70,49 +66,54 @@ export default {
   mounted() {
     // 监听窗口变化，获取浏览器宽高
     window.addEventListener('resize', this.getHeight);
-    this.getResult(this.$route.query.resultPath)
-    this.scriptViewState.bottomContentHeight = this.$el.clientHeight
+    this.scriptViewState.bottomContentHeight = this.$el.clientHeight;
+    this.script.id = this.$route.query.taskId || Date.now();
+    if (this.$route.query.parentPath) {
+      api.fetch(
+      `/filesystem/getDirFileTrees`, {
+        path: this.$route.query.parentPath
+      },
+      'get'
+    )
+      .then((rst) => {
+        // 后台的结果集顺序是根据结果集名称按字符串排序的，展示时会出现结果集对应不上的问题，所以加上排序
+        if(rst.dirFileTrees && rst.dirFileTrees.children) {
+          const slice = (name) => {
+            return Number(name.slice(1, name.lastIndexOf('.')));
+          }
+          const resultList = rst.dirFileTrees.children.sort((a, b) => {
+            return slice(a.name) - slice(b.name);
+          });
+          this.script.resultList = resultList
+        }
+      })
+    } else if(this.$route.query.resultPath) {
+      this.script.result.path = this.$route.query.resultPath
+      this.script.resultList = [{
+        path:  this.$route.query.resultPath,
+      }]
+    }
   },
   methods: {
     getHeight: debounce(function () {
       this.scriptViewState.bottomContentHeight = this.$el.clientHeight
     }, 300),
-    getResult(resultPath) {
-      const pageSize = 5000;
-      const url = '/filesystem/openFile';
-      api.fetch(url, {
-        path: resultPath,
-        pageSize,
-      }, 'get')
-        .then((ret) => {
-          const result = {
-            'headRows': ret.metadata,
-            'bodyRows': ret.fileContent,
-            // 如果totalLine是null，就显示为0
-            'total': ret.totalLine ? ret.totalLine : 0,
-            // 如果内容为null,就显示暂无数据
-            'type': ret.fileContent ? ret.type : 0,
-            'path': resultPath,
-            'current': 1,
-            'size': 20,
-          };
-          this.script.resultSet = 0;
-          this.script.resultList = [{
-            path: resultPath,
-            result
-          }]
-          this.$nextTick(()=>{
-            this.loading = false
-          })
-        }).catch(() => {
-        });
-    },
     getRunType() {
       if (this.$route.query.fileName ) {
         let supportedMode = find(SUPPORTED_LANG_MODES, (p) => p.rule.test(this.$route.query.fileName)) || {};
-        return supportedMode.runType
+        return supportedMode
       }
-    }
+    },
+    changeResultSet(data, cb) {
+      const resultSet = data.currentSet || 0;
+      this.script = {
+        ...this.script,
+        resultSet
+      };
+      if (cb) {
+        cb();
+      }
+    },
   }
 }
 </script>

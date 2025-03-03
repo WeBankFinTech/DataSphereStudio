@@ -28,4 +28,8 @@ public interface DSSMenuRoleMapper extends BaseMapper<DSSMenuRole> {
 
     public void insertBatch(@Param("list") List<DSSWorkspaceMenuRole> menuRoles);
 
+    List<DSSWorkspaceMenuRole> queryWorkspaceMenuRole(@Param("workspaceId") int workspaceId,@Param("updateBy") String updateBy);
+
+    void updateWorkspaceMenuRoleById(@Param("list") List<Integer> idList,@Param("updateBy") String updateBy);
+
 }

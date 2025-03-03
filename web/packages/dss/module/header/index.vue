@@ -103,6 +103,21 @@
       </li>
       <li
         class="menu-item"
+        @click="goAccount"
+        :class="isAccountPage ? 'header-actived' : '' "
+      >
+        工作流元数据
+      </li>
+      <!-- <li
+        v-if="isAdmin"
+        class="menu-item"
+        @click="goAppConnlist"
+        :class="isConsolePage ? 'header-actived' : '' "
+      >
+        AppConn管理台
+      </li> -->
+      <li
+        class="menu-item"
         v-if="$route.query.workspaceId"
         @click="goConsole"
         :class="isConsolePage ? 'header-actived' : '' "
@@ -189,6 +204,7 @@ export default {
       currentId: -1,
       isHomePage: false,
       isConsolePage: false,
+      isAccountPage: false,
     };
   },
   mixins: [mixin],
@@ -268,6 +284,7 @@ export default {
       if (v.query.menuApplicationId) {
         this.isHomePage = false
         this.isConsolePage = false
+        this.isAccountPage = false
         this.currentId = +v.query.menuApplicationId
       }
     },
@@ -525,11 +542,6 @@ export default {
       }
     },
     changeProj(proj, p) {
-      if (
-        p.id == this.currentProject.id &&
-        proj.id == this.$route.query.projectTaxonomyID
-      )
-        return;
       // 得考虑在流程图页面和知画的情况, 在此情况下跳转到工程页
       if (["/process"].includes(this.$route.path)) {
         this.$router.replace({ path: "/project" });
@@ -538,8 +550,6 @@ export default {
           path: this.$route.path,
           query: {
             workspaceId: this.$route.query.workspaceId,
-            ...this.$route.query,
-            projectTaxonomyID: proj.id,
             projectID: p.id,
             projectName: p.name,
             notPublish: p.notPublish,
@@ -550,6 +560,7 @@ export default {
     goHome() {
       this.isHomePage = true;
       this.isConsolePage = false;
+      this.isAccountPage = false;
       if (this.isAdmin) {
         this.$router.push("/newhome");
       } else {
@@ -573,6 +584,7 @@ export default {
     goSpaceHome() {
       this.isHomePage = true;
       this.isConsolePage = false;
+      this.isAccountPage = false;
       let workspaceId = this.$route.query.workspaceId;
       this.currentId = -1;
       if (!workspaceId) {
@@ -586,10 +598,11 @@ export default {
     },
     goConsole() {
       this.isHomePage = false;
+      this.isAccountPage = false;
       this.isConsolePage = true;
       this.currentId = -1;
       const url =
-        location.origin + "/dss/linkis/?noHeader=1&noFooter=1#/console";
+        `${location.origin}/dss/linkis/?noHeader=1&noFooter=1&t=${Date.now()}#/console`;
       this.$router.push({
         path: '/commonIframe/linkis',
         query: {
@@ -598,9 +611,29 @@ export default {
         }
       });
     },
+    goAccount() {
+      this.isHomePage = false;
+      this.isConsolePage = false;
+      this.isAccountPage = true;
+      this.currentId = -1;
+      let workspaceId = this.$route.query.workspaceId;
+      const url =
+        `${location.origin}/next-web/?workspaceId=${workspaceId}&timestamp=${Date.now()}#/accounts`;
+      this.$router.push({
+        path: '/commonIframe/accounts',
+        query: {
+          workspaceId,
+          url
+        }
+      });
+    },
+    goAppConnlist() {
+      location.href = '/next-web/#/appconn'
+    },
     goCollectedUrl(app) {
       this.isHomePage = false;
       this.isConsolePage = false;
+      this.isAccountPage = false;
       this.currentId = app.menuApplicationId || -1;
       this.gotoCommonFunc({app, index: 0}, {
         workspaceId: this.$route.query.workspaceId,

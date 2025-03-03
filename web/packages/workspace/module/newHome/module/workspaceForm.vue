@@ -143,8 +143,8 @@ export default {
     })
     GetTreeDepartments().then(res => {
       let list = res.deptTree
-      list && list.length === 1 ? util.deleteEmptyChildren(list[0]) : ''
-      this.treeDepartments = list[0] ? list[0].children : list
+      // list && list.length === 1 ? util.deleteEmptyChildren(list[0]) : ''
+      this.treeDepartments = list // list[0] ? list[0].children : list
     })
   },
   watch: {

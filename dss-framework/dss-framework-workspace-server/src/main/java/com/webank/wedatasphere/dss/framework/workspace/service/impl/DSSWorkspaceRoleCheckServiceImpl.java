@@ -25,4 +25,11 @@ public class DSSWorkspaceRoleCheckServiceImpl implements DSSWorkspaceRoleCheckSe
                 (dssWorkspaceService.isAdminUser((long) workspaceId, loginUser) && ((!dssWorkspaceService.isAdminUser((long) workspaceId, username) && !roles.contains(1))
                         || (StringUtils.equals(loginUser, username) && roles.contains(1))));
     }
+
+    @Override
+    public boolean checkUserRolesOperation(String username, List<Integer> roles) {
+        return true;
+    }
+
+
 }

@@ -33,10 +33,14 @@ public class DSSNodeDefault implements DSSNode {
     private List<Resource> resources;
     private String title;
     private String desc;
-    private String createTime;
+    private Long createTime;
     private String userProxy;
     private String modifyUser;
     private Long modifyTime;
+    private String appTag;
+    private String businessTag;
+    private String ecConfTemplateId;
+    private String ecConfTemplateName;
     /**
      * dependencys 是该Node的依赖节点
      */
@@ -168,10 +172,105 @@ public class DSSNodeDefault implements DSSNode {
         return "dwsNode{" +
                 "layout=" + layout +
                 ", id='" + id + '\'' +
+                ", key='" + key + '\'' +
                 ", jobType='" + jobType + '\'' +
                 ", lastUpdateTime=" + lastUpdateTime +
                 ", params=" + params +
                 ", resources=" + resources +
+                ", jobType=" + jobType +
+                ", title=" + title +
+                ", createTime=" + createTime +
+                ", modifyTime=" + modifyTime +
+                ", modifyUser=" + modifyUser +
+                ", desc='" + desc + '\'' +
                 '}';
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    public String getJobType() {
+        return jobType;
+    }
+
+    public void setJobType(String jobType) {
+        this.jobType = jobType;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
+    }
+
+    public Long getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Long createTime) {
+        this.createTime = createTime;
+    }
+
+    public void setModifyUser(String modifyUser) {
+        this.modifyUser = modifyUser;
+    }
+
+    public void setModifyTime(Long modifyTime) {
+        this.modifyTime = modifyTime;
+    }
+
+    public String getLastUpdateTime() {
+        return lastUpdateTime;
+    }
+
+    public void setLastUpdateTime(String lastUpdateTime) {
+        this.lastUpdateTime = lastUpdateTime;
+    }
+
+    public String getAppTag() {
+        return appTag;
+    }
+
+    public void setAppTag(String appTag) {
+        this.appTag = appTag;
+    }
+
+    public String getBusinessTag() {
+        return businessTag;
+    }
+
+    public void setBusinessTag(String businessTag) {
+        this.businessTag = businessTag;
+    }
+
+    public String getEcConfTemplateId() {
+        return ecConfTemplateId;
+    }
+
+    public void setEcConfTemplateId(String ecConfTemplateId) {
+        this.ecConfTemplateId = ecConfTemplateId;
+    }
+
+    public String getEcConfTemplateName() {
+        return ecConfTemplateName;
+    }
+
+    public void setEcConfTemplateName(String ecConfTemplateName) {
+        this.ecConfTemplateName = ecConfTemplateName;
+    }
+
+    public void setDependencys(List<String> dependencys) {
+        this.dependencys = dependencys;
     }
 }

@@ -16,6 +16,10 @@
 
 package com.webank.wedatasphere.dss.framework.project.entity.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.webank.wedatasphere.dss.standard.app.structure.project.ref.DSSProjectDataSource;
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -41,9 +45,14 @@ public class ProjectResponse implements Serializable {
     private String product;
     private Boolean isArchive;
     //工程创建时间
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createTime;
     //工程修改时间
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updateTime;
+    private List<DSSProjectDataSource> dataSourceList;
 
     public Boolean getEditable() {
         return editable;
@@ -79,6 +88,27 @@ public class ProjectResponse implements Serializable {
      * 编码模式 list
      */
     private List<String> orchestratorModeList;
+
+    private Boolean associateGit;
+
+    private String gitUser;
+
+    private String gitToken;
+
+    private String workspaceName;
+
+    /**
+     * 开发流程 下拉列表
+     */
+    private List<String> devProcessPermission;
+
+    public String getWorkspaceName() {
+        return workspaceName;
+    }
+
+    public void setWorkspaceName(String workspaceName) {
+        this.workspaceName = workspaceName;
+    }
 
     public Date getCreateTime() {
         return createTime;
@@ -208,6 +238,14 @@ public class ProjectResponse implements Serializable {
         this.updateTime = updateTime;
     }
 
+    public List<DSSProjectDataSource> getDataSourceList() {
+        return dataSourceList;
+    }
+
+    public void setDataSourceList(List<DSSProjectDataSource> dataSourceList) {
+        this.dataSourceList = dataSourceList;
+    }
+
     @Override
     public String toString() {
         return "ResponseProjectVo{" +
@@ -228,6 +266,42 @@ public class ProjectResponse implements Serializable {
                 ", devProcessList=" + devProcessList +
                 ", orchestratorModeList=" + orchestratorModeList +
                 ", editable=" + editable +
+                ", associateGit=" + associateGit +
+                ", gitUser=" + gitUser +
+                ", gitToken=" + gitToken +
+                ", devProcessPermission=" + devProcessPermission +
                 '}';
+    }
+
+    public Boolean getAssociateGit() {
+        return associateGit;
+    }
+
+    public void setAssociateGit(Boolean associateGit) {
+        this.associateGit = associateGit;
+    }
+
+    public String getGitUser() {
+        return gitUser;
+    }
+
+    public void setGitUser(String gitUser) {
+        this.gitUser = gitUser;
+    }
+
+    public String getGitToken() {
+        return gitToken;
+    }
+
+    public void setGitToken(String gitToken) {
+        this.gitToken = gitToken;
+    }
+
+    public List<String> getDevProcessPermission() {
+        return devProcessPermission;
+    }
+
+    public void setDevProcessPermission(List<String> devProcessPermission) {
+        this.devProcessPermission = devProcessPermission;
     }
 }

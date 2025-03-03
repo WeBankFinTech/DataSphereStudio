@@ -372,6 +372,10 @@
             flex-basis: 62px;
             font-size: 16px;
             margin-right: 20px;
+            display: inline-block;
+            width: 62px;
+            overflow: hidden;
+            text-overflow: ellipsis;
             @include font-color($light-text-color, $dark-text-color);
         }
         .engine-ul {
@@ -386,7 +390,6 @@
                 border-radius: $border-radius-base;
                 padding: 5px;
                 position: $relative;
-                width: 60px;
                 height: 60px;
                 margin: 8px 20px 8px 0;
                 box-sizing: border-box;

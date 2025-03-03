@@ -1,0 +1,11 @@
+{
+  "name": "@dataspherestudio/shared",
+  "version": "0.0.1",
+  "dependencies": {
+    "axios": "1.6.4"
+  },
+  "main": "./index.js",
+  "module": "./index.js",
+  "devDependencies": {},
+  "scripts": {}
+}

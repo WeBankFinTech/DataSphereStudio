@@ -195,10 +195,11 @@ public class ExecuteCodeHelper {
 
 
 
-    public static  String getResultContent(String user, String path, int maxSize, UJESClient client) {
+    public static  String getResultContent(String user, String path, int maxSize, UJESClient client, boolean enableLimit) {
         return client.resultSet(ResultSetAction.builder()
                     .setPath(path)
                     .setUser(user)
+                    .setEnableLimit(enableLimit)
                     .setPageSize(maxSize).build()).getResponseBody();
     }
 

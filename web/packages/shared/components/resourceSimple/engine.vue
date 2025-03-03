@@ -23,17 +23,19 @@
         class="engine-list"
         v-for="item in ideClassList"
         :key="item">
-        <span class="engline-name">{{ calssifyName(item) }}</span>
+        <span class="engline-name" :title="calssifyName(item)">{{ calssifyName(item) }}</span>
         <ul class="engine-ul">
           <template
             v-for="(subitem, index) in ideEngineList">
             <li
               class="engine-li"
+              :title="subitem.fixedEngineConn"
               :class="[{'active': subitem.isActive}, supportColor(subitem.engineStatus)]"
-              v-if="subitem.engineType === item || subitem.engineStatus === item || (item === 'Idle' && (subitem.engineStatus === 'Error' || subitem.engineStatus === 'ShuttingDown' || subitem.engineStatus === 'Dead'))"
+              v-if="shouldRender(subitem, item)"
               :key="index"
               @click="subitem.isActive = !subitem.isActive">
               <SvgIcon class='engine-icon job-content-icon' :class="supportIcon(subitem).className" :icon-class="supportIcon(subitem).icon" style='font-size: 30px;' :color="supportIcon(subitem).color === 'yellow' ? '#f4cf2a': supportIcon(subitem).color"/>
+              <span v-if="subitem.fixedEngineConn" class="fixlabel">{{ subitem.fixedEngineConn }}</span>
               <Icon
                 v-show="subitem.isActive"
                 class="engine-right"
@@ -63,17 +65,19 @@
         class="engine-list"
         v-for="item in boardClassList"
         :key="item">
-        <span class="engline-name">{{ calssifyName(item) }}</span>
+        <span class="engline-name" :title="calssifyName(item)">{{ calssifyName(item) }}</span>
         <ul class="engine-ul">
           <template
             v-for="(subitem, index) in boardEngineList">
             <li
               class="engine-li"
+              :title="subitem.fixedEngineConn"
               :class="[{'active': subitem.isActive}, supportColor(subitem.engineStatus)]"
-              v-if="subitem.engineType === item || subitem.engineStatus === item || (item === 'Idle' && (subitem.engineStatus === 'Error' || subitem.engineStatus === 'ShuttingDown' || subitem.engineStatus === 'Dead'))"
+              v-if="shouldRender(subitem, item)"
               :key="index"
               @click="subitem.isActive = !subitem.isActive">
               <SvgIcon class='engine-icon job-content-icon' :class="supportIcon(subitem).className" :icon-class="supportIcon(subitem).icon" style='font-size: 30px;' :color="supportIcon(subitem).color === 'yellow' ? '#f4cf2a': supportIcon(subitem).color"/>
+              <span v-if="subitem.fixedEngineConn" class="fixlabel">{{ subitem.fixedEngineConn }}</span>
               <Icon
                 v-show="subitem.isActive"
                 class="engine-right"
@@ -103,17 +107,19 @@
         class="engine-list"
         v-for="item in otherClassList"
         :key="item">
-        <span class="engline-name">{{ calssifyName(item) }}</span>
+        <span class="engline-name" :title="calssifyName(item)">{{ calssifyName(item) }}</span>
         <ul class="engine-ul">
           <template
             v-for="(subitem, index) in otherEngineList">
             <li
               class="engine-li"
+              :title="subitem.fixedEngineConn"
               :class="[{'active': subitem.isActive}, supportColor(subitem.engineStatus)]"
-              v-if="subitem.engineType === item || subitem.engineStatus === item || (item === 'Idle' && (subitem.engineStatus === 'Error' || subitem.engineStatus === 'ShuttingDown' || subitem.engineStatus === 'Dead'))"
+              v-if="shouldRender(subitem, item)"
               :key="index"
               @click="subitem.isActive = !subitem.isActive">
               <SvgIcon class='engine-icon job-content-icon' :class="supportIcon(subitem).className" :icon-class="supportIcon(subitem).icon" style='font-size: 30px;' :color="supportIcon(subitem).color === 'yellow' ? '#f4cf2a': supportIcon(subitem).color"/>
+              <span v-if="subitem.fixedEngineConn" class="fixlabel">{{ subitem.fixedEngineConn }}</span>
               <Icon
                 v-show="subitem.isActive"
                 class="engine-right"
@@ -148,6 +154,10 @@ export default {
         {
           value: 1,
           label: this.$t('message.common.resourceSimple.AZT'),
+        },
+        {
+          value: 2,
+          label: this.$t('message.common.resourceSimple.AYY'),
         },
       ],
       ideEngineList: [],
@@ -234,6 +244,14 @@ export default {
           return params
       }
     },
+    shouldRender(subitem, item) {
+      const isEngineTypeOrStatusMatch = subitem.engineType === item || subitem.engineStatus === item;
+      const isIdleAndErrorShuttingDownOrDead = 
+        (item === 'Idle' && ['Error', 'ShuttingDown', 'Dead'].includes(subitem.engineStatus));
+      const isCreatorMatch = subitem.creator === item;
+
+      return isEngineTypeOrStatusMatch || isIdleAndErrorShuttingDownOrDead ||isCreatorMatch;
+    },
     killJob() {
       if (this.loading) return this.$Message.warning(this.$t('message.common.resourceSimple.DDJK'));
       const params = [];
@@ -275,6 +293,15 @@ export default {
           if (item.engineType === 'pipeline') {
             item.engineType = 'pipeLine';
           }
+          try {
+            item.labels =  typeof item.labels == 'string' ? JSON.parse(item.labels) : item.labels;
+            if (Array.isArray(item.labels)) {
+              const labelItem = item.labels.find(item => item.labelKey === 'fixedEngineConn')
+              item.fixedEngineConn = labelItem ? labelItem.stringValue || '' : ''; 
+            }
+          } catch (error) {
+            
+          }
           if (item.creator === 'IDE') {
             this.ideEngineList.push(item);
           } else if (item.creator === 'Visualis') {
@@ -297,6 +324,12 @@ export default {
         engineList.map((item) => {
           if (!classList.includes(item.engineType)) {
             classList.push(item.engineType);
+          }
+        });
+      } else if(selectData === 2) {
+        engineList.map((item) => {
+          if (!classList.includes(item.creator)) {
+            classList.push(item.creator);
           }
         });
       } else {
@@ -341,6 +374,7 @@ export default {
         { rule: 'pipeLine', logo: 'fi-storage' },
         { rule: 'appconn', logo: 'fi-workflow' },
         { rule: 'pipeline', logo: 'fi-storage' },
+        { rule: 'nebula', logo: 'fi-nebula' },
       ];
       const color = this.supportColor(item.engineStatus);
       const support = supportTypes.filter((type) => type.rule === item.engineType);
@@ -373,3 +407,11 @@ export default {
   },
 };
 </script>
+<style scoped>
+li span.fixlabel {
+  padding-left: 5px;
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+</style>

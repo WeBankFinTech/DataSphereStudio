@@ -30,4 +30,6 @@ public interface NodeParser {
     String updateSubFlowID(String nodeJson, long subflowId) throws IOException;
     String getNodeValue(String key, String nodeJson) throws IOException;
     List<Resource> getNodeResource(String nodeJson);
+
+    Map<String, Object> getNodeJobContent(String nodeJson) throws IOException;
 }

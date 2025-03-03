@@ -46,10 +46,10 @@
       </Input>
       <div slot="footer">
         <Button type="text" size="large" @click="Cancel">{{
-          $t("message.workspaceManagement.cancel")
+          $t("message.scripts.cancel")
         }}</Button>
         <Button type="primary" size="large" @click="confirmAdd">{{
-          $t("message.workspaceManagement.ok")
+          $t("message.scripts.ok")
         }}</Button>
       </div>
     </Modal>

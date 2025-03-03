@@ -33,6 +33,9 @@ public class DSSWorkspace {
     private String lastUpdateUser;
     private String workspaceType;
     private int adminPermission;
+    private String enabledFlowKeywordsCheck;
+
+    private String isDefaultReference;
 
     public int getAdminPermission() {
         return adminPermission;
@@ -139,4 +142,19 @@ public class DSSWorkspace {
     }
 
 
+    public String getEnabledFlowKeywordsCheck() {
+        return enabledFlowKeywordsCheck;
+    }
+
+    public void setEnabledFlowKeywordsCheck(String enabledFlowKeywordsCheck) {
+        this.enabledFlowKeywordsCheck = enabledFlowKeywordsCheck;
+    }
+
+    public String getIsDefaultReference() {
+        return isDefaultReference;
+    }
+
+    public void setIsDefaultReference(String isDefaultReference) {
+        this.isDefaultReference = isDefaultReference;
+    }
 }

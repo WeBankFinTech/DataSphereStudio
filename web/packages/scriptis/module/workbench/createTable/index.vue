@@ -342,16 +342,23 @@ export default {
       if (!isXls) {
         delete source.table.sheet
       }
+      let fieldDelimiter = source.table.separator;
+      if (source.table.separator === '%20') {
+        fieldDelimiter = ' ';
+      } else if (source.table.separator === '|') {
+        fieldDelimiter = '\\|';
+      }
       const sourceP = {
         path,
         pathType: source.table.type,
         hasHeader: source.table.isHasHeader,
         encoding: isXls ? '' : source.table.chartset,
-        fieldDelimiter: isXls ? '' : source.table.separator,
+        fieldDelimiter: isXls ? '' : fieldDelimiter,
         sheet: source.table.sheet &&  source.table.sheet.toString(),
         quote,
         escapeQuotes,
       };
+
       const importInfo = {
         importType: ['hive', 'csv', 'xlsx'].indexOf(source.importType),
         args: isHive ? {

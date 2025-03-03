@@ -59,9 +59,6 @@ export default {
     };
   },
   computed: {
-    tableBaseInfo() {
-      return this.dbInfo;
-    },
   },
   methods: {
     formatValue(item) {

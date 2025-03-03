@@ -17,15 +17,20 @@
 package com.webank.wedatasphere.dss.orchestrator.server.service;
 
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
-import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorCopyInfo;
+import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
+import com.webank.wedatasphere.dss.git.common.protocol.GitTree;
+import com.webank.wedatasphere.dss.git.common.protocol.response.GitHistoryResponse;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.*;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.*;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.CommonOrchestratorVo;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorCopyHistory;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorUnlockVo;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
+
 import org.apache.commons.math3.util.Pair;
 
 import java.util.List;
+import java.util.Map;
 
 
 public interface OrchestratorFrameworkService {
@@ -45,4 +50,17 @@ public interface OrchestratorFrameworkService {
     Boolean getOrchestratorCopyStatus(Long sourceOrchestratorId);
 
     DSSOrchestratorCopyInfo getOrchestratorCopyInfoById(String copyInfoId);
+
+
+    OrchestratorSubmitJob getOrchestratorStatus(Long orchestratorId);
+
+    GitHistoryResponse getHistory(Long workspaceId, Long orchestratorId, String projectName);
+
+
+    void modifyOrchestratorMeta(String username, ModifyOrchestratorMetaRequest modifyOrchestratorMetaRequest, Workspace workspace, DSSOrchestratorVersion orchestratorVersion) throws Exception;
+
+    List<OrchestratorMeta> getAllOrchestratorMeta(OrchestratorMetaRequest orchestratorMetaRequest, List<Long> total,String username);
+
+    DSSOrchestratorVersion getLatestOrchestratorVersion(Long orchestratorId);
+
 }

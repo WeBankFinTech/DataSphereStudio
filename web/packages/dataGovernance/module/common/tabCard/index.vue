@@ -210,7 +210,7 @@ export default {
   }
 }
 .content-html {
-  /deep/ span {
+  ::v-deep span {
     color: #3495F7;
   }
 }

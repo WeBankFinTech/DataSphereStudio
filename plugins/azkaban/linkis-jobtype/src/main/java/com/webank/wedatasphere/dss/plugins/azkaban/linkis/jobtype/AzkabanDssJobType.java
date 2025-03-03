@@ -96,6 +96,7 @@ public class AzkabanDssJobType extends AbstractJob {
         String runTodayH = getRunTodayh(false);
         if (StringUtils.isNotBlank(runTodayH)) {
             this.jobPropsMap.put("run_today_h", runTodayH);
+            this.jobPropsMap.put("run_today_hour", runTodayH);
         }
         this.job = JobBuilder.getAzkanbanBuilder().setJobProps(this.jobPropsMap).build();
         this.job.setLogObj(new AzkabanJobLog(this));

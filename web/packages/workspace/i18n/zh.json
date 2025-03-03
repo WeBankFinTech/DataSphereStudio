@@ -377,7 +377,9 @@
       "config": "配置",
       "deleteSuccess": "{name}删除成功",
       "paramsTemplate": "可用参数模板",
-      "defaultTemplate": "默认参数模板"
+      "defaultTemplate": "默认参数模板",
+      "defaultResTemplate": "默认资源参数模板",
+      "isQuoteTemplate": "新增节点是否默认引用资源参数模板"
     },
     "permissions": {
       "departManagement": "部门管理",

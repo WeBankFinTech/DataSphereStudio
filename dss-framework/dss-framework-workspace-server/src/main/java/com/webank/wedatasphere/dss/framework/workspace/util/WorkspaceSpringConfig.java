@@ -17,7 +17,7 @@
 package com.webank.wedatasphere.dss.framework.workspace.util;
 
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceService;
-import com.webank.wedatasphere.dss.framework.workspace.service.StaffInfoGetter;
+import com.webank.wedatasphere.dss.common.StaffInfoGetter;
 import com.webank.wedatasphere.dss.framework.workspace.service.impl.DSSWorkspaceServiceImpl;
 import com.webank.wedatasphere.dss.framework.workspace.service.impl.DefaultStaffInfoGetter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;

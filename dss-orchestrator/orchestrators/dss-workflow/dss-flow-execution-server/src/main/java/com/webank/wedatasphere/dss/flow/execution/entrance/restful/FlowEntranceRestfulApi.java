@@ -160,16 +160,23 @@ public class FlowEntranceRestfulApi extends EntranceRestfulApi {
                 logger.error("Got {} task for taskID : {}", size, realTaskID);
                 message = Message.error("Got " + size + " task for taskId : " + realTaskID);
             } else {
-                String status = taskList.get(0).getStatus();
-                message.data("status", status).data("execID", id);
+                WorkflowQueryTask task = taskList.get(0);
+                String status = task.getStatus();
+                String logPath = task.getLogPath();
+                message.data("status", status).data("execID", id).data("logPath",logPath);
             }
             message.setMethod("/api/entrance/" + id + "/status");
             return message;
         }
         if (job.isDefined()) {
+            long realTaskID = Long.parseLong(taskID);
+            WorkflowQueryTask queryTask = new WorkflowQueryTask();
+            queryTask.setTaskID(realTaskID);
+            List<WorkflowQueryTask> taskList = taskMapper.selectTask(queryTask);
+            String logPath = taskList.isEmpty() ? null : taskList.get(taskList.size() - 1).getLogPath();
             message = Message.ok();
             message.setMethod("/api/entrance/" + id + "/status");
-            message.data("status", job.get().getState().toString()).data("execID", id);
+            message.data("status", job.get().getState().toString()).data("execID", id).data("logPath",logPath);
         } else {
             message = Message.error("ID The corresponding job is empty and cannot obtain the corresponding task status.(ID 对应的job为空，不能获取相应的任务状态)");
         }

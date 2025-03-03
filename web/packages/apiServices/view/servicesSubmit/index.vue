@@ -46,7 +46,7 @@
             prop="applyUser"
             label="授权用户">
             <Select v-model="formData.applyUser" multiple filterable>
-              <Option v-for="item in applyUserList" :key="item.name" :value="item.name">{{item.name}}</Option>
+              <Option v-for="(item, index) in applyUserList" :key="item.name + index" :value="item.name">{{item.name}}</Option>
             </Select>
           </FormItem>
           <FormItem
@@ -84,7 +84,7 @@
             prop="attentionUser"
             label="关注人">
             <Select v-model="formData.attentionUser" multiple filterable>
-              <Option v-for="item in applyUserList" :key="item.name" :value="item.name">{{item.name}}</Option>
+              <Option v-for="(item, index) in applyUserList" :key="item.name + index" :value="item.name">{{item.name}}</Option>
             </Select>
           </FormItem>
         </Form>
@@ -342,7 +342,15 @@ export default {
         GetWorkspaceUserManagement( {
           workspaceId: this.$route.query.workspaceId
         }).then((res) => {
-          this.applyUserList = res.workspaceUsers;
+          this.applyUserList = [];
+          let userMap = {};
+          res.workspaceUsers.forEach((item) => {
+            if (item.name && !userMap[item.name]) {
+              this.applyUserList.push(item);
+              userMap[item.name] = 1;
+            }
+          })
+          userMap = null;
         })
       }
     },

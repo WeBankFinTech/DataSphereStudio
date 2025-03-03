@@ -148,6 +148,7 @@ export default {
           { label: `${this.$t('message.scripts.createTable.FH')}(;)`, value: ';' },
           { label: `${this.$t('message.scripts.createTable.ZBF')}(\\t)`, value: '\\t' },
           { label: this.$t('message.scripts.createTable.KG'), value: '%20' },
+          { label: this.$t('message.scripts.hiveTableExport.SX'), value: '|' },
         ],
         chartset: [
           { label: 'utf-8', value: 'utf-8' },

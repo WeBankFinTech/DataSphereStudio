@@ -42,6 +42,49 @@ public class QueryProjectVo implements Serializable {
 
     private Integer visible;
 
+    private Boolean associateGit;
+    private String dataSourceListJson;
+
+
+    private String accessUsers;
+
+    private String editUsers;
+
+    private String releaseUsers;
+
+    private String workspaceName;
+
+    public String getWorkspaceName() {
+        return workspaceName;
+    }
+
+    public void setWorkspaceName(String workspaceName) {
+        this.workspaceName = workspaceName;
+    }
+
+    public String getAccessUsers() {
+        return accessUsers;
+    }
+
+    public void setAccessUsers(String accessUsers) {
+        this.accessUsers = accessUsers;
+    }
+
+    public String getEditUsers() {
+        return editUsers;
+    }
+
+    public void setEditUsers(String editUsers) {
+        this.editUsers = editUsers;
+    }
+
+    public String getReleaseUsers() {
+        return releaseUsers;
+    }
+
+    public void setReleaseUsers(String releaseUsers) {
+        this.releaseUsers = releaseUsers;
+    }
 
     public Long getId() {
         return id;
@@ -161,5 +204,21 @@ public class QueryProjectVo implements Serializable {
 
     public void setVisible(Integer visible) {
         this.visible = visible;
+    }
+
+    public Boolean getAssociateGit() {
+        return associateGit;
+    }
+
+    public void setAssociateGit(Boolean associateGit) {
+        this.associateGit = associateGit;
+    }
+
+    public String getDataSourceListJson() {
+        return dataSourceListJson;
+    }
+
+    public void setDataSourceListJson(String dataSourceListJson) {
+        this.dataSourceListJson = dataSourceListJson;
     }
 }

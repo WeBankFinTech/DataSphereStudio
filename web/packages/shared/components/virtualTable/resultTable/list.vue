@@ -89,6 +89,12 @@ export default {
     };
   },
   methods: {
+    setScroll(scrollTop,scrollLeft) {
+      if(this.$refs.vuescroll) {
+        this.$refs.vuescroll.scrollTo({y: scrollTop}, 0);
+        this.$refs.vuescroll.scrollTo({x: scrollLeft}, 0);
+      }
+    },
     handleScroll(v, h) {
       this.$emit('on-scroll', { v, h });
       this.$refs.body.handleScroll(v, h);

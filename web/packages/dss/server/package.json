@@ -12,7 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "cross-env": "^7.0.3",
-    "koa": "^2.6.2",
+    "koa": "^2.15.4",
     "koa-body": "^4.2.0",
     "koa-router": "^10.0.0",
     "mysql": "^2.16.0"

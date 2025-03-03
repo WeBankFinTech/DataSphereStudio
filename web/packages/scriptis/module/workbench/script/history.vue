@@ -206,16 +206,17 @@ export default {
               if (EXECUTE_COMPLETE_TYPE.indexOf(task.status) !== -1) {
                 this.$emit('update-from-history', task);
               }
-              this.$set(this.history, historyItemidx, {
+              const item = {
                 ...this.history[historyItemidx], 
                 runningTime: task.costTime, 
                 createDate: task.createdTime,
                 data: task.executionCode,
-                // errDesc: task.errDesc,
-                // errCode: task.errCode,
-                // failedReason: task.errCode && task.errDesc ? task.errCode + task.errDesc : task.errCode || task.errDesc || '',
                 status: task.status,
-              })
+              }
+              if (task.errDesc && !item.failedReason) {
+                item.failedReason = (task.errCode || '') + task.errDesc
+              }
+              this.$set(this.history, historyItemidx, item)
             }
           })
         }).finally(() => {

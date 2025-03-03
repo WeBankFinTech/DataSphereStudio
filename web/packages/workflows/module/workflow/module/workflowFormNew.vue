@@ -123,6 +123,7 @@
 <script>
 import tag from '@dataspherestudio/shared/components/tag/index.vue';
 import api from '@dataspherestudio/shared/common/service/api';
+import { GetWorkspaceData, GetWorkspaceTemplateData  } from '@dataspherestudio/shared/common/service/apiCommonMethod.js'
 import { useData } from './useData.js';
 const FORMITEMTYPE = {
   RADIO: 'radio',
@@ -165,15 +166,27 @@ export default {
       defaultTemplates: [],
     };
   },
-  mounted() {
+  async mounted() {
     this.fetchLevelData()
     if(this.workflowDataCurrent.projectId) {
-      this.getTemplateDataByProject(this.workflowDataCurrent.projectId)
+      await this.getTemplateDataByProject(this.workflowDataCurrent.projectId)
     }
     if (this.selectOrchestratorList.length === 1) {
       this.workflowDataCurrent.orchestratorMode = this.selectOrchestratorList[0].dicKey
       if (this.orchestratorModeList.mapList[this.workflowDataCurrent.orchestratorMode].length === 1) {
         this.workflowDataCurrent.orchestratorWayString = this.orchestratorModeList.mapList[this.workflowDataCurrent.orchestratorMode][0].dicKey
+      }
+    }
+    const workspaceData  = await GetWorkspaceData(this.$route.query.workspaceId)
+    this.workflowDataCurrent.isDefaultReference = workspaceData.workspace.isDefaultReference
+    if(workspaceData && workspaceData.workspace) {
+      const workspaceTemplateData = await GetWorkspaceTemplateData();
+      if (workspaceTemplateData && workspaceTemplateData.workspaceDefaultTemplates && workspaceTemplateData.workspaceDefaultTemplates.length >0) {
+          const templateList = workspaceTemplateData.workspaceDefaultTemplates.map(item => {
+                  return item.templateId
+          });
+          this.$set(this.workflowDataCurrent, 'templateIds', templateList);
+          this.$forceUpdate();
       }
     }
   },

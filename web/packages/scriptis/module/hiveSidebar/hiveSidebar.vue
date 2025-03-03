@@ -9,16 +9,32 @@
         @on-change="handleDatasourceTypeChange"
       >
         <Option
-          v-for="(item, idx) in datasourceList"
+          v-for="(item, idx) in datasourceTypeList"
           :value="item.name"
           :key="idx"
         >{{ item.name }}</Option
         >
       </Select>
     </div>
+    <div class="datasource-select" v-if="datasourceType === 'StarRocks'">
+      数据源名:
+      <Select
+        v-model="datasourceName"
+        style="width:110px"
+        size="small"
+        @on-change="handleDatasourceChange"
+      >
+        <Option
+          v-for="(item, idx) in datasourceList"
+          :value="item.dataSourceName"
+          :key="idx"
+        >{{ item.dataSourceName }}</Option
+        >
+      </Select>
+    </div>
     <we-navbar
       ref="navbar"
-      :placeholder="datasourceType == 'Hive' ? 'db.table' : '搜索图空间'"
+      :placeholder="datasourceType == 'NebulaGraph' ? '搜索图空间' : 'db.table'"
       :nav-list="navList"
       :add-title="$t('message.scripts.createdTitle')"
       @on-add="openAddTab"
@@ -50,9 +66,19 @@
       @we-click="onClickNG"
       @we-contextmenu="onContextMenuNG"
       @we-dblclick="handledbclickNG"/>
+    <starrocks-list 
+      v-if="datasourceType == 'StarRocks'"
+      class="we-side-bar-content v-hivedb-list"
+      :list="starrocksList"
+      :filter-text="searchText"
+      :loading="isPending"
+      @we-click="onClickStarRocks"
+      @we-contextmenu="onContextMenuStarRocks"
+      @we-dblclick="handledbclickStarRocks"/>
     <we-menu
       ref="contextMenu"
       id="hive">
+      <!-- hive菜单内容 -->
       <template v-if="currentType === 'db'">
         <we-menu-item @select="copyName">
           {{ $t('message.scripts.database.contextMenu.db.copyName') }}
@@ -93,6 +119,7 @@
         <we-menu-item @select="copyName">{{ $t('message.scripts.database.contextMenu.field.copyColumnsName') }}</we-menu-item>
         <we-menu-item @select="pasteName">{{ $t('message.scripts.database.contextMenu.field.pasteName') }}</we-menu-item>
       </template>
+      <!-- NebulaGraph菜单内容 -->
       <template v-if="currentType === 'ng_space'">
         <we-menu-item @select="copyName">
           复制图空间名
@@ -116,6 +143,37 @@
         <we-menu-item @select="refresh">
           {{ $t('message.scripts.constants.refresh') }}
         </we-menu-item>
+      </template>
+      <!-- starrocks -->
+      <template v-if="currentType === 'starrocks_db'">
+        <we-menu-item @select="copyName">
+          {{ $t('message.scripts.database.contextMenu.db.copyName') }}
+        </we-menu-item>
+        <we-menu-item @select="pasteName">
+          {{ $t('message.scripts.database.contextMenu.db.pasteName') }}
+        </we-menu-item>
+        <we-menu-item class="ctx-divider"/>
+        <we-menu-item @select="refresh">
+          {{ $t('message.scripts.constants.refresh') }}
+        </we-menu-item>
+      </template>
+      <template v-if="currentType === 'starrocks_tb'">
+        <we-menu-item
+          @select="queryTable"
+          v-if="!model">{{ $t('message.scripts.database.contextMenu.tb.queryTable') }}</we-menu-item>
+        <we-menu-item
+          @select="openDeleteDialog"
+          v-if="!model">{{ $t('message.scripts.database.contextMenu.tb.deleteTable') }}</we-menu-item>
+        <we-menu-item class="ctx-divider"/>
+        <we-menu-item @select="copyName">{{ $t('message.scripts.database.contextMenu.tb.copyName') }}</we-menu-item>
+        <we-menu-item @select="pasteName">{{ $t('message.scripts.database.contextMenu.tb.pasteName') }}</we-menu-item>
+        <we-menu-item @select="copyAllColumns">{{ $t('message.scripts.database.contextMenu.tb.copyAllColumns') }}</we-menu-item>
+        <we-menu-item class="ctx-divider"/>
+        <we-menu-item @select="refresh">{{ $t('message.scripts.constants.refresh') }}</we-menu-item>
+      </template>
+      <template v-if="currentType === 'starrocks_field'">
+        <we-menu-item @select="copyName">{{ $t('message.scripts.database.contextMenu.field.copyColumnsName') }}</we-menu-item>
+        <we-menu-item @select="pasteName">{{ $t('message.scripts.database.contextMenu.field.pasteName') }}</we-menu-item>
       </template>
     </we-menu>
     <we-hive-table-export
@@ -147,6 +205,7 @@ import util from '@dataspherestudio/shared/common/util';
 import deleteDialog from '@dataspherestudio/shared/components/deleteDialog';
 import weHiveList from './hiveList';
 import ngList from './hiveList/ngList.vue';
+import StarrocksList from './hiveList/starrocks.vue';
 import WeHiveTableExport from './hiveTableExport';
 import plugin from '@dataspherestudio/shared/common/util/plugin'
 export default {
@@ -155,7 +214,8 @@ export default {
     weHiveList,
     WeHiveTableExport,
     deleteDialog,
-    ngList
+    ngList,
+    StarrocksList
   },
   props: {
     type: {
@@ -167,6 +227,7 @@ export default {
   },
   data() {
     const baseinfo = storage.get("baseInfo", "local") || {}
+    const  datasourceType = localStorage.getItem('hiveSiderbar_dataSourceType') || 'Hive'
     return {
       tableowner: baseinfo.tableowner || '',
       searchText: '',
@@ -180,14 +241,18 @@ export default {
       isDeleting: false,
       sortshow: false,
       loadDataFn: () => {},
-      oReq: null,
       csTableList: [],
       ngListData: [],
-      datasourceType: this.type || 'Hive',
-      datasourceList: [{
+      starrocksList: [],
+      datasourceType: datasourceType,
+      datasourceName: '',
+      datasourceList: [],
+      datasourceTypeList: [{
         name: 'Hive'
       },{
         name: 'NebulaGraph'
+      },{
+        name: 'StarRocks'
       }]
     };
   },
@@ -214,6 +279,8 @@ export default {
     },
     navList() {
       if (this.datasourceType === 'NebulaGraph') {
+        return  ['search', 'refresh']
+      } else if (this.datasourceType === 'StarRocks') {
         return  ['search', 'refresh']
       } else if (this.node && Object.keys(this.node)) {
         return ['search', 'refresh']
@@ -399,7 +466,7 @@ export default {
             route: this.getCurrentDsslabels()
           }
         }
-        api.fetch(`/dss/workflow/columns`, params).then((res)=>{
+        return api.fetch(`/dss/workflow/columns`, params).then((res)=>{
           const column = res.columns;
           const length = column.length;
           let tmpString = '';
@@ -424,7 +491,7 @@ export default {
           this.tableList = [...this.tableList]
           this.cacheHiveTree();
         })
-      }else{
+      } else {
         return new Promise((resolve, reject) => {
           try {
             api.fetch(`/datasource/columns`, {database: item.dbName, table: item.name}, 'get').then((rst)=>{
@@ -473,9 +540,52 @@ export default {
       this.setHiveCache(this.currentAcitved);
       this.pasteName();
     },
-    handleDatasourceTypeChange() {
+    async handleDatasourceTypeChange() {
+      localStorage.setItem('hiveSiderbar_dataSourceType', this.datasourceType);
       this.searchText = '';
-      setTimeout(()=>{
+      const username = this.getUserName()
+      if (this.datasourceType === 'StarRocks') {
+        let dataSet = []
+        if (!this.starrocksTypeId) {
+          const { typeList } = await api.fetch('/data-source-manager/type/all', {}, 'get')
+          const starrockItem = typeList.find(it => {
+            return it.name === 'starrocks'
+          })
+          this.starrocksTypeId = starrockItem ?  starrockItem.id : ''
+        }
+        const rst = await api
+          .fetch(
+            'data-source-manager/info/connect-params',
+            {
+              //获取数据源数据
+              pageSize: 1000,
+              typeId: this.starrocksTypeId,
+              currentPage: 1,
+            },
+            {
+              method: 'get',
+              cacheOptions: { time: 60000 }
+            }
+          )
+          if (rst && rst.queryList) {
+            for (let i = 0; i < rst.queryList.length; i++) {
+              // expire 为false
+              // versionId 大于0
+              // publishedVersionId 存在此字段（未发布的数据源不含有此字段），且大于0
+              // 满足这三个条件的为有效数据源，需要在列表中被筛选
+              if (
+                rst.queryList[i].expire === false &&
+                rst.queryList[i].versionId > 0 &&
+                rst.queryList[i].publishedVersionId &&
+                rst.queryList[i].connectParams.username === username
+              ) {
+                dataSet.push(rst.queryList[i])
+              }
+            }
+            this.datasourceList = dataSet
+          }
+      }
+      setTimeout(() => {
         if (this.datasourceType === 'Hive') {
           if (this.tableList.length) {
             this.tableList = [...this.tableList]
@@ -485,14 +595,23 @@ export default {
               this.getTables({name: 'default', csssign: true }, true);
             }
           }
-        } else {
+        } else if (this.datasourceType === 'NebulaGraph') {
           if (this.ngListData.length) {
             this.ngListData = [...this.ngListData]
           } else {
             this.getNGDataList()
           }
+        } else if(this.datasourceType === 'StarRocks') {
+          if (this.starrocksList.length) {
+            this.starrocksList = [...this.starrocksList]
+          } else {
+            this.getStarRokcsDataList()
+          }
         }
       }, 20)
+    },
+    handleDatasourceChange() {
+      this.getStarRokcsDataList()
     },
     getSpaceChildren(item, refresh) {
       this.currentAcitved = item;
@@ -537,6 +656,120 @@ export default {
             }
           })
         }
+      }).catch((err) => {
+        this.isPending = false;
+      })
+    },
+    getStarRokcsDataList() {
+      let sourceItem = this.datasourceList.find(it => it.dataSourceName === this.datasourceName)
+      if ((!this.datasourceName || !sourceItem) && this.datasourceList.length > 0) {
+        sourceItem = this.datasourceList[0]
+        this.datasourceName = this.datasourceList[0].dataSourceName
+      }
+      const params = {
+        dataSourceName: this.datasourceName,
+        system: 'DSS-IDE'
+      }
+      if (this.datasourceName) {
+        this.isPending = true;
+        api.fetch('/metadataQuery/getDatabases', params, 'get').then(res => {
+          this.isPending = false;
+          if (res && res.dbs) {
+            this.starrocksList = res.dbs.map(it =>{
+              return {
+                name: it,
+                dataType: 'starrocks_db',
+                dataSourceName: params.dataSourceName,
+                system: params.system,
+                typeIcon: 'fi-hivedb',
+                _id: util.guid(),
+                children: [],
+                loaded: false,
+                isLeaf: false,
+              }
+            })
+          }
+        }).catch((err) => {
+          this.starrocksList = [];
+          this.isPending = false;
+        })
+      }
+    },
+    getStarRocksTables(node, refresh) {
+      const params = {
+        dataSourceName: node.dataSourceName,
+        system: node.system,
+        database: node.name
+      }
+      if (refresh) {
+        node.children = []
+      }
+      this.currentAcitved = node;
+      if (node.children && node.children.length) return
+      api.fetch('/metadataQuery/getTables', params, 'get').then(res => {
+          this.isPending = false;
+          if (res && res.tables) {
+             const temArray = res.tables.map(it =>{
+              return {
+                name: it,
+                dataType: 'starrocks_tb',
+                dataSourceName: params.dataSourceName,
+                system: params.system,
+                database: params.database,
+                typeIcon: 'fi-table',
+                _id: util.guid(),
+                children: [],
+                loaded: false,
+                isLeaf: false,
+              }
+            })
+            this.$set(node, 'loaded', true);
+            this.$set(node, 'children', temArray);
+          }
+          this.starrocksList = [...this.starrocksList]
+      }).catch((err) => {
+        this.isPending = false;
+      })
+    },
+    getStarRocksColumns(node, refresh) {
+      const params = {
+        dataSourceName: node.dataSourceName,
+        system: node.system,
+        database: node.database,
+        table: node.name
+      }
+      if (refresh) {
+        node.children = []
+      }
+      this.currentAcitved = node;
+      if (node.children && node.children.length) return
+      return api.fetch('/metadataQuery/getColumns', params, 'get').then(res => {
+          this.isPending = false;
+          if (res && res.columns) {
+            let tmpString = '';
+             const temArray = res.columns.map((it, index) =>{
+              if(index === length - 1) {
+                tmpString += it.name;
+              } else if (index < length - 1) {
+                tmpString += `${it.name},`;
+              }
+              return {
+                name: it.name,
+                type: it.type,
+                dataType: 'starrocks_field',
+                typeIcon: 'fi-field',
+                _id: util.guid(),
+                ...params,
+                children: [],
+                loaded: false,
+                isLeaf: false,
+              }
+            })
+            this.$set(node, 'fullColumn', tmpString);
+            this.$set(node, 'loaded', true);
+            this.$set(node, 'children', temArray);
+            this.starrocksList = [...this.starrocksList];
+          }
       }).catch((err) => {
         this.isPending = false;
       })
@@ -795,6 +1028,26 @@ export default {
       this.currentAcitved = item;
       this.$refs.contextMenu.open(ev);
     },
+    onClickStarRocks({item}) {
+      this.$refs.contextMenu.close();
+      switch (item.dataType) {
+        case 'starrocks_db':
+          this.getStarRocksTables(item);
+          break;
+        case 'starrocks_tb':
+          this.getStarRocksColumns(item);
+          break;
+      }
+    },
+    handledbclickStarRocks({ item }) {
+      this.currentAcitved = item;
+      this.pasteName();
+    },
+    onContextMenuStarRocks({ ev, item }) {
+      this.currentType = item.dataType;
+      this.currentAcitved = item;
+      this.$refs.contextMenu.open(ev);
+    },
     async viewSpaceInfo() {
       const filename = `图空间信息(${this.currentAcitved.name})`;
       const md5Path = util.md5(filename);
@@ -833,10 +1086,11 @@ export default {
       let copyLable = '';
       switch (this.currentAcitved.dataType) {
         case 'tb':
+        case 'starrocks_tb':
           if (this.currentAcitved.contextKey) {
             copyLable = this.currentAcitved.name
           } else {
-            copyLable = `${this.currentAcitved.dbName}.${this.currentAcitved.name}`;
+            copyLable = `${this.currentAcitved.dbName || this.currentAcitved.database}.${this.currentAcitved.name}`;
           }
           break;
         default:
@@ -861,6 +1115,16 @@ export default {
           } 
         } else {
           this.getNGDataList();
+        }
+      } else if (this.datasourceType === 'StarRocks') {
+        if (this.currentAcitved) {
+          if (this.currentAcitved.dataType === 'starrocks_db') {
+            this.getStarRocksTables(this.currentAcitved, true)
+          } else if(this.currentAcitved.dataType === 'starrocks_tb'){
+            this.getStarRocksColumns(this.currentAcitved, true)
+          }
+        } else {
+          this.getStarRokcsDataList()
         }
       } else {
         if (this.currentAcitved) {
@@ -909,14 +1173,26 @@ export default {
       }
     },
     queryTable(name) {
-      const tabName = typeof name === 'string' ? name : `${this.currentAcitved.dbName}.${this.currentAcitved.name}`;
-      const code = `select * from ${tabName} limit 100`;
-      const filename = `${tabName}_select.hql`;
-      const md5Path = util.md5(filename);
+      let tabName = ''
+      let code = ''
+      let filename = ''
+      let md5Path = ''
+      if (this.currentType == 'tb') {
+        tabName = typeof name === 'string' ? name : `${this.currentAcitved.dbName}.${this.currentAcitved.name}`;
+        code = `select * from ${tabName} limit 100`;
+        filename = `${tabName}_select.hql`;
+      } else if(this.currentType == 'starrocks_tb') {
+        tabName = typeof name === 'string' ? name : `${this.currentAcitved.database}.${this.currentAcitved.name}`;
+        code = `select * from ${tabName} limit 100`;
+        filename = `${tabName}_select.jdbc`;
+      }
+      md5Path = util.md5(filename);
+
       this.dispatch('Workbench:add', {
         id: md5Path,
         filename,
         filepath: '',
+        dataSetValue: this.datasourceName, // starrocks 数据源才有的，查询表时带上
         // saveAs表示临时脚本，需要关闭或保存时另存
         saveAs: true,
         noLoadCache: true,
@@ -926,7 +1202,7 @@ export default {
           return;
         }
         this.$nextTick(() => {
-          this.dispatch('Workbench:run', { id: md5Path });
+          this.dispatch('Workbench:run', { id: md5Path, dataSetValue: this.datasourceName,});
         });
       });
     },
@@ -1012,7 +1288,11 @@ export default {
     },
     async copyAllColumns() {
       if (!this.currentAcitved.fullColumn) {
-        await this.getTableColumns(this.currentAcitved);
+        if (this.currentType == 'starrocks_tb') {
+          await this.getStarRocksColumns(this.currentAcitved)
+        } else {
+          await this.getTableColumns(this.currentAcitved);
+        }
       }
       util.executeCopy(this.currentAcitved.fullColumn);
     },
@@ -1024,16 +1304,40 @@ export default {
       });
     },
     deleteTable() {
+      let tableName = '';
+      let code = '';
+      let filename = '';
+      let afterRunDel = () => {
+        //
+      }
+      if (this.currentType == 'tb') {
+        tableName = `${this.currentAcitved.dbName}.${this.currentAcitved.name}`;
+        code = this.currentAcitved.isView ? `drop view ${tableName};` : `drop table ${tableName};`;
+        filename = `${tableName}_drop.hql`;
+        afterRunDel = () => {
+          // 由于删除表成功之后，currentAcitved指向为当前已被删除的表，所以要改为刷新库
+          this.currentAcitved = find(this.tableList, (db) => db.name === (this.currentAcitved.dbName || this.currentAcitved.name));
+          this.setHiveCache(this.currentAcitved);
+          this.refresh();
+        }
+      } else if(this.currentType == 'starrocks_tb') {
+        tableName = `${this.currentAcitved.database}.${this.currentAcitved.name}`;
+        code = `drop table ${tableName};`;
+        filename = `${tableName}_drop.jdbc`;
+        afterRunDel = () => {
+          // 由于删除表成功之后，currentAcitved指向为当前已被删除的表，所以要改为刷新库
+          this.currentAcitved = find(this.starrocksList, (db) => db.name === this.currentAcitved.name);
+          this.refresh();
+        }
+      }
       this.isDeleting = true;
-      const tableName = `${this.currentAcitved.dbName}.${this.currentAcitved.name}`;
-      const code = this.currentAcitved.isView ? `drop view ${tableName};` : `drop table ${tableName};`;
-      const filename = `${tableName}_drop.hql`;
       const md5Path = util.md5(filename);
       this.dispatch('Workbench:add', {
         id: md5Path,
         filename,
         filepath: '',
         saveAs: true,
+        dataSetValue: this.datasourceName, // starrocks 数据源才有的，查询表时带上
         noLoadCache: true,
         // type: 'backgroundScript',
         code,
@@ -1046,13 +1350,9 @@ export default {
         this.$refs.deleteDialog.close();
         this.$nextTick(() => {
           this.dispatch('Workbench:run', {
+            dataSetValue: this.datasourceName,
             id: md5Path,
-          }, () => {
-            // 由于删除表成功之后，currentAcitved指向为当前已被删除的表，所以要改为刷新库
-            this.currentAcitved = find(this.tableList, (db) => db.name === (this.currentAcitved.dbName || this.currentAcitved.name));
-            this.setHiveCache(this.currentAcitved);
-            this.refresh();
-          });
+          }, afterRunDel);
         });
       });
     },

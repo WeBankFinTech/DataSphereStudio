@@ -95,11 +95,6 @@
         </template>
       </template>
     </Form>
-    <div class="save-button" v-if="isShowSaveButton">
-      <Button @click="save"
-        :disabled="isNodeMap">{{$t('message.workflow.process.nodeParameter.BC')}}
-      </Button>
-    </div>
     <templateSelectDrawer ref="templateSelectDrawer" v-show="isTemplateDrawerShow" @isShow="handleTemplateShow"
       :nodeInfo="nodeData" :templateList="templateList" @submit="handleTemplateSelect"
       :defaultTemplateId="currentNode.ecConfTemplateId"></templateSelectDrawer>
@@ -108,9 +103,11 @@
 <script>
 import resource from './resource.vue';
 import weTag from '@dataspherestudio/shared/components/tag/index.vue'
+import api from '@dataspherestudio/shared/common/service/api'
 import { isEmpty, cloneDeep } from 'lodash';
 import templateSelectDrawer from './templateSelectDrawer.vue'
 import { useData } from './useData.js';
+
 const {
   getTemplateDatas,
 } = useData();
@@ -134,17 +131,9 @@ export default {
       type: Boolean,
       default: false,
     },
-    isShowSaveButton: {
-      type: Boolean,
-      default: true,
-    },
     nodes: {
       type: Array,
       default: () => [],
-    },
-    isNodeMap: {
-      type: Boolean,
-      default: false
     },
     consoleParams: {
       type: Array,
@@ -578,7 +567,11 @@ export default {
       }
       return param;
     },
-    validFrom(cb) {
+    async validFrom(cb) {
+      const hasView = await this.checkIsView(this.currentNode.jobParams['check-object'], this.currentNode.jobParams['job-desc'])
+      if (hasView) {
+        return
+      }
       this.$refs.baseInfoForm.validate((baseInfoValid) => {
         if (baseInfoValid) {
           if (this.$refs.parameterForm) {
@@ -600,6 +593,37 @@ export default {
           this.$Message.warning(this.$t('message.workflow.process.nodeParameter.JDBDXTXBHF'));
         }
       });
+    },
+    async checkIsView(checkObject, jobDesc) {
+      if (!checkObject && !jobDesc) {
+        return false;
+      }
+      let hasView = []
+      this.$emit('saveButtonStatus', true);
+      try {
+        const res = await api.fetch('/dss/datapipe/datasource/validateDataCheckerHasView', {
+          checkObject,
+          jobDesc
+        }, 'post')
+        hasView = res && res.result && res.result.filter(it => it.view)
+        if (hasView.length) {
+          let strs = jobDesc.split('\n')
+          const tbs = [checkObject, ...strs].filter((str) => {
+            return hasView.some(it => new RegExp(`${it.db}\\.${it.table}\\b`).test(str))
+          }).join('<br/>')
+          const msg = `check.objeck或job.desc存在视图表:<br/><p>${tbs}</p><br/>请先删除视图表！`
+          this.$Modal.warning({
+            title: '提示',
+            content: `<div style="word-break: break-all;max-height: 470px;overflow-y:auto">${msg}</div>`,
+            closable: true,
+            width: 650
+          });
+        }
+      } catch (error) {
+        //
+      }
+      this.$emit('saveButtonStatus', false);
+      return hasView.length > 0
     },
     resourcesAction() {
       let resources = [];

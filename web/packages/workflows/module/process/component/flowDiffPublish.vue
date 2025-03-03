@@ -1,5 +1,5 @@
 <template>
-    <Drawer :title="$t('message.workflow.publishingWorkflow')" v-model="showDrawer" width="80%" :mask-closable="false"
+    <Drawer :title="$t('message.workflow.publishingWorkflow')" v-model="showDrawer" :width="drawerWidth" :mask-closable="false" draggable
         class-name="custom-drawer-style">
         <div class="flow-wrapper">
             <template v-if="associateGit">
@@ -84,6 +84,7 @@ export default {
     },
     data() {
         return {
+            drawerWidth: '33%',
             editorHeight: '300px',
             isLoading: false,
             isExpand: false,
@@ -130,7 +131,18 @@ export default {
             }
         }
     },
+    mounted() {
+        window.addEventListener('resize', this.handleWindowResize);
+        this.handleWindowResize();
+    },
+    beforeDestroy() {
+        window.removeEventListener('resize', this.handleWindowResize);
+    },
     methods: {
+        handleWindowResize() {
+            const initWidth = window.innerWidth * 0.33;
+            this.drawerWidth = `${initWidth}px`;
+        },
         buildTree(data, level = 1) {
             if (!data || ['[]', '{}'].includes(JSON.stringify(data))) return undefined;
             let values = data;

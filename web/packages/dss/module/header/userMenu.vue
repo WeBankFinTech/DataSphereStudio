@@ -96,6 +96,12 @@ export default {
     async logout() {
       const unsave = await eventbus.emit('check.scriptis.unsave');
       if (unsave) return
+      if ( window.$Wa) {
+        window.$Wa.track('user_logout', {
+          userName: window.username,
+          timestamp: Date.now()
+        })
+      }
       api.fetch('/user/logout', {}).then(() => {
         this.$emit('clear-session');
         storage.set('need-refresh-proposals-hql', true);

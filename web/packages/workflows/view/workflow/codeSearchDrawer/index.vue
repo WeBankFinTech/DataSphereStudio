@@ -4,6 +4,13 @@
             <div class="code-form">
                 <Form ref="codeFormRef" inline>
                     <FormItem label="">
+                        <Select class="code-form__select flow" v-model="searchForm.projectName" placeholder="请选择"
+                            filterable @on-change="getFlow($event)">
+                            <template #prefix>项目名:</template>
+                            <Option v-for="item in projectList" :value="item.name" :key="item.id">{{ item.name }}</Option>
+                        </Select>
+                    </FormItem>
+                    <FormItem label="">
                         <Select class="code-form__select flow" v-model="searchForm.workflowNameList" placeholder="请选择"
                             multiple filterable>
                             <template #prefix>工作流:</template>
@@ -123,6 +130,7 @@ export default {
     data() {
         return {
             searchForm: {
+                projectName: '',
                 workflowNameList: [],
                 typeList: [],
                 nodeName: '',
@@ -140,6 +148,7 @@ export default {
             showMore: false, // 查看更多
             currentItem: {},
             flowList: [],
+            projectList: [],
             loading: false
         }
     },
@@ -156,10 +165,12 @@ export default {
     watch: {
         showDrawer: {
             immediate: true,
-            handler: function (show) {
+            handler: async function (show) {
                 if (show) {
                     this.pageReset();
-                    this.getFlow();
+                    await this.getProject();
+                    this.searchForm.projectName = this.$route.query.projectName
+                    this.getFlow(this.searchForm.projectName)
                 }
             }
         }
@@ -191,7 +202,7 @@ export default {
             }
             this.loading = true;
             const params = {
-                projectName: this.$route.query.projectName,
+                projectName: this.searchForm.projectName,
                 workspaceId: this.$route.query.workspaceId,
                 workflowNameList: this.searchForm.workflowNameList,
                 typeList: this.searchForm.typeList,
@@ -232,6 +243,7 @@ export default {
         },
         pageReset() {
             this.searchForm = {
+                projectName: this.$route.query.projectName,
                 workflowNameList: [],
                 typeList: [],
                 nodeName: '',
@@ -252,10 +264,24 @@ export default {
         },
         gotoFile(ev, item, code) {
             const paths = (item.path || '').split('/');
+            const curProjectObj = this.projectList.find(item => { return item.name === this.searchForm.projectName})
+            // 子工作流节点
             if (paths.length > 3) {
-                return this.$Message.warning("暂不支持进入子工作流节点详情");
+                api.fetch(`/dss/workflow/queryNodeInfoByPath`, {
+                    path: item.path,
+                    projectId: curProjectObj.id,
+                }, 'post').then((res) => {
+                    const nodeInfo = {
+                        ...res.data,
+                        projectName: curProjectObj.name,
+                        id: curProjectObj.id
+                    }
+                    console.log('nodeInfo111', nodeInfo)
+                    this.$emit('openSubFlowNode', ev, item, code,nodeInfo)
+                })
+            } else {
+                this.$emit('openFlowNode', ev, item, code, curProjectObj)
             }
-            this.$emit('openFlowNode', ev, item, code)
         },
         handleClick(item, line) {
             item.end = line;
@@ -266,25 +292,42 @@ export default {
                 this.nodeTypeList = (rst.type || []).map(item => ({ name: item }));
             })
         },
-        getFlow() {
-            api.fetch(
-                `${this.$API_PATH.ORCHESTRATOR_PATH}getAllOrchestrator`,
+        async getProject() {
+            await api.fetch(
+                `${this.$API_PATH.PROJECT_PATH}getAllProjects`,
                 {
                     workspaceId: this.$route.query.workspaceId,
-                    orchestratorMode: this.currentMode,
-                    projectId: this.$route.query.projectID,
                 },
                 "post"
             )
                 .then((res) => {
-                    this.flowList = res.page.map((f) => {
-                        return {
-                            ...f,
-                            name: f.orchestratorName,
-                            type: "flow",
-                        };
+                    this.projectList = res.projects.filter((f) => {
+                        return f.associateGit
                     });
                 });
+        },
+        getFlow(projectName) {
+            const curProjectObj = this.projectList.find(item => { return item.name === projectName})
+            if(curProjectObj && curProjectObj.id) {
+                api.fetch(
+                    `${this.$API_PATH.ORCHESTRATOR_PATH}getAllOrchestrator`,
+                    {
+                        workspaceId: this.$route.query.workspaceId,
+                        orchestratorMode: this.currentMode,
+                        projectId: curProjectObj.id,
+                    },
+                    "post"
+                )
+                    .then((res) => {
+                        this.flowList = res.page.map((f) => {
+                            return {
+                                ...f,
+                                name: f.orchestratorName,
+                                type: "flow",
+                            };
+                        });
+                    });
+            }
         },
     }
 }
@@ -479,13 +522,15 @@ export default {
 <style lang="less">
 .custom-drawer-style {
     z-index: 1004 !important;
-    .ivu-drawer-body {
-        height: calc(100% - 100px);
-        overflow: auto;
-    }
-
-    .ivu-drawer-content {
-        top: 55px;
+    .ivu-drawer{
+        max-width: 78%;
+        .ivu-drawer-body {
+            height: calc(100% - 100px);
+            overflow: auto;
+        }
+        .ivu-drawer-content {
+            top: 55px;
+        }
     }
 }
 </style>

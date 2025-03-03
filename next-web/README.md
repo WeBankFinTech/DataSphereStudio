@@ -20,7 +20,6 @@ wnpm run dev
 
 浏览器插件 SwitchyOmega 配置规则，非接口的资源转发至 http://localhost:5173，开发时访问目标域名即可
 网址正则示例：
-^***REMOVED***(?!/api)._
 ^http://***REMOVED***:8088(?!/api)._
 
 ## 代码提交规范

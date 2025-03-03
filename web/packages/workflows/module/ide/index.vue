@@ -128,7 +128,8 @@ export default {
   },
   methods: {
     changeScriptTab({ type }) {
-      this.dataSourcetype = type
+      // console.log('changeScriptTab-ide', type)
+      // this.dataSourcetype = type
     },
     init() {
       this.leftSideNavList = this.setLeftSideNavList();

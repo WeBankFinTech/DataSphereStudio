@@ -310,11 +310,13 @@ export default {
   },
 }
 </script>
-<style lang="less" scoped>
+<style lang="scss" scoped>
+@import '@dataspherestudio/shared/common/style/variables.scss';
 .designer .designer-toolbar .toolbar-diabled-item {
-  color: #d2d3d5;
+  @include font-color(#d2d3d5, #FFFFFF4D);
+  cursor: not-allowed;
   .icon-label {
-    color: #d2d3d5;
+    @include font-color(#d2d3d5, #FFFFFF4D);
   }
 }
 </style>

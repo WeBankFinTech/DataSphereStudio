@@ -42,6 +42,14 @@ public class OrchestratorRequest {
      */
     private LabelRouteVO labels;
 
+    public OrchestratorRequest() {
+    }
+
+    public OrchestratorRequest(Long workspaceId, Long projectId) {
+        this.workspaceId = workspaceId;
+        this.projectId = projectId;
+    }
+
     public LabelRouteVO getLabels() {
         return labels;
     }

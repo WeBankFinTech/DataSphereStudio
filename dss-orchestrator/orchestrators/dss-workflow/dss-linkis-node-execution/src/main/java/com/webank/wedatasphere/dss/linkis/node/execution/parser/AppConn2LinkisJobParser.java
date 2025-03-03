@@ -73,6 +73,8 @@ public class AppConn2LinkisJobParser extends BML2LinkisJobParser {
                 throw new LinkisJobExecutionErrorException(50063, "Failed to get workspace str, responseBody is: " +
                         result.getResponseBody());
             }
+        }catch(LinkisJobExecutionErrorException e){
+            throw  new RuntimeException(e);
         } finally {
             if(client != null) {
                 client.close();

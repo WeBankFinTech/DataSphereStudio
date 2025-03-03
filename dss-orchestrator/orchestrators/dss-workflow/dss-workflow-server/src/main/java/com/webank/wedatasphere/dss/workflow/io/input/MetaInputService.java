@@ -19,6 +19,7 @@ package com.webank.wedatasphere.dss.workflow.io.input;
 
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlowRelation;
+import org.apache.linkis.protocol.util.ImmutablePair;
 
 import java.io.IOException;
 import java.util.List;
@@ -26,6 +27,7 @@ import java.util.List;
 public interface MetaInputService {
 
     List<DSSFlow> inputFlow(String basePath) throws IOException;
+    ImmutablePair<List<DSSFlow>,List<DSSFlowRelation>> inputFlowNew(String flowMetaPath) throws IOException;
 
     List<DSSFlowRelation> inputFlowRelation(String basePath) throws IOException;
 

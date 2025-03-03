@@ -1,8 +1,8 @@
 ##Linkis gateway url
 LINKIS_GATEWAY_URL=http://127.0.0.1:9001
 
-##Linkis gateway token default 172.0.0.1
-LINKIS_GATEWAY_TOKEN=172.0.0.1
+##Linkis gateway token default WS-AUTH
+LINKIS_GATEWAY_TOKEN=xxx
 
 
 ##Azkaban executor host

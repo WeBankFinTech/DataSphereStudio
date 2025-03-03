@@ -22,11 +22,11 @@
 
     <sql id="orchestrator_main">
         id,`name`,`type`,`desc`,`creator`,`create_time`,`project_id`,`uses`,`appconn_name`,`uuid`,`secondary_type` ,
-        `workspace_id`,`orchestrator_mode`,`orchestrator_way`,`orchestrator_level`,`update_user`,`update_time`
+        `workspace_id`,`orchestrator_mode`,`orchestrator_way`,`orchestrator_level`,`update_user`,`update_time`,`is_default_reference`
     </sql>
 
     <sql id="orchestrator_version">
-        id,`orchestrator_id`,`app_id`,`source`,`version`,`comment`,`update_time`,`updater`,`project_id`,`content`,`context_id`,`valid_flag`
+        id,`orchestrator_id`,`app_id`,`source`,`version`,`comment`,`update_time`,`updater`,`project_id`,`content`,`context_id`,`valid_flag`, `commit_id`
     </sql>
 
     <sql id="orchestrator_ref_orchestration">
@@ -35,12 +35,16 @@
 
     <select id="getOrchestrator"
             resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo">
-        SELECT * FROM `dss_orchestrator_info` WHERE id = #{id}
+        SELECT
+        <include refid="orchestrator_main"/>,`status`
+        FROM `dss_orchestrator_info` WHERE id = #{id}
     </select>
 
     <select id="getOrchestratorByUUID"
             resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo">
-        SELECT * FROM `dss_orchestrator_info` WHERE uuid = #{uuid}
+        SELECT
+        <include refid="orchestrator_main"/>, `status`
+        FROM `dss_orchestrator_info` WHERE uuid = #{uuid}
     </select>
 
     <insert id="addOrchestrator" useGeneratedKeys="true" keyProperty="id"
@@ -49,7 +53,8 @@
         VALUES
         (#{id},#{name},#{type},#{desc},#{creator},#{createTime},#{projectId},#{uses},#{appConnName},
         #{uuid},#{secondaryType},
-        #{workspaceId},#{orchestratorMode},#{orchestratorWay},#{orchestratorLevel},#{updateUser},#{updateTime})
+        #{workspaceId},#{orchestratorMode},#{orchestratorWay},#{orchestratorLevel},#{updateUser},#{updateTime}
+        ,#{isDefaultReference})
     </insert>
 
     <update id="updateOrchestrator"
@@ -64,9 +69,22 @@
             <if test="orchestratorLevel != null">`orchestrator_level`=#{orchestratorLevel},</if>
             <if test="updateUser != null">`update_user`=#{updateUser},</if>
             <if test="updateTime != null">`update_time`=#{updateTime},</if>
+            <if test="isDefaultReference != null">`is_default_reference`=#{isDefaultReference},</if>
         </trim>
         WHERE id = #{id}
     </update>
+
+    <update id="updateOrchestratorBmlVersion">
+        UPDATE dss_orchestrator_info
+        <set>
+            `bml_version` = #{bmlVersion}, `resource_id` = #{resourceId}
+        </set>
+        where `id` = #{id}
+    </update>
+
+    <select id="getOrchestratorBmlVersion" resultType="com.webank.wedatasphere.dss.common.entity.BmlResource">
+        SELECT `bml_version` as `version`, resource_id FROM dss_orchestrator_info WHERE `id` = #{id}
+    </select>
 
 
     <delete id="deleteOrchestrator">
@@ -80,7 +98,7 @@
             parameterType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion">
         INSERT INTO dss_orchestrator_version_info (<include refid="orchestrator_version"/>)
         VALUES
-        (#{id},#{orchestratorId},#{appId},#{source},#{version},#{comment},#{updateTime},#{updater},#{projectId},#{content},#{contextId},#{validFlag})
+        (#{id},#{orchestratorId},#{appId},#{source},#{version},#{comment},NOW(),#{updater},#{projectId},#{content},#{contextId},#{validFlag}, #{commitId})
     </insert>
 
 
@@ -100,10 +118,17 @@
         WHERE id = #{id}
     </update>
 
+    <update id="updateOrchestratorVersionUpdateTime"
+            parameterType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion">
+        UPDATE dss_orchestrator_version_info
+        set `update_time` = Now()
+        WHERE id = #{id}
+    </update>
+
     <select id="getLatestOrchestratorVersionById"
             resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion">
         SELECT
-        *
+        <include refid="orchestrator_version"/>
         FROM
         `dss_orchestrator_version_info`
         WHERE
@@ -115,7 +140,7 @@
     <select id="getLatestOrchestratorVersionByIdAndValidFlag"
             resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion">
         SELECT
-        *
+        <include refid="orchestrator_version"/>
         FROM
         `dss_orchestrator_version_info`
         WHERE
@@ -128,7 +153,7 @@
     <select id="getOrchestratorVersion"
             resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion">
         SELECT
-        *
+        <include refid="orchestrator_version"/>
         FROM
         `dss_orchestrator_version_info`
         WHERE
@@ -154,7 +179,9 @@
 
     <select id="getVersionByOrchestratorId"
             resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion">
-        SELECT * FROM dss_orchestrator_version_info
+        SELECT
+        <include refid="orchestrator_version"/>, commit_id
+        FROM dss_orchestrator_version_info
         WHERE orchestrator_id = #{orchestratorId} and valid_flag = 1 and context_id != ''
         ORDER BY id DESC
     </select>
@@ -181,10 +208,13 @@
         <result column="updater" property="updater" jdbcType="LONGVARCHAR"/>
         <result column="project_id" property="projectId" jdbcType="BIGINT"/>
         <result column="content" property="content" jdbcType="LONGVARCHAR"/>
+        <result column="commit_id" property="commitId" jdbcType="LONGVARCHAR"/>
     </resultMap>
 
     <select id="getOrchestratorVersions" resultMap="orchestrator_version_info_result_map">
-        select * from `dss_orchestrator_version_info` where `project_id` = #{projectId} and `orchestrator_id` =
+        select
+        <include refid="orchestrator_version"/>
+        from `dss_orchestrator_version_info` where `project_id` = #{projectId} and `orchestrator_id` =
         #{orchestratorId} and valid_flag = 1
     </select>
 
@@ -200,7 +230,9 @@
 
 
     <select id="getVersionByOrchestratorIdAndVersion" resultMap="orchestrator_version_info_result_map">
-        SELECT * FROM dss_orchestrator_version_info
+        SELECT
+        <include refid="orchestrator_version"/>
+        FROM dss_orchestrator_version_info
         WHERE orchestrator_id = #{orchestratorId} and version = #{version} and valid_flag = 1
         ORDER BY app_id DESC limit 1
     </select>
@@ -213,7 +245,9 @@
 
     <select id="queryOrchestratorInfos" parameterType="java.util.Map"
             resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo">
-        select * from dss_orchestrator_info
+        select
+        <include refid="orchestrator_main"/>, `status`
+        from dss_orchestrator_info
         <where>
             <if test="params.workspace_id != null">
                 workspace_id=#{params.workspace_id}
@@ -235,7 +269,8 @@
 
     <select id="getRefOrchestrationId"
             resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorRefOrchestration">
-        select *
+        select
+        <include refid="orchestrator_ref_orchestration"/>
         from dss_orchestrator_ref_orchestration_relation
         where orchestrator_id = #{orchestratorId}
     </select>
@@ -274,4 +309,239 @@
             #{item.id}
         </foreach>
     </update>
+
+    <insert id="insertOrchestratorSubmitJob" useGeneratedKeys="true" keyProperty="id" parameterType="com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorSubmitJob">
+        insert into dss_orchestrator_submit_job_info (`orchestrator_id`, `create_time`, `update_time`, `instance_name`, `status`) values
+        (#{orchestratorId}, Now(), Now(), #{instanceName}, #{status})
+    </insert>
+
+    <update id="updateOrchestratorSubmitJobStatus">
+        update dss_orchestrator_submit_job_info
+        <set>
+            `error_msg` = #{errMsg} ,`update_time` = Now() , `status` = #{status}
+        </set>
+        where `id` = #{id}
+    </update>
+
+    <select id="getLatestOrchestratorSubmitJobId" resultType="long">
+        select `id` from dss_orchestrator_submit_job_info where `orchestrator_id` = #{orchestratorId}
+        order by update_time desc limit 1
+    </select>
+
+    <update id="updateOrchestratorSubmitResult">
+        update dss_orchestrator_submit_job_info
+        <set>
+            `submit_result` = #{result},`update_time` = Now() , `status` = #{status}
+        </set>
+        where `id` = #{id}
+    </update>
+
+    <update id="batchUpdateOrchestratorSubmitJobStatus">
+        update dss_orchestrator_submit_job_info
+        <set>
+            `error_msg` = #{errMsg} ,`update_time` = Now() , `status` = #{status}
+        </set>
+        where `id` IN
+        <foreach collection="list" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </update>
+
+    <select id="selectSubmitJobStatus" resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorSubmitJob">
+        select `id`, `orchestrator_id`, `create_time`, `update_time`, instance_name, status, error_msg from dss_orchestrator_submit_job_info
+        where orchestrator_id = #{orchestratorId}
+        order by id desc limit 1
+    </select>
+
+    <select id="selectSubmitJobStatusById" resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorSubmitJob">
+        SELECT `id`, `orchestrator_id`, `create_time`, `update_time`, instance_name, status, error_msg FROM dss_orchestrator_submit_job_info
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectResult" resultType="java.lang.String">
+        SELECT submit_result FROM dss_orchestrator_submit_job_info WHERE id = #{id}
+    </select>
+
+
+    <select id="getAllOrchestratorMeta" parameterType="com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorMetaRequest"
+            resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorMeta">
+        select * from
+        (select t1.id              as orchestratorId
+        ,t1.name            as orchestratorName
+        ,t1.desc            as description
+        ,t1.uuid            as uuid
+        ,t1.status          as status
+        ,t1.is_default_reference as isDefaultReference
+        ,t1.project_id      as projectId
+        ,t2.name    as projectName
+        ,t2.associate_git   as associateGit
+        ,t3.global_var      as globalVar
+        ,t3.meta_resource        as metaResource
+        ,t3.proxy_user      as proxyUser
+        from dss_orchestrator_info t1
+        join dss_project t2  on t1.project_id  = t2.id and t2.workspace_id = #{workspaceId} and t2.visible = 1
+        left join dss_workflow_node_meta t3 on t1.id = t3.orchestrator_id
+        ) A
+        where 1 = 1
+
+        <if test="projectList!=null and projectList.size() > 0">
+            and projectName in
+            <foreach collection="projectList" item="project" open="(" separator="," close=")">
+                #{project}
+            </foreach>
+        </if>
+
+        <if test="orchestratorName!= null and orchestratorName != ''">
+            and orchestratorName like concat('%',#{orchestratorName},'%')
+        </if>
+
+    </select>
+
+
+    <select id="getOrchestratorMeta" parameterType="java.lang.Long"
+            resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorMeta">
+        select
+         t1.id as id
+        ,t1.id as orchestratorId
+        ,t2.global_var      as globalVar
+        ,t2.meta_resource        as metaResource
+        ,t2.proxy_user      as proxyUser
+        ,t1.name            as orchestratorName
+        ,t1.type            as type
+        ,t1.desc            as description
+        ,t1.creator         as creator
+        ,t1.project_id      as projectId
+        ,t1.uses            as uses
+        ,t1.appconn_name    as appconnName
+        ,t1.secondary_type  as secondaryType
+        ,t1.workspace_id    as workspaceId
+        ,t1.orchestrator_mode  as orchestratorMode
+        ,t1.orchestrator_way  as orchestratorWay
+        ,t1.orchestrator_level as orchestratorLevel
+        ,t1.project_id      as projectId
+        ,t1.uuid            as uuid
+        ,t1.status          as status
+        ,t1.is_default_reference as isDefaultReference
+        ,t3.associate_git   as associateGit
+        from dss_orchestrator_info t1
+        left join dss_workflow_node_meta t2 on t1.id = t2.orchestrator_id
+        left join dss_project t3 on t1.project_id  = t3.id
+        where t1.id = #{orchestratorId}
+    </select>
+
+    <select id="getOrchestratorName" resultType="java.lang.String">
+        SELECT name from dss_orchestrator_info where id IN
+        <foreach collection="list" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getOrchestratorReleaseVersionInfo" parameterType="java.util.List"
+            resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorReleaseVersionInfo">
+        select  a.id               as id
+        ,a.orchestrator_id  as orchestratorId
+        ,a.version          as version
+        ,a.update_time      as updateTime
+        ,a.updater          as updater
+        ,b.status           as status
+        ,b.error_msg        as errorMsg
+        ,b.update_time      as releaseTime
+        ,COALESCE (b.id,0)  as releaseTaskId
+        ,b.release_user     as releaseUser
+        from dss_orchestrator_version_info a
+        left join dss_release_task b on a.orchestrator_id = b.orchestrator_id and a.id = b.orchestrator_version_id
+        where a.valid_flag  = 1  and a.orchestrator_id in
+        <foreach collection="orchestratorIdList" index="index" item="orchestratorId" open="(" close=")" separator=",">
+            #{orchestratorId}
+        </foreach>
+
+    </select>
+
+
+    <select id="getOrchestratorDefaultTemplateInfo"
+            resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorTemplateInfo">
+        select  a.orchestrator_id as orchestratorId
+        ,b.name   as templateName
+        from dss_workflow_default_template  a
+        join dss_ec_config_template  b on a.template_id  = b.template_id
+        where a.orchestrator_id in
+        <foreach collection="orchestratorIdList" index="index" item="orchestratorId" open="(" close=")" separator=",">
+            #{orchestratorId}
+        </foreach>
+    </select>
+
+    <select id="getAllOrchestratorName" resultType="java.lang.String">
+        select distinct t1.name
+        from dss_orchestrator_info t1
+        join dss_project t2
+        on t1.project_id  = t2.id
+        and t2.workspace_id = #{workspaceId}
+        and t2.visible = 1
+        <if test="projectName != null and projectName !=''">
+            and t2.name = #{projectName}
+        </if>
+    </select>
+
+
+
+    <select id="getOrchestratorVersionById" resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorReleaseVersionInfo">
+        select  a.id               as id
+        ,a.orchestrator_id  as orchestratorId
+        ,a.version          as version
+        ,a.update_time      as updateTime
+        ,a.updater          as updater
+        ,b.status           as status
+        ,b.error_msg        as errorMsg
+        ,b.update_time      as release_time
+        ,b.id               as releaseTaskId
+        from dss_orchestrator_version_info a
+        left join dss_release_task b on a.orchestrator_id = b.orchestrator_id and a.id = b.orchestrator_version_id
+        where a.valid_flag  = 1  and a.orchestrator_id  = #{orchestratorId}
+        order by b.id desc  limit 1
+    </select>
+
+    <select id="getSubmitJobStatus" resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorSubmitJob">
+        select `id`, `orchestrator_id`, `create_time`, `update_time`, instance_name, status, error_msg from dss_orchestrator_submit_job_info
+        where orchestrator_id in
+        <foreach collection="orchestratorIdList" index="index" item="orchestratorId" open="(" close=")" separator=",">
+            #{orchestratorId}
+        </foreach>
+    </select>
+
+    <update id="updateOrchestratorNotContainsKeywordsNode">
+        update dss_orchestrator_info set not_contains_keywords_node = #{notContainsKeywordsNode}
+        where id = #{orchestratorId}
+    </update>
+
+    <select id="getOrchestratorNotContainsKeywordsNode" resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo">
+        select t1.id
+              ,t1.name
+              ,t1.not_contains_keywords_node as notContainsKeywordsNode
+              ,t1.project_id  as projectId
+              ,t1.workspace_id as workspaceId
+              ,t2.name as projectName
+              ,t2.associate_git as associateGit
+        from dss_orchestrator_info t1
+        left join dss_project t2 on t1.project_id = t2.id
+        where t1.id =#{orchestratorId}
+    </select>
+
+
+    <select id="getOrchestratorListById" resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo">
+        select t1.id
+              ,t1.name
+              ,t1.not_contains_keywords_node as notContainsKeywordsNode
+              ,t1.project_id  as projectId
+              ,t1.workspace_id as workspaceId
+              ,t2.name as projectName
+              ,t2.associate_git as associateGit
+        from dss_orchestrator_info t1
+        left join dss_project t2 on t1.project_id = t2.id
+        where t1.id in
+        <foreach collection="orchestratorIdList" index="index" item="orchestratorId" open="(" close=")" separator=",">
+            #{orchestratorId}
+        </foreach>
+    </select>
+
+
 </mapper>

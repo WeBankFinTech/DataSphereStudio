@@ -25,7 +25,8 @@ import java.util.Properties;
 
 public class DataDruidFactory {
 	private static volatile DruidDataSource jobInstance;
-    private static volatile DruidDataSource bdpInstance;
+
+    private static volatile DruidDataSource dopsInstance;
     private static volatile DruidDataSource msgInstance;
 
     public static DruidDataSource getJobInstance(Properties props, Logger log) {
@@ -35,26 +36,27 @@ public class DataDruidFactory {
                     try {
                         jobInstance = createDataSource(props, log, "Job");
                     } catch (Exception e) {
-                        throw new RuntimeException("Error creating Druid DataSource", e);
+                        throw new RuntimeException("Error creating job Druid DataSource", e);
                     }
                 }
             }
         }
         return jobInstance;
     }
-    public static DruidDataSource getBDPInstance(Properties props, Logger log) {
-        if (bdpInstance == null ) {
+
+    public static DruidDataSource getDopsInstance(Properties props, Logger log) {
+        if (dopsInstance == null) {
             synchronized (DataDruidFactory.class) {
-                if(bdpInstance == null) {
+                if (dopsInstance == null) {
                     try {
-                        bdpInstance = createDataSource(props, log, "BDP");
+                        dopsInstance = createDataSource(props, log, "Dops");
                     } catch (Exception e) {
-                        throw new RuntimeException("Error creating Druid DataSource", e);
+                        throw new RuntimeException("Error creating DOPS Druid DataSource", e);
                     }
                 }
             }
         }
-        return bdpInstance;
+        return dopsInstance;
     }
 
     public static DruidDataSource getMsgInstance(Properties props, Logger log) {
@@ -109,6 +111,22 @@ public class DataDruidFactory {
                 }
             } catch (Exception e) {
                 log.error("password decore failed" + e);
+            }
+        }else if ("Dops".equals(type)) {
+            name = props.getProperty("dops.datachecker.jdo.option.name");
+            url = props.getProperty("dops.datachecker.jdo.option.url");
+            username = props.getProperty("dops.datachecker.jdo.option.username");
+            password=props.getProperty("dops.datachecker.jdo.option.password");
+            loginType = props.getProperty("dops.datachecker.jdo.option.login.type");
+            log.info("dops url is:" + url + "and name is:" + username);
+            try {
+                if ("base64".equals(loginType)) {
+                    password = new String(Base64.getDecoder().decode(props.getProperty("dops.datachecker.jdo.option.password").getBytes()), "UTF-8");
+                } else {
+                    password = props.getProperty("dops.datachecker.jdo.option.password");
+                }
+            } catch (Exception e) {
+                log.error("password decore failed", e);
             }
         }
         int initialSize = Integer.valueOf(props.getProperty("datachecker.jdo.option.initial.size", "1"));

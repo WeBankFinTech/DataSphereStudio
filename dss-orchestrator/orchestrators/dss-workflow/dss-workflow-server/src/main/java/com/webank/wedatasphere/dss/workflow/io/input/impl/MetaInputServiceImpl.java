@@ -16,18 +16,23 @@
 
 package com.webank.wedatasphere.dss.workflow.io.input.impl;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.reflect.TypeToken;
 import com.webank.wedatasphere.dss.common.utils.IoUtils;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlowRelation;
 import com.webank.wedatasphere.dss.workflow.io.input.MetaInputService;
 import com.webank.wedatasphere.dss.workflow.io.input.MetaReader;
+import org.apache.linkis.protocol.util.ImmutablePair;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.lang.reflect.Type;
 import java.util.List;
+
+import static com.webank.wedatasphere.dss.workflow.io.export.impl.MetaExportServiceImpl.*;
 
 
 @Service
@@ -37,6 +42,20 @@ public class MetaInputServiceImpl implements MetaInputService {
 
     private final String fileName = "meta.txt";
 
+    @Override
+    public ImmutablePair<List<DSSFlow>,List<DSSFlowRelation>> inputFlowNew(String flowMetaPath) throws IOException {
+        File flowMetaFile = new File(flowMetaPath + File.separator + FLOW_META_FILE_NAME);
+        JsonParser jsonParser = new JsonParser();
+        Gson gson = new Gson();
+        try (FileReader reader = new FileReader(flowMetaFile)) {
+            Type flowListType = new TypeToken<List<DSSFlow>>() {}.getType();
+            Type flowRelationListType = new TypeToken<List<DSSFlowRelation>>() {}.getType();
+            JsonObject jsonObject = jsonParser.parse(reader).getAsJsonObject();
+            List<DSSFlow> flows = gson.fromJson(jsonObject.get(FLOW_META_KEY), flowListType);
+            List<DSSFlowRelation> flowRelations = gson.fromJson(jsonObject.get(FLOW_RELATION_META_KEY), flowRelationListType);
+            return new ImmutablePair<>(flows, flowRelations);
+        }
+    }
 
     @Override
     public List<DSSFlow> inputFlow(String basePath) throws IOException {

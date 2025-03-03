@@ -203,6 +203,7 @@
         "publish": "发布",
         "mapMOdel": "地图模式",
         "stop": "停止",
+        "submitgit": "提交",
         "GZLKF": "工作流",
         "params": "参数",
         "resource": "资源",
@@ -379,6 +380,7 @@
           "WJYCZ": "文件已存在，请选择其它文件或选择其它文件夹！",
           "WJMCBHF": "文件名称不合法，仅支持以字母、数字、中文、下划线、中短线且带后缀的命名！",
           "SCBCG100": "上传文件不超过100M！",
+          "SCBCG200": "上传文件不超过200M！",
           "SCCG": "文件 {name} 上传成功！",
           "WJCCXE": "文件大小超出限额！",
           "WJBSC": "资源文件 {name} 已被成功删除！"
@@ -408,6 +410,7 @@
       "publish": {
         "desc": "发布描述:",
         "inputDesc": "请输入发布描述",
+        "submitDesc": "请输入提交注释",
         "error": "工作流{name}发布失败",
         "success": "工作流{name}发布成功",
         "failed": "工作流发布错误",
@@ -454,6 +457,8 @@
       "importflow": "导入工作流",
       "Nopermission": "无运维权限",
       "Configuration": "配置",
+      "Find": "查找",
+      "viewgit": "查看git",
       "Delete": "删除",
       "Copy": "复制",
       "Show": "查看版本",

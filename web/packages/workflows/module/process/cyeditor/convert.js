@@ -24,6 +24,7 @@ export default function convertFlowJson(flowjson) {
         }
       }
       item.selected = element.selected;
+      item.disabled = element.disabled;
       elements.nodes.push(item)
     })
     const hasNode = (target) => {

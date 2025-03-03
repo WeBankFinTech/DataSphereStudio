@@ -52,6 +52,8 @@ public class OrchestratorCreateRequest extends OrchestratorRequest {
 
     private String workspaceName;
 
+    private String isDefaultReference;
+
     public OrchestratorCreateRequest() {
     }
 
@@ -128,6 +130,14 @@ public class OrchestratorCreateRequest extends OrchestratorRequest {
 
     public void setOrchestratorLevel(String orchestratorLevel) {
         this.orchestratorLevel = orchestratorLevel;
+    }
+
+    public String getIsDefaultReference() {
+        return isDefaultReference;
+    }
+
+    public void setIsDefaultReference(String isDefaultReference) {
+        this.isDefaultReference = isDefaultReference;
     }
 
     @Override

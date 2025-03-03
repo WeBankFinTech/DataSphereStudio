@@ -173,7 +173,8 @@ public class ApiServiceExecuteRestfulApi {
                              @RequestParam(required = false, name = "taskId") String taskId,
                              @RequestParam(required = false, name = "page", defaultValue = "1") Integer page,
                              @RequestParam(required = false, name = "pageSize", defaultValue = "5000") Integer pageSize,
-                             @RequestParam(required = false, name = "charset", defaultValue = "utf-8") String charset) {
+                             @RequestParam(required = false, name = "charset", defaultValue = "utf-8") String charset,
+                             @RequestParam(required = false, name = "enableLimit", defaultValue = "false") Boolean enableLimit) {
         String userName = SecurityFilter.getLoginUsername(req);
         logger.info("User {} wants to open resultSet file {} in task {}.", userName, path, taskId);
         if (!isNumber(taskId)) {
@@ -191,7 +192,7 @@ public class ApiServiceExecuteRestfulApi {
         } else if (userName.equals(apiServiceJob.getSubmitUser())) {
             UJESClient client = LinkisJobSubmit.getClient();
             try {
-                String fileContent = ExecuteCodeHelper.getResultContent(apiServiceJob.getProxyUser(), path, pageSize, client);
+                String fileContent = ExecuteCodeHelper.getResultContent(apiServiceJob.getProxyUser(), path, pageSize, client,enableLimit);
                 return DSSCommonUtils.COMMON_GSON.fromJson(fileContent, Message.class);
             } catch (Exception e) {
                 logger.error("User {} fetch resultSet {} failed.", userName, path, e);

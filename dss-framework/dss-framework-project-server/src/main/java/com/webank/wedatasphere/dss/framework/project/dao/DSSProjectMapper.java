@@ -32,8 +32,6 @@ import java.util.List;
 @Mapper
 public interface DSSProjectMapper extends BaseMapper<DSSProjectDO> {
 
-    void addProject(DSSProjectPo dssProjectPo);
-
     @Select("select id from dss_project where `name` = #{projectName}")
     Long getProjectIdByName(@Param("projectName") String projectName);
 
@@ -70,4 +68,19 @@ public interface DSSProjectMapper extends BaseMapper<DSSProjectDO> {
      *
      */
     List<QueryProjectVo> getDeletedProjects(ProjectQueryRequest projectRequest);
+
+
+
+    List<QueryProjectVo> queryListByParam(ProjectQueryRequest projectRequest);
+
+
+    List<Integer> getProjectIdByUser(@Param("priv") Integer priv,@Param("userList") List<String> userList);
+
+    List<DSSProjectDO> getProjectByName(List<String> list);
+
+
+    List<String> queryProjectName(@Param("workspaceId") Long workspaceId,@Param("queryUser") String queryUser);
+
+
+    List<QueryProjectVo> queryProjectList(@Param("workspaceId") Long workspaceId,@Param("queryUser") String queryUser);
 }

@@ -20,7 +20,7 @@ import org.apache.linkis.common.conf.CommonVars;
 
 
 public class DSSScriptisConfiguration {
-    public final static CommonVars<String> LINKIS_AUTHOR_USER_TOKEN = CommonVars.apply("wds.linkis.client.api.service.author.user.token","172.0.0.1");
+    public final static CommonVars<String> LINKIS_AUTHOR_USER_TOKEN = CommonVars.apply("wds.linkis.client.api.service.author.user.token","");
     public final static CommonVars<String> LINKIS_ADMIN_USER = CommonVars.apply("wds.linkis.client.api.service.adminuser","ws");
 
     public final static  CommonVars<Long>  LINKIS_CONNECTION_TIMEOUT = CommonVars.apply("wds.linkis.client.connection.timeout",45000L);
@@ -28,6 +28,5 @@ public class DSSScriptisConfiguration {
 
     public final static String GLOBAL_LIMITS_PREFIX = "wds.dss.scriptis.global.limits.";
     public final static String GLOBAL_LIMIT_PREFIX = "wds.dss.scriptis.global.limit.";
-
 
 }

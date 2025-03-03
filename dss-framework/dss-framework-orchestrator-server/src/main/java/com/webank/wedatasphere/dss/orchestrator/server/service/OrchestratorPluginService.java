@@ -16,8 +16,22 @@
 
 package com.webank.wedatasphere.dss.orchestrator.server.service;
 
+import com.webank.wedatasphere.dss.common.entity.BmlResource;
+import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
+import com.webank.wedatasphere.dss.git.common.protocol.GitTree;
+import com.webank.wedatasphere.dss.git.common.protocol.response.GitCommitResponse;
+import com.webank.wedatasphere.dss.git.common.protocol.response.GitFileContentResponse;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestFrameworkConvertOrchestration;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseConvertOrchestrator;
+import com.webank.wedatasphere.dss.orchestrator.server.entity.request.BatchPublishFlowCheckRequest;
+import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorSubmitRequest;
+import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorDiffDirVo;
+import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorDiffNodeVo;
+import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorRelationVo;
+import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
+
+import java.util.List;
+import java.util.Map;
 
 
 public interface OrchestratorPluginService {
@@ -28,5 +42,27 @@ public interface OrchestratorPluginService {
     ResponseConvertOrchestrator convertOrchestration(RequestFrameworkConvertOrchestration requestConversionOrchestration);
 
     ResponseConvertOrchestrator getConvertOrchestrationStatus(String id);
+
+    Long diffFlow(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace) throws Exception;
+
+    OrchestratorDiffDirVo diffPublish(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace);
+
+    GitFileContentResponse diffFlowContent(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace) throws DSSErrorException;
+
+    void submitFlow(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace) throws DSSErrorException;
+
+    void batchSubmitFlow(Map<String, List<OrchestratorRelationVo>> map, Map<String, Long> projectMap, String username, Workspace workspace, String label, String comment) throws DSSErrorException;
+
+    GitCommitResponse submitWorkflowSync(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace) throws DSSErrorException;
+
+    BmlResource uploadWorkflowListToGit(List<Long> flowIdList, String projectName, String label, String username, Workspace workspace, Long projectId) throws Exception;
+
+    String diffStatus(Long taskId) throws DSSErrorException;
+
+    OrchestratorDiffDirVo diffContent(Long taskId);
+
+    OrchestratorDiffNodeVo getNotContainsKeywordsNode(long orchestratorId, long projectId, Workspace workspace) throws  DSSErrorException;
+
+    List<OrchestratorDiffNodeVo> batchPublishFlowCheck(BatchPublishFlowCheckRequest request,Workspace workspace) throws DSSErrorException;
 
 }

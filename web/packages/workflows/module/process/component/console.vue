@@ -176,6 +176,7 @@ export default {
       const node = this.node;
       this.script = new Script({
         nodeId: node.key,
+        runType: this.node.runType,
         title: node.title,
         scriptViewState: this.scriptViewState,
       });
@@ -234,6 +235,7 @@ export default {
         this.updateNodeCache(['log']);
       });
       this.execute.on('result', (ret) => {
+        if (!this.execute) return
         this.showPanelTab('result');
         const storeResult = {
           'headRows': ret.metadata,
@@ -460,6 +462,7 @@ export default {
           if (cache) {
             this.script = Object.assign({}, new Script({
               nodeId,
+              runType: this.node.runType,
               title: this.node.title,
               scriptViewState: this.scriptViewState,
             }), cache);

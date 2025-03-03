@@ -559,7 +559,12 @@ export default {
         
         const showConvertModal = () => {
           const options = ["hive", "spark", "starrocks"]
-            .filter(it => it !== vm.application)
+            .filter(it => {
+              if (vm.application === 'jdbc') {
+                return it !== 'starrocks'
+              }
+              return it !== vm.application
+            })
           let type = options[0]
           this.$Modal.confirm({
             title: '代码转换',

@@ -21,15 +21,18 @@ export const useData = () => {
   const getTemplateDatas = async (params) => {
     console.log('getTemplateDatas-params', params)
     let originTemplates = []
-    await api.fetch(`${apiPre}getProjectTemplates`, params, 'get').then(res => {
-      originTemplates = res.templates || []
-    })
-    originTemplates.forEach(e => {
-      e.child.forEach(subE => {
-        subE.disabled = false
-        subE.enginType = e.enginType
+    try {
+      await api.fetch(`${apiPre}getProjectTemplates`, params, 'get').then(res => {
+        originTemplates = res.templates || []
       })
-    })
+      originTemplates.forEach(e => {
+        e.child.forEach(subE => {
+          subE.disabled = false
+          subE.enginType = e.enginType
+        })
+    })} catch (e) {
+      console.log('getTemplateDatas-error', e)
+    }
     return originTemplates
   }
   return {

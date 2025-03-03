@@ -165,7 +165,7 @@ export default {
   },
   computed: {
     allDisbled() {
-      return ['hql', 'sql', 'py', 'tsql'].includes(this.script.runType);
+      return ['hql', 'sql', 'py', 'tsql', 'jdbc'].includes(this.script.runType);
     }
   },
   methods: {

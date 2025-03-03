@@ -16,6 +16,7 @@
  */
 
 import api from '@dataspherestudio/shared/common/service/api';
+import storage from '@dataspherestudio/shared/common/helper/storage';
 import Vue from 'vue';
 export default {
   name: 'HiveSidebar',
@@ -27,8 +28,12 @@ export default {
   },
   methods: {
     getAllDbsAndTables() {
+      const closeSuggest = storage.get('close_db_table_suggest');
+      if (closeSuggest) {
+        return Promise.resolve([])
+      }
       return new Promise((resolve, reject) => {
-        api.fetch(`/datasource/all`, 'get').then((rst) => {
+        api.fetch(`/datasource/getByAccessTime`, 'get').then((rst) => {
           const hiveList = [];
           if (rst.dbs) {
             rst.dbs.forEach((list) => {

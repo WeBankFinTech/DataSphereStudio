@@ -1,5 +1,5 @@
 <template>
-    <Modal v-model="show" width="600" title="生成的Datachecker结果，请核对">
+    <Modal v-model="show" width="660" title="生成的Datachecker结果，请核对">
         <div>
             <Table :columns="columns" :data="list" max-height="500" @on-row-dblclick="handleRowDblClick">
                 <template slot-scope="{ row, index }" slot="db">
@@ -26,6 +26,9 @@
                         {{ row.partition }}
                     </template>
                 </template>
+                <template slot-scope="{ row, index }" slot="view">
+                    {{ row.view === true ? '是' : row.view === false ? '否' : '' }}
+                </template>
                 <template slot-scope="{ row, index }" slot="action">
                     <span class="table_action error" @click="handleDelete(row, index)">
                         删除
@@ -38,11 +41,12 @@
                     </span>
                 </template>
             </Table>
-            <Button type="success" style="margin-top: 10px;" @click="add">添加新行</Button>
+            <Button type="success" style="margin-top: 10px;margin-right: 20px;" @click="add">添加新行</Button>
+            <Button type="success" style="margin-top: 10px;" @click="delView">批量删除视图表</Button>
         </div>
         <div slot="footer">
             <Button @click="cancel">取消</Button>
-            <Button type="primary" @click="ok">确认</Button>
+            <Button type="primary" :loading="loading" @click="ok">确认</Button>
         </div>
     </Modal>
 </template>
@@ -54,11 +58,13 @@ export default {
         return {
             loading: false,
             show: false,
+            hasView: false,
             editRow: null,
             columns: [
                 { title: "库名", key: "db", slot: "db" },
                 { title: "表名", key: "table", slot: "table" },
                 { title: "分区名", key: "partition", slot: "partition" },
+                { title: "是否视图", key: "view", slot: "view" },
                 { title: "操作", slot: 'action', }
             ],
             list: []
@@ -71,16 +77,45 @@ export default {
             this.editRow = null;
         },
         ok() {
-            this.show = false;
-            this.$emit('confirm', this.node, this.list.map(it => {
+            const items = this.list.filter(it => it.db && it.table).map(it => {
                 return {
                     db: it.db.trim(),
                     table: it.table.trim(),
-                    partition: it.partition.trim()
+                    partition: it.partition ? it.partition.trim() : '',
                 }
-            }))
-            this.list = []
-            this.editRow = null
+            })
+            if (items.length < 1 || this.list.length !== items.length) {
+                this.$Message.error('请检查库表分区信息！')
+            } else {
+                this.checkIsView(items, () => {
+                    this.show = false;
+                    this.$emit('confirm', this.node, items)
+                    this.list = []
+                    this.editRow = null
+                })
+               
+            }
+        },
+        checkIsView(items, cb) {
+            this.loading = true
+            api.fetch('/dss/datapipe/datasource/validateTables', {
+               tables: items
+            }, 'post').then((res) => {
+                const hasView = res && res.result && res.result.some(it => it.view)
+                if (hasView) {
+                    this.list = res.result.sort(it => it.view ? -1 : 1)
+                    this.hasView = true
+                }
+                if (cb) {
+                    if (hasView) {
+                        this.$Message.error('存在视图表，请先删除视图表！')
+                    } else {
+                        cb()
+                    }
+                }
+            }).finally(() => {
+                this.loading = false;
+            })
         },
         handleCopy(row) {
             this.list.push({
@@ -112,6 +147,10 @@ export default {
                 index: this.list.length - 1
             }
         },
+        delView() {
+            this.list = this.list.filter(it => !it.view)
+            this.hasView = false
+        },
         fetchList() {
             if (this.node.resources && this.node.resources.length && this.node.jobContent && this.node.jobContent.script) {
                 this.loading = true
@@ -133,6 +172,7 @@ export default {
                         nodeType: this.node.type
                     }, 'post').then((rst) => {
                         this.list = rst.meta
+                        this.checkIsView(rst.meta)
                     }).catch(() => {
                         this.show = false
                     }).finally(() => {

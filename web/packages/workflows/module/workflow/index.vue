@@ -227,8 +227,14 @@ export default {
           "post"
         )
         .then(res => {
-          this.dataList[0].dwsFlowList = res.page;
-          this.cacheData = this.dataList;
+          const obj = {
+            ...params,
+            flowList: res.page
+          }
+          this.$emit('updateWorkflowInfo',obj)
+          // 没有dataList这个数据
+          // this.dataList[0].dwsFlowList = res.page;
+          // this.cacheData = this.dataList;
           this.loading = false;
         })
         .catch(() => {
@@ -385,9 +391,6 @@ export default {
             if (cb) {
               cb(true)
             }
-            setTimeout(() => {
-              this.$router.go(0);
-            }, 1500);
           })
           .catch(() => {
             this.loading = false;

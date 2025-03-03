@@ -101,7 +101,7 @@
             :history="script.history"
             :script-view-state="scriptViewState"
             :run-type="script.runType"
-            :node="node" 
+            :node="node"
             @update-from-history="updateFromHistory"/>
           <field
             v-if="bottomTab.show_fieldDetail"
@@ -423,7 +423,7 @@ export default {
     this.autoSave();
     if (this.scriptResult && this.scriptResult.columnPageNow && this.scriptResult.columnPageNow != this.scriptViewState.columnPageNow) {
       this.scriptViewState.columnPageNow = this.scriptResult.columnPageNow;
-    }        
+    }
   },
   beforeDestroy() {
     // 关闭tab页面不再继续轮询接口
@@ -461,7 +461,7 @@ export default {
           eventType?: any,
           arg?: {}
       }]
-     * @param {*} param0 
+     * @param {*} param0
      */
     initListenerCopilotEvent() {
       plugin.on('copilot_web_listener_inster', this.insterCode)
@@ -553,7 +553,6 @@ export default {
       }
     },
     'Workbench:removeTab'() {
-      // fix ***REMOVED***
       if (this.node) {
         this.resizePanel()
       }
@@ -657,7 +656,7 @@ export default {
         if (!found) {
         // 如果执行代码中存在某变量，但在参数列表中不存在，则返回 false
           // console.log('不存在的变量', variable)
-          return false; 
+          return false;
         }
       }
 
@@ -666,12 +665,12 @@ export default {
     filterComments(code) {
         // 拆分成行
         const lines = code.split('\n');
-        
+
         // 过滤每一行
         const filteredLines = lines.map(line => {
             // 找到注释符的位置
             const commentIndex = line.indexOf('--');
-            
+
             if (commentIndex === 0) {
                 // 注释符在句首，过滤整行
                 return '';
@@ -683,25 +682,19 @@ export default {
                 return line;
             }
         });
-        
+
         // 合并过滤后的行
         return filteredLines.join('\n').trim();
     },
     async run(option, cb) {
       this.scriptViewState.columnPageNow = 1;
       this.handleLines = {}
-      this.script.codePrecheckRes = {};
       this.script.validParamsInfoRes = {};
       this.isShowFieldDetailTab = false;
       if (option && option.id === this.script.id) {
-        if (window.$Wa) window.$Wa.clickStat('run',this.script.fileName);
         if (this.scriptViewState.topPanelFull) {
           this.dispatch('Workbench:setTabPanelSize');
           this.scriptViewState.topPanelFull = false;
-        }
-        if (this.$refs.progressTab) {
-          this.$refs.progressTab.updateErrorMsg({})
-          this.$refs.progressTab.updateCodePreCheck({});
         }
         const data = this.getExecuteData(option);
         if (this.execute) {
@@ -721,13 +714,20 @@ export default {
           logLine: 1,
         };
         // code-preckcheck执行依赖progress页先展示，延时有关联影响
-        setTimeout(()=>{
-          this.showPanelTab('progress');
-        }, 100)
+        if (this.scriptViewState.showPanel != 'progress') {
+            setTimeout(()=>{
+              this.showPanelTab('progress');
+            }, 100)
+        }
+
         let runPrecheck = false;
         if (option && option.isRestore) {
           this.execute.restore(option);
         } else {
+          if (this.$refs.progressTab) {
+            this.$refs.progressTab.updateErrorMsg({})
+            this.$refs.progressTab.updateCodePreCheck({});
+          }
           this.dispatch('IndexedDB:clearLog', this.script.id);
           this.dispatch('IndexedDB:clearResult', this.script.id);
           this.dispatch('IndexedDB:clearProgress', this.script.id);
@@ -744,7 +744,7 @@ export default {
             duration: 3,
           });
         } else {
-          this.save('', option.dataSetValue);
+          this.save('', option.dataSetValue, 'run');
         }
         this.execute.once('sendStart', (code) => {
           const name = this.work.filepath || this.work.filename;
@@ -1108,7 +1108,7 @@ export default {
         });
         // 只有hive或者spark引擎类型才会调用代码关联审查 置于末尾，不影响其余事件
         if (runPrecheck && (
-          (this.script.application === 'spark' && this.script.runType === 'sql') 
+          (this.script.application === 'spark' && this.script.runType === 'sql')
           || (this.script.application === 'hive' && this.script.runType === 'hql'))) {
           const variable = isEmpty(this.script.params.variable) ? {} : util.convertArrayToObject(this.script.params.variable);
           let params = {
@@ -1210,7 +1210,6 @@ export default {
             this.execute.queryStatusaAfterKill = 0
             cb();
           });
-          this.script.steps = []; // socket downgrade事件之前点击运行，终止运行loading后恢复
           this.script.running = false;
         } else {
           this.killTimer = setTimeout(() => {
@@ -1229,8 +1228,71 @@ export default {
         }, 1000 * 60 * 5);
       }
     },
-    nodeSave() {
+    async getCurWorkspaceValidRes () {
+      try {
+        const id = this.$route.query.workspaceId;
+        const res = await api.fetch(
+          `dss/framework/workspace/workspaces/${id}`,
+          {},
+          'get'
+        );
+        const result = res.workspace.enabledFlowKeywordsCheck || '0';
+        return result === '1' ? true: false;
+      } catch (err) {
+        console.warn(err);
+      }
+    },
+    containsKeywords(keywords, scriptCode) {
+      // 将脚本代码转换为小写，以便忽略大小写
+      const lowerCaseScript = scriptCode.toLowerCase();
+      for (let keyword of keywords) {
+      // 对关键字中的正则表达式特殊字符进行转义
+      const escapedKeyword = this.escapeRegExp(keyword);
+      // 创建正则表达式，确保关键字作为一个完整的单词出现（使用 \b 匹配单词边界）
+      const regex = new RegExp(`\\b${escapedKeyword}\\b`, 'i');
+      // 如果当前关键字作为一个完整的单词存在于脚本代码中，立即返回 true
+      if (regex.test(lowerCaseScript)) {
+        return true;
+      }
+      }
+      // 如果所有关键字都不作为一个完整的单词存在于脚本代码中，返回 false
+      return false;
+    },
+    escapeRegExp(string) {
+      return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& 表示匹配到的整个字符串
+    },
+    async workspaceKeyValid() {
+      const validType = ['sql','hql','py'];
+      if (this.script.runType && validType.includes(this.script.runType)) {
+        const curWorkspaceValidRes = await this.getCurWorkspaceValidRes();
+        if(curWorkspaceValidRes) {
+          const keyWords = ['insert', 'create table']
+          const containsKeywordsResult = this.containsKeywords(keyWords, this.script.data)
+          return containsKeywordsResult;
+        }
+      }
+      return true
+    },
+    async handleNodeSave(auto, type) {
       if (this.readonly) return this.$Message.warning(this.$t('message.scripts.notSave'));
+      const r = await this.workspaceKeyValid();
+      // 校验通过、自动保存时或者运行时不弹窗
+      if (r || auto || type === 'run') {
+        this.nodeSave();
+      } else {
+        const content = `<p class="ellipse-p">${this.node.title}节点不包含关键字insert或create table</p>`;
+        this.$Modal.confirm({
+            title: '节点关键字检查',
+            content: content,
+            okText: '继续保存',
+            cancelText:'返回修改',
+            onOk: () => {
+                this.nodeSave();
+            },
+        });
+      }
+    },
+    nodeSave() {
       let params = {
         fileName: this.script.fileName,
         scriptContent: this.script.data,
@@ -1289,9 +1351,9 @@ export default {
           this.work.unsave = true;
         });
     },
-    async save(auto, dataSetValue) {
+    async save(auto, dataSetValue, type) {
       if (this.node && Object.keys(this.node).length > 0) {
-        this.nodeSave();
+        this.handleNodeSave(auto, type);
       } else {
         const params = {
           path: this.work.filepath,
@@ -1314,7 +1376,7 @@ export default {
             this.work.data.params.configuration.runtime[
               'wds.linkis.engine.runtime.datasource'
             ] = dataSetValue;
-          } else { 
+          } else {
             this.work.data.params.configuration.runtime = {
               'wds.linkis.engine.runtime.datasource': dataSetValue
             }
@@ -1422,7 +1484,7 @@ export default {
       }
     },
     updateFromHistory(task) {
-      if (task && this.execute.taskID == task.taskID) {
+      if (task && this.execute && this.execute.taskID == task.taskID) {
         let notSync = false;
         if (task && this.script.steps.length > 0) {
           // 当前步骤不是终态，历史步骤是终态
@@ -1713,15 +1775,15 @@ export default {
                   on: {
                     'click': function () {
                       const message = `请检查并修改如下代码中的语法错误: ${code}，执行错误信息如下: ${errMessage}`;
-                      plugin.emit('copilot_web_open_change', { 
-                        type: 'CodeCorrection', 
-                        message, 
+                      plugin.emit('copilot_web_open_change', {
+                        type: 'CodeCorrection',
+                        message,
                         params: {
                           type: vm.script ? typeMap[vm.script.ext] || vm.script.application : '',
                           code,
                           taskId,
                           errMessage
-                        } 
+                        }
                       })
                       vm.$Notice.close('codefixnotice')
                     }
@@ -1740,7 +1802,7 @@ export default {
         // 当前激活脚本
         if (taskId && errCode) {
           storage.remove(`cache_needfix_${this.script.id}`)
-          api.fetch('/copilot/executeCode', { 
+          api.fetch('/copilot/executeCode', {
             errCode
           }, 'get').then(res => {
             if (res.popup) {
@@ -1762,6 +1824,10 @@ export default {
 </script>
 <style lang="scss" scoped>
   @import '@dataspherestudio/shared/common/style/variables.scss';
+  .ellipse-p {
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
   .editor-panel {
     position: relative;
     .script-line {

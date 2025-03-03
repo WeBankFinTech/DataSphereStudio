@@ -89,5 +89,6 @@ export default {
 .iframeClass{
     height: 100%;
     display: block;
+    background-color: #fff;
 }
 </style>

@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <Table :columns="columnData" :data="tableData" :height="200"></Table>
+  <div class="copy-table-wrapper" ref="copyTableContainer">
+    <Table :columns="columnData" :data="tableData" :height="tableHeight || 200"></Table>
     <div class="version-page-bar">
       <Page
         ref="page"
@@ -34,6 +34,7 @@ export default {
   mixins: [mixin],
   data() {
     return {
+      tableHeight:0,
       columnData: [
         {
           title: 'ID',
@@ -112,6 +113,14 @@ export default {
       this.page.pageSize = val;
       this.page.pageNow = 1;
     },
+    calcTableHeight(curHeight) {
+      this.$nextTick(() => {
+        if (this.$refs.copyTableContainer) {
+          const containerHeight = curHeight || this.$refs.copyTableContainer.clientHeight
+          this.tableHeight = Math.max(containerHeight - 64, 0)
+        }
+      })
+    }
   },
   mounted() {
     this.getHistoryData()

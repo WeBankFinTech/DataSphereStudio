@@ -32,6 +32,12 @@
             <groupId>org.apache.linkis</groupId>
             <artifactId>linkis-gateway-server-support</artifactId>
             <version>${linkis.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>servlet-api</artifactId>
+                    <groupId>javax.servlet</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
     <build>

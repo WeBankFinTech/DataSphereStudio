@@ -67,6 +67,10 @@
                     <groupId>com.webank.azkaban</groupId>
                     <artifactId>azkaban-db</artifactId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>servlet-api</artifactId>
+                    <groupId>javax.servlet</groupId>
+                </exclusion>
             </exclusions>
             <scope>provided</scope>
 

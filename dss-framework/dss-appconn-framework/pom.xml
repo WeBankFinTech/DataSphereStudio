@@ -70,6 +70,10 @@
                     <artifactId>linkis-common</artifactId>
                     <groupId>org.apache.linkis</groupId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>servlet-api</artifactId>
+                    <groupId>javax.servlet</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>

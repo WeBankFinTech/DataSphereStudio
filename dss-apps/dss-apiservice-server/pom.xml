@@ -69,6 +69,10 @@
                     <artifactId>xstream</artifactId>
                     <groupId>com.thoughtworks.xstream</groupId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>servlet-api</artifactId>
+                    <groupId>javax.servlet</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>

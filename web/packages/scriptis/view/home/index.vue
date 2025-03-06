@@ -230,12 +230,6 @@ export default {
         cacheOptions: {time: 3000}
       })
     },
-    getCopilotEnabled() {
-      return api.fetch(`/copilot/user/isinwhitelist`, {}, {
-        method: 'get',
-        cacheOptions: {time: 3000}
-      })
-    },
     getHeight() {
       this.resize(window.innerHeight);
     },

@@ -1,26 +1,3 @@
--- 1.1.12 sql
--- 表dss_orchestrator_job_info添加instance_name,status和error_msg字段
-ALTER TABLE `dss_orchestrator_job_info` ADD `instance_name` varchar(128) DEFAULT NULL COMMENT '执行任务的实例';
-ALTER TABLE `dss_orchestrator_job_info` ADD `status` varchar(128) DEFAULT NULL COMMENT '转换任务状态';
-ALTER TABLE `dss_orchestrator_job_info` ADD `error_msg` varchar(2048) DEFAULT NULL COMMENT '转换任务异常信息';
-ALTER TABLE `dss_orchestrator_job_info` CHANGE `updated_time` `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP;
-ALTER TABLE `dss_orchestrator_job_info` MODIFY `job_id` varchar(64) DEFAULT NULL COMMENT '任务id';
--- 表dss_release_task添加instance_name字段
-ALTER TABLE `dss_release_task` ADD `instance_name` varchar(128) DEFAULT NULL COMMENT '执行任务的实例' AFTER `status`;
--- 表dss_workflow_task添加instance_name字段
-ALTER TABLE `dss_workflow_task` ADD `instance_name` varchar(128) DEFAULT NULL COMMENT '执行任务的实例' AFTER `status`;
--- 表dss_orchestrator_copy_info添加instance_name字段
-ALTER TABLE `dss_orchestrator_copy_info` ADD `instance_name` varchar(128) DEFAULT NULL COMMENT '执行任务的实例' AFTER `status`;
--- 表dss_project_copy_task添加instance_name和error_orc字段
-ALTER TABLE `dss_project_copy_task` ADD `instance_name` varchar(128) DEFAULT NULL COMMENT '执行任务的实例' AFTER `status`;
-ALTER TABLE `dss_project_copy_task` ADD `error_orc` varchar(2048) DEFAULT '' COMMENT '拷贝异常编排' AFTER `error_msg`;
-ALTER TABLE `dss_project_copy_task` MODIFY `error_msg` text COMMENT '拷贝异常信息';
--- 表dss_project_operate_record添加instance_name字段
-ALTER TABLE `dss_project_operate_record` ADD `instance_name` varchar(128) DEFAULT NULL COMMENT '执行任务的实例' AFTER `status`;
--- 表dss_workspace_user_role添加update_user和update_time字段
-ALTER TABLE `dss_workspace_user_role` add `update_user` varchar(32) DEFAULT NULL COMMENT '更新人';
-ALTER TABLE `dss_workspace_user_role` add `update_time` datetime DEFAULT NULL COMMENT '更新时间';
-
 -- 1.1.13 sql
 -- 参数模板表
 CREATE TABLE `dss_ec_config_template`
@@ -157,40 +134,21 @@ values
 ('wds.linkis.engineconn.java.driver.memory','hive引擎内存，默认值：1G','hive driver memory, default：1G','wds.linkis.engineconn.java.driver.memory','wds-linkis-engineconn.java.driver.memory','Input',0,NULL,'1G',0,NULL,0,1,1,0,'runtime');
 
 -- 建立hive关联关系
-INSERT INTO `dss_workflow_node_to_ui` (`workflow_node_id`, `ui_id`)
-VALUES (
-    (SELECT id FROM `dss_workflow_node` WHERE name = 'hql'),
-    (SELECT id FROM `dss_workflow_node_ui` WHERE `key` = 'wds.linkis.engineconn.java.driver.memory')
-);
+INSERT INTO `dss_workflow_node_to_ui` (`workflow_node_id`, `ui_id`) VALUES ((SELECT id FROM `dss_workflow_node` WHERE name = 'hql'),(SELECT id FROM `dss_workflow_node_ui` WHERE `key` = 'wds.linkis.engineconn.java.driver.memory'));
 
 -- 增加校验
-insert into `dss_workflow_node_ui_validate` (`validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`)
-values('Regex', '^([1-9]|10|[1-9])(g|G){0,1}$', '设置范围为[1,10],设置超出限制', 'hive memory limit 1,10', 'blur');
+insert into `dss_workflow_node_ui_validate` (`validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('Regex', '^([1-9]|10|[1-9])(g|G){0,1}$', '设置范围为[1,10],设置超出限制', 'hive memory limit 1,10', 'blur');
 
-insert into `dss_workflow_node_ui_validate` (`validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`)
-values('Regex', '^((source.type|check.object).\\w+=(\\w(\\.)*(\\{(.+?)\\})*)+[;\n]*)+$', '请正确填写多源配置', 'params config error, please make sure!', 'blur');
+insert into `dss_workflow_node_ui_validate` (`validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('Regex', '^((source.type|check.object).\\w+=(\\w(\\.)*(\\{(.+?)\\})*)+[;\n]*)+$', '请正确填写多源配置', 'params config error, please make sure!', 'blur');
 
-insert into `dss_workflow_node_ui_validate` (`validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`)
-values('Function', 'validateJobDesc', 'check.object配置重复,请检查', 'exist check.object repeat please check!', 'blur');
+insert into `dss_workflow_node_ui_validate` (`validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('Function', 'validateJobDesc', 'check.object配置重复,请检查', 'exist check.object repeat please check!', 'blur');
 
 -- 关联校验
-INSERT INTO `dss_workflow_node_ui_to_validate` (`ui_id`, `validate_id`)
-VALUES (
-    (SELECT id FROM `dss_workflow_node_ui` WHERE `key` = 'wds.linkis.engineconn.java.driver.memory'),
-    (SELECT id FROM `dss_workflow_node_ui_validate` WHERE error_msg = '设置范围为[1,10],设置超出限制' AND error_msg_en = 'hive memory limit 1,10')
-);
+INSERT INTO `dss_workflow_node_ui_to_validate` (`ui_id`, `validate_id`) VALUES ((SELECT id FROM `dss_workflow_node_ui` WHERE `key` = 'wds.linkis.engineconn.java.driver.memory'),(SELECT id FROM `dss_workflow_node_ui_validate` WHERE error_msg = '设置范围为[1,10],设置超出限制' AND error_msg_en = 'hive memory limit 1,10'));
 
-INSERT INTO `dss_workflow_node_ui_to_validate` (`ui_id`, `validate_id`)
-VALUES (
-    (SELECT id FROM `dss_workflow_node_ui` WHERE `key` = 'job.desc'),
-    (SELECT id FROM `dss_workflow_node_ui_validate` WHERE error_msg = '请正确填写多源配置' AND error_msg_en = 'params config error, please make sure!')
-);
+INSERT INTO `dss_workflow_node_ui_to_validate` (`ui_id`, `validate_id`) VALUES ((SELECT id FROM `dss_workflow_node_ui` WHERE `key` = 'job.desc'),(SELECT id FROM `dss_workflow_node_ui_validate` WHERE error_msg = '请正确填写多源配置' AND error_msg_en = 'params config error, please make sure!'));
 
-INSERT INTO `dss_workflow_node_ui_to_validate` (`ui_id`, `validate_id`)
-VALUES (
-    (SELECT id FROM `dss_workflow_node_ui` WHERE `key` = 'job.desc'),
-    (SELECT id FROM `dss_workflow_node_ui_validate` WHERE error_msg = 'check.object配置重复,请检查' AND error_msg_en = 'exist check.object repeat please check!')
-);
+INSERT INTO `dss_workflow_node_ui_to_validate` (`ui_id`, `validate_id`) VALUES ((SELECT id FROM `dss_workflow_node_ui` WHERE `key` = 'job.desc'),(SELECT id FROM `dss_workflow_node_ui_validate` WHERE error_msg = 'check.object配置重复,请检查' AND error_msg_en = 'exist check.object repeat please check!'));
 
 -- job.desc描述文案修改
 update
@@ -289,7 +247,6 @@ WHERE
 
 
 -- 1.1.20 sql
-ALTER TABLE event_queue ADD COLUMN run_date  VARCHAR(8) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL COMMENT '信号的run_date'  AFTER send_ip;
 ALTER TABLE dss_ec_release_strategy ADD COLUMN cross_cluster   tinyint(1) DEFAULT 0 COMMENT '是否跨集群,0为否，1为是'  AFTER queue;
 ALTER TABLE dss_queue_in_workspace ADD COLUMN cross_cluster   tinyint(1) DEFAULT 0 COMMENT '是否跨集群,0为否，1为是'  AFTER queue;
 -- 新增历史查询字段
@@ -318,33 +275,20 @@ INSERT  INTO `dss_workflow_node_ui` (`key`,`description`,`description_en`,`lable
 INSERT INTO `dss_workflow_node_ui` (`key`,`description`,`description_en`,`lable_name`,`lable_name_en`,`ui_type`,`required`,`value`,`default_value`,`is_hidden`,`condition`,`is_advanced`,`order`,`node_menu_type`,`is_base_info`,`position`) values ('mapreduce.job.running.reduce.limit','请填写reduce任务数限制','please reduce task limit','mapreduce.job.running.reduce.limit','mapreduce.job.running.reduce.limit','Input',0,NULL,'999',0,"!${params.configuration.startup['ec.conf.templateId']}",0,1,1,0,'startup');
 
 -- 添加 dss_workflow_node主键ID和dss_workflow_node_ui主键ID 关联信息至节点ui中间表 dss_workflow_node_to_ui
-INSERT INTO `dss_workflow_node_to_ui` (`workflow_node_id`, `ui_id`) VALUES (
-    (SELECT id FROM `dss_workflow_node` WHERE name = 'hql'),
-    (SELECT id FROM `dss_workflow_node_ui` WHERE `key` = 'mapreduce.job.running.map.limit')
-);
+INSERT INTO `dss_workflow_node_to_ui` (`workflow_node_id`, `ui_id`) VALUES ((SELECT id FROM `dss_workflow_node` WHERE name = 'hql'),(SELECT id FROM `dss_workflow_node_ui` WHERE `key` = 'mapreduce.job.running.map.limit'));
 
-INSERT INTO `dss_workflow_node_to_ui` (`workflow_node_id`, `ui_id`) VALUES (
-    (SELECT id FROM `dss_workflow_node` WHERE name = 'hql'),
-    (SELECT id FROM `dss_workflow_node_ui` WHERE `key` = 'mapreduce.job.running.reduce.limit')
-);
+INSERT INTO `dss_workflow_node_to_ui` (`workflow_node_id`, `ui_id`) VALUES ((SELECT id FROM `dss_workflow_node` WHERE name = 'hql'),(SELECT id FROM `dss_workflow_node_ui` WHERE `key` = 'mapreduce.job.running.reduce.limit'));
 
 -- 添加规则校验
-insert into `dss_workflow_node_ui_validate` (`validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`)
-values('Regex', '^(1[0-9]{1,5}|200000|[1-9][0-9]{1,4})$', '设置范围为[10,200000],设置超出限制', 'map task limit 10,200000', 'blur');
+insert into `dss_workflow_node_ui_validate` (`validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('Regex', '^(1[0-9]{1,5}|200000|[1-9][0-9]{1,4})$', '设置范围为[10,200000],设置超出限制', 'map task limit 10,200000', 'blur');
 
-insert into `dss_workflow_node_ui_validate` (`validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`)
-values('Regex', '^([1-9][0-9]{1,2}|999|)$', '设置范围为[10,999],设置超出限制', 'reduce task limit 10,999', 'blur');
+insert into `dss_workflow_node_ui_validate` (`validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('Regex', '^([1-9][0-9]{1,2}|999|)$', '设置范围为[10,999],设置超出限制', 'reduce task limit 10,999', 'blur');
 
 -- 关联校验
 
-insert into dss_workflow_node_ui_to_validate (ui_id,validate_id)  values (
-  (select id  from `dss_workflow_node_ui` WHERE `key` = 'mapreduce.job.running.map.limit'),
-  (select id  from dss_workflow_node_ui_validate  where  error_msg_en = 'map task limit 10,200000')
-);
+insert into dss_workflow_node_ui_to_validate (ui_id,validate_id)  values ((select id  from `dss_workflow_node_ui` WHERE `key` = 'mapreduce.job.running.map.limit'),(select id  from dss_workflow_node_ui_validate  where  error_msg_en = 'map task limit 10,200000'));
 
-insert into dss_workflow_node_ui_to_validate (ui_id,validate_id)  values (
-  (select id  from `dss_workflow_node_ui` WHERE `key` = 'mapreduce.job.running.reduce.limit'),
-  (select id  from dss_workflow_node_ui_validate  where  error_msg_en = 'reduce task limit 10,999');
+insert into dss_workflow_node_ui_to_validate (ui_id,validate_id)  values ((select id  from `dss_workflow_node_ui` WHERE `key` = 'mapreduce.job.running.reduce.limit'),(select id  from dss_workflow_node_ui_validate  where  error_msg_en = 'reduce task limit 10,999'));
 
 
  update  dss_workflow_node_ui_validate set error_msg = '设置范围为[1,10],设置超出限制',error_msg_en = 'must be between 1 and 10'  where id = (select t2.validate_id  from dss_workflow_node_ui t1
@@ -378,10 +322,7 @@ ALTER TABLE dss_ec_release_ims_record MODIFY COLUMN content text CHARACTER SET u
 INSERT INTO dss_workflow_node_ui (`key`,description,description_en,lable_name,lable_name_en,ui_type,required,value,default_value,is_hidden,`condition`,is_advanced,`order`,node_menu_type,is_base_info,`position`) VALUES
     ('auto.disabled','默认为false，若禁用，工作流执行和调度会跳过该节点','default false','是否禁用节点','auto.disabled','Select',1,'["true","false"]',NULL,0,NULL,0,1,1,0,'special');
 
-insert into dss_workflow_node_ui_to_validate (ui_id,validate_id)  values (
-                                                                             (select id  from `dss_workflow_node_ui` WHERE `key` = 'auto.disabled' limit 1),
-                                                                             (select id  from dss_workflow_node_ui_validate  where  validate_type='None' limit 1)
-                                                                         );
+insert into dss_workflow_node_ui_to_validate (ui_id,validate_id)  values ((select id  from `dss_workflow_node_ui` WHERE `key` = 'auto.disabled' limit 1),(select id  from dss_workflow_node_ui_validate  where  validate_type='None' limit 1));
 
 INSERT INTO dss_workflow_node_to_ui (workflow_node_id, ui_id)
 SELECT id, (SELECT id FROM `dss_workflow_node_ui` WHERE `key` = 'auto.disabled' limit 1) FROM dss_workflow_node;
@@ -518,27 +459,8 @@ INSERT INTO dss_workflow_node_ui_to_validate (ui_id,validate_id) VALUES
     (
         (SELECT  id FROM dss_workflow_node_ui where `key`='msg.channel.type')
         ,
-        (SELECT  id FROM dss_workflow_node_ui_validate where  validate_type='None' limit 1)
-    )
-;
+        (SELECT  id FROM dss_workflow_node_ui_validate where  validate_type='None' limit 1));
 
-
-
-
-
-INSERT INTO dss_workflow_node_to_ui (workflow_node_id,ui_id) VALUES
-                                                                 (
-                                                                     (SELECT id from dss_workflow_node  where node_type ='linkis.appconn.eventchecker.eventsender')
-                                                                     ,
-                                                                     (SELECT  id FROM dss_workflow_node_ui where `key`='msg.channel.type')
-                                                                 )
-        ,
-                                                                 (
-                                                                     (SELECT id from dss_workflow_node  where node_type ='linkis.appconn.eventchecker.eventreceiver')
-                                                                     ,
-                                                                     (SELECT  id FROM dss_workflow_node_ui where `key`='msg.channel.type')
-                                                                 )
-;
 
 
 -- 1.8.0 sql
@@ -595,24 +517,16 @@ INSERT INTO dss_workflow_node_ui_to_validate (ui_id ,validate_id ) VALUES
 
 UPDATE dss_workflow_node_ui_validate set error_msg='请严格按照dbname.tablename{ds=partitionname}格式填写，中间不允许有空格' ,validate_range='^\\s*[a-zA-Z]([^.]*\\.[^.]*){1,}\\s*$' where error_msg ='需要检查的数据源dbname.tablename{partition}' ;
 
-INSERT INTO dss_workflow_node (name,appconn_name,node_type,jump_type,support_jump,submit_to_scheduler,enable_copy,should_creation_before_node,icon_path)
-VALUES ('nebula','scriptis','linkis.nebula.nebula',2,1,1,1,0,'svgs/nebula-graph.svg');
+INSERT INTO dss_workflow_node (name,appconn_name,node_type,jump_type,support_jump,submit_to_scheduler,enable_copy,should_creation_before_node,icon_path) VALUES ('nebula','scriptis','linkis.nebula.nebula',2,1,1,1,0,'svgs/nebula-graph.svg');
 
-INSERT INTO dss_workflow_node_to_group (node_id,group_id)
-VALUES ((select id from dss_workflow_node where node_type = 'linkis.nebula.nebula') ,(select id from dss_workflow_node_group where name_en = 'Data development'));
+INSERT INTO dss_workflow_node_to_group (node_id,group_id) VALUES ((select id from dss_workflow_node where node_type = 'linkis.nebula.nebula') ,(select id from dss_workflow_node_group where name_en = 'Data development'));
 
-INSERT INTO dss_workflow_node_to_ui (workflow_node_id,ui_id)
-VALUES ((select id from dss_workflow_node where node_type = 'linkis.nebula.nebula'),(select id from dss_workflow_node_ui where `key` = 'title' and node_menu_type = '1' ));
-INSERT INTO dss_workflow_node_to_ui (workflow_node_id,ui_id)
-VALUES ((select id from dss_workflow_node where node_type = 'linkis.nebula.nebula'),(select id from dss_workflow_node_ui where `key` = 'desc' and node_menu_type = '1' ));
-INSERT INTO dss_workflow_node_to_ui (workflow_node_id,ui_id)
-VALUES ((select id from dss_workflow_node where node_type = 'linkis.nebula.nebula'),(select id from dss_workflow_node_ui where `key` = 'businessTag'));
-INSERT INTO dss_workflow_node_to_ui (workflow_node_id,ui_id)
-VALUES ((select id from dss_workflow_node where node_type = 'linkis.nebula.nebula'),(select id from dss_workflow_node_ui where `key` = 'appTag'));
-INSERT INTO dss_workflow_node_to_ui (workflow_node_id,ui_id)
-VALUES ((select id from dss_workflow_node where node_type = 'linkis.nebula.nebula'),(select id from dss_workflow_node_ui where `key` = 'ReuseEngine'));
-INSERT INTO dss_workflow_node_to_ui (workflow_node_id,ui_id)
-VALUES ((select id from dss_workflow_node where node_type = 'linkis.nebula.nebula'),(select id from dss_workflow_node_ui where `key` = 'auto.disabled'));
+INSERT INTO dss_workflow_node_to_ui (workflow_node_id,ui_id) VALUES ((select id from dss_workflow_node where node_type = 'linkis.nebula.nebula'),(select id from dss_workflow_node_ui where `key` = 'title' and node_menu_type = '1' ));
+INSERT INTO dss_workflow_node_to_ui (workflow_node_id,ui_id) VALUES ((select id from dss_workflow_node where node_type = 'linkis.nebula.nebula'),(select id from dss_workflow_node_ui where `key` = 'desc' and node_menu_type = '1' ));
+INSERT INTO dss_workflow_node_to_ui (workflow_node_id,ui_id) VALUES ((select id from dss_workflow_node where node_type = 'linkis.nebula.nebula'),(select id from dss_workflow_node_ui where `key` = 'businessTag'));
+INSERT INTO dss_workflow_node_to_ui (workflow_node_id,ui_id) VALUES ((select id from dss_workflow_node where node_type = 'linkis.nebula.nebula'),(select id from dss_workflow_node_ui where `key` = 'appTag'));
+INSERT INTO dss_workflow_node_to_ui (workflow_node_id,ui_id) VALUES ((select id from dss_workflow_node where node_type = 'linkis.nebula.nebula'),(select id from dss_workflow_node_ui where `key` = 'ReuseEngine'));
+INSERT INTO dss_workflow_node_to_ui (workflow_node_id,ui_id) VALUES ((select id from dss_workflow_node where node_type = 'linkis.nebula.nebula'),(select id from dss_workflow_node_ui where `key` = 'auto.disabled'));
 
 
 
@@ -645,8 +559,7 @@ CREATE TABLE `dss_dataset_user_usage_cache` (
 
 alter table dss_workflow_node_content_to_ui add PARTITION(
     PARTITION eventsenderWTSS VALUES IN ('wtss.eventchecker.sender'),
-    PARTITION eventreceiverWTSS VALUES IN ('wtss.eventchecker.receiver')
-);
+    PARTITION eventreceiverWTSS VALUES IN ('wtss.eventchecker.receiver'));
 
 
 
@@ -674,4 +587,3 @@ alter table dss_workspace add enabled_flow_keywords_check tinyint DEFAULT '0' CO
 alter table dss_workspace add is_default_reference tinyint  DEFAULT '0' COMMENT '是否默认引用资源参数模板,1、是 0、否';
 
 alter table dss_orchestrator_info add not_contains_keywords_node longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin COMMENT '不包含关键字的节点信息';
-

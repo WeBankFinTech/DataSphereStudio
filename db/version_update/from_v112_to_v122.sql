@@ -150,14 +150,6 @@ INSERT INTO `dss_workflow_node_ui_to_validate` (`ui_id`, `validate_id`) VALUES (
 
 INSERT INTO `dss_workflow_node_ui_to_validate` (`ui_id`, `validate_id`) VALUES ((SELECT id FROM `dss_workflow_node_ui` WHERE `key` = 'job.desc'),(SELECT id FROM `dss_workflow_node_ui_validate` WHERE error_msg = 'check.object配置重复,请检查' AND error_msg_en = 'exist check.object repeat please check!'));
 
--- job.desc描述文案修改
-update
-	`dss_workflow_node_ui`
-set
-	`description` = '请正确填写多源配置，数据源编号从01开始，按行分割。如：\nsource.type.01=hivedb\ncheck.object.01=db.tb{ds=${run_date}}\ncheck.object.02=db2.tb{ds=${run_date}}\nsource.type可不填，系统将根据库名自动识别数据来源，如：\ncheck.object.01=db.tb{ds=${run_date}}\ncheck.object.02=db2.tb{ds=${run_date}}'
-where
-	`key` = 'job.desc';
-
 -- 工作流节点选择引用模板，隐藏参数
 -- spark、pyspark、scala、hive节点
 update

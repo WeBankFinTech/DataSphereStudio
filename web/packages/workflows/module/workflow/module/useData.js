@@ -9,9 +9,7 @@ export const useData = () => {
     if(!params.orchestratorId) {
       return [];
     }
-    await api.fetch(`${apiPre}getWrokflowDefaultTemplates`, params, 'get').then(res => {
-      templateObjectArray = res.wrokflowDefaultTemplates || []
-    })
+
     templateIdArray = templateObjectArray.map((item) => {
       return item.templateId
     })

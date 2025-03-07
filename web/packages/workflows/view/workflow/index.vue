@@ -464,7 +464,7 @@ export default {
     createProject() {
       this.actionType = "add";
       this.currentProjectData = {
-        devProcessPermission: this.currentProjectData.devProcessPermission,
+        devProcessPermission: this.currentProjectData.devProcessList,
         name: "",
         description: "",
         business: "",
@@ -506,7 +506,7 @@ export default {
     getSelectDevProcess() {
       this.selectDevprocess = this.devProcessBase
         ? this.devProcessBase.filter((item) =>
-          (this.currentProjectData.devProcessPermission || []).includes(item.dicValue)
+          (this.currentProjectData.devProcessList || []).includes(item.dicValue)
         )
         : [];
       // 切换项目，若项目没有对应模式，自动切换第一个
@@ -630,7 +630,7 @@ export default {
         this.reFreshTreeData({id: target.id, name: target.name}, flows)
         this.tabList = this.tabList.filter(item => {
           return item.query.orchestratorId !== orchestratorId
-        }) 
+        })
       })
     },
     openFlowNode(evt, item, code) {
@@ -673,7 +673,7 @@ export default {
             }
           }
         });
-      }      
+      }
     },
     handleTreeModal(project) {
       this.treeModalShow = true;

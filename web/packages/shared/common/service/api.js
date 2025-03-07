@@ -219,7 +219,8 @@ const success = function (response) {
         data = JSON.parse(response.data);
       } catch (e) {
         console.log(e, response.data)
-        throw new Error(API_ERR_MSG);
+//        throw new Error(API_ERR_MSG);
+        return {}
       }
     } else if (util.isObject(response.data)) {
       // 兼容ds blob流下载
@@ -232,7 +233,10 @@ const success = function (response) {
         data = response.data
       }
     } else {
-      throw new Error(API_ERR_MSG);
+        console.log(response)
+        console.log(API_ERR_MSG)
+//      throw new Error(API_ERR_MSG);
+        return {}
     }
     let res = getData(data);
     let code = res.codePath;
@@ -466,9 +470,9 @@ const showErrMsg = function (error) {
 const isShowErr = (url) => {
   const noShowUrlList = [
     '/dss/datapipe/datasource/getSchemaBaseInfo',
-    '/validator/code-precheck', 
-    '/copilot/codecompletion', 
-    '/copilot/codeadoption', 
+    '/validator/code-precheck',
+    '/copilot/codecompletion',
+    '/copilot/codeadoption',
     '/copilot/user/isinwhitelist',
     '/dss/guide/solution/reportProblem'];
   if (noShowUrlList.includes(url)) {

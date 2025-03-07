@@ -151,36 +151,6 @@ export default {
       this.getEngineList()
     },
     getEngineList() {
-      this.loading = true;
-      const params = {
-        workspaceId: this.$route.query.workspaceId,
-        pageNow: this.pageData.pageNow,
-        pageSize: this.pageData.pageSize,
-      }
-      if (this.searchBar.status) {
-        params.status = this.searchBar.status
-      }
-      if (this.searchBar.createUser) {
-        params.createUser = this.searchBar.createUser
-      }
-      if (this.searchBar.engineType) {
-        params.engineType = this.searchBar.engineType
-      }
-      if (this.searchBar.yarnQueue) {
-        params.yarnQueue = this.searchBar.yarnQueue
-      }
-      if (this.sort) {
-        params.orderBy = this.sort.orderBy
-        params.sortBy = this.sort.sortBy
-      }
-      api.fetch(`${this.$API_PATH.WORKSPACE_PATH}listEngineConnInstances`, params, 'post').then((res) => {
-        this.list = res.engineList || [];
-        this.pageData.total = res.total
-        this.loading = false;
-      }).catch((err) => {
-        console.error(err)
-        this.loading = false;
-      });
     },
     getUserList() {
       if (this.$route.query.workspaceId) {

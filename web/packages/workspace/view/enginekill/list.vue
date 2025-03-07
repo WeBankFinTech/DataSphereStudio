@@ -103,20 +103,7 @@ export default {
       this.getEngineList();
     },
     getEngineList() {
-      this.loading = true;
-      const params = {
-        workspaceId: this.$route.query.workspaceId,
-        pageNow: this.pageData.pageNow,
-        pageSize: this.pageData.pageSize,
-      }
-      api.fetch(`${this.$API_PATH.WORKSPACE_PATH}listEcKillHistory`, params, 'get').then((res) => {
-        this.list = res.engineList || []
-        this.pageData.total = res.total
-        this.loading = false;
-      }).catch((err) => {
-        console.error(err)
-        this.loading = false;
-      });
+
     },
 
   }

@@ -622,28 +622,6 @@ export default {
   methods: {
     doQuery() {
       this.pageData.pageNow = 1
-      const params = {
-        workspaceId: this.$route.query.workspaceId,
-      }
-      api.fetch(`${this.$API_PATH.WORKSPACE_PATH}getEcReleaseStrategyList`, params, 'get').then((res) => {
-        this.pageData.totol = res.total
-        this.list = (res.strategyList || []).filter(item => {
-          let resItem = true
-          if (this.searchBar.status) {
-            resItem = item.status == this.searchBar.status
-          }
-          if (this.searchBar.crossCluster) {
-            resItem = resItem && this.searchBar.crossCluster === String(!!item.crossCluster);
-          }
-          if (this.searchBar.yarnQueue && this.searchBar.yarnQueue.trim()) {
-            resItem = resItem && this.searchBar.yarnQueue.trim() === item.queue
-          }
-          if (this.searchBar.name && this.searchBar.name.trim()) {
-            resItem = resItem && new RegExp(this.searchBar.name.trim(), 'i').test(item.name)
-          }
-          return resItem
-        })
-      })
     },
     handleCrossCluster(crossCluster, type, queue) {
       if (type === 'search') {

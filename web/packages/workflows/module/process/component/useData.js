@@ -16,9 +16,6 @@ export const useData = () => {
   const getTemplateDatas = async (params) => {
     console.log('getTemplateDatas-params', params)
     let originTemplates = []
-    await api.fetch(`${apiPre}getProjectTemplates`, params, 'get').then(res => {
-      originTemplates = res.templates || []
-    })
     return originTemplates
   }
   return {

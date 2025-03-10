@@ -35,7 +35,6 @@ import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
-import com.webank.wedatasphere.dss.common.protocol.project.ProjectInfoListRequest;
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectListQueryRequest;
 import com.webank.wedatasphere.dss.common.service.BMLService;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
@@ -67,10 +66,7 @@ import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorBas
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorService;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
-import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectDeletionOperation;
-import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectService;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ref.DSSProjectDataSource;
-import com.webank.wedatasphere.dss.standard.app.structure.project.ref.RefProjectContentRequestRef;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
@@ -92,8 +88,6 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
-
-import static com.webank.wedatasphere.dss.framework.project.utils.ProjectOperationUtils.tryProjectOperation;
 
 public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProjectDO> implements DSSProjectService {
     private static final Logger LOGGER = LoggerFactory.getLogger(DSSProjectServiceImpl.class);
@@ -351,7 +345,7 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
     }
 
     @Override
-    public void deleteProject(String username, ProjectDeleteRequest projectDeleteRequest, Workspace workspace, DSSProjectDO dssProjectDO) throws Exception {
+    public void deleteProject(String username, ProjectDeleteOrRestoreRequest projectDeleteRequest, Workspace workspace, DSSProjectDO dssProjectDO)  {
         if (dssProjectDO == null) {
             throw new DSSErrorException(600001, "工程不存在!");
         }
@@ -359,33 +353,27 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
         if (!dssProjectDO.getUsername().equalsIgnoreCase(username)) {
             throw new DSSErrorException(600002, "刪除工程失敗，沒有删除权限!");
         }
-        if (projectDeleteRequest.isIfDelOtherSys()) {
-            LOGGER.warn("User {} requires to delete all projects with name {} in third-party AppConns.", username, dssProjectDO.getName());
-            Map<AppInstance, Long> appInstanceToRefProjectId = new HashMap<>(10);
-            tryProjectOperation((appConn, appInstance) -> {
-                        Long refProjectId = getAppConnProjectId(appInstance.getId(), projectDeleteRequest.getId());
-                        if (refProjectId == null) {
-                            LOGGER.warn("delete project {} for third-party AppConn {} is ignored, appInstance is {}. Caused by: the refProjectId is null.",
-                                    dssProjectDO.getName(), appConn.getAppDesc().getAppName(), appInstance.getBaseUrl());
-                            return false;
-                        } else {
-                            appInstanceToRefProjectId.put(appInstance, refProjectId);
-                            return true;
-                        }
-                    }, workspace, ProjectService::getProjectDeletionOperation,
-                    null,
-                    (appInstance, refProjectContentRequestRef) -> refProjectContentRequestRef.setProjectName(dssProjectDO.getName())
-                            .setRefProjectId(appInstanceToRefProjectId.get(appInstance)).setUserName(username),
-                    (structureOperation, structureRequestRef) -> ((ProjectDeletionOperation) structureOperation).deleteProject((RefProjectContentRequestRef) structureRequestRef),
-                    null, "delete refProject " + dssProjectDO.getName());
-        }
         // 对于DSS项目进行归档
         archiveGitProject(username, projectDeleteRequest, workspace, dssProjectDO);
         projectMapper.deleteProject(projectDeleteRequest.getId());
         LOGGER.warn("User {} deleted project {}.", username, dssProjectDO.getName());
     }
+    @Override
+    public void restoreProject(String username, ProjectDeleteOrRestoreRequest projectDeleteRequest, Workspace workspace, DSSProjectDO dssProjectDO) throws Exception {
+        if (dssProjectDO == null) {
+            throw new DSSErrorException(600001, "工程不存在!");
+        }
+        if (!Integer.valueOf(-1).equals(dssProjectDO.getVisible())) {
+            throw new DSSRuntimeException("非近期删除的项目，不允许恢复!");
+        }
+        LOGGER.warn("user {} begins to restore project {} in workspace {}.", username, dssProjectDO.getName(), workspace.getWorkspaceName());
+        // 对于DSS项目进行归档恢复
+        archiveGitProject(username, projectDeleteRequest, workspace, dssProjectDO);
+        projectMapper.restoreProject(projectDeleteRequest.getId());
+        LOGGER.warn("User {} restore project {}.", username, dssProjectDO.getName());
+    }
 
-    private void archiveGitProject(String username, ProjectDeleteRequest projectDeleteRequest, Workspace workspace, DSSProjectDO dssProjectDO) {
+    private void archiveGitProject(String username, ProjectDeleteOrRestoreRequest projectDeleteRequest, Workspace workspace, DSSProjectDO dssProjectDO) {
         if (dssProjectDO.getAssociateGit() != null && dssProjectDO.getAssociateGit()) {
             Sender gitSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
             Map<String, BmlResource> file = new HashMap<>();

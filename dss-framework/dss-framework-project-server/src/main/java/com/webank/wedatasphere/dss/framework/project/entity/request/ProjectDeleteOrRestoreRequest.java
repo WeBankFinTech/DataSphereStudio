@@ -21,16 +21,13 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 
 @XmlRootElement
-public class ProjectDeleteRequest {
+public class ProjectDeleteOrRestoreRequest {
 
     @NotNull(message = "工程id不能为空")
     private Long id;
 
     @NotNull(message = "确认不能为空")
     private boolean sure;
-
-    @NotNull(message = "同步删除其它系统工程不能为空")
-    private boolean ifDelOtherSys;
 
     public Long getId() {
         return id;
@@ -48,20 +45,13 @@ public class ProjectDeleteRequest {
         this.sure = sure;
     }
 
-    public boolean isIfDelOtherSys() {
-        return ifDelOtherSys;
-    }
 
-    public void setIfDelOtherSys(boolean ifDelOtherSys) {
-        this.ifDelOtherSys = ifDelOtherSys;
-    }
 
     @Override
     public String toString() {
         return "ProjectDeleteRequest{" +
                 "id=" + id +
                 ", sure=" + sure +
-                ", ifDelOtherSys=" + ifDelOtherSys +
                 '}';
     }
 }

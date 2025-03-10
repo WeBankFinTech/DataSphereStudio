@@ -121,7 +121,7 @@ public class DSSGitProjectManagerServiceImpl  implements DSSGitProjectManagerSer
         String gitToken = projectInfoByProjectName.getGitToken();
         String gitUrl = projectInfoByProjectName.getGitUrl();
         // 远程归档
-        DSSGitUtils.archive(projectName, gitUser, gitToken, gitUrl);
+//        DSSGitUtils.archive(projectName, gitUser, gitToken, gitUrl);
         // 删除本地项目
         DSSGitUtils.archiveLocal(projectName, gitUser, request.getWorkspaceId());
         return new GitArchivePorjectResponse();

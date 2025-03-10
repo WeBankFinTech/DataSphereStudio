@@ -55,8 +55,11 @@ public interface DSSProjectMapper extends BaseMapper<DSSProjectDO> {
             "where `project_id` = #{dssProjectId} and `appconn_instance_id` = #{appInstanceId}")
     Long getAppConnProjectId(@Param("appInstanceId")Long appInstanceId, @Param("dssProjectId")Long dssProjectId);
 
-    @Update("update dss_project set `visible` = 0 where `id` = #{projectId}")
+    @Update("update dss_project set `visible` = -1 where `id` = #{projectId}")
     void deleteProject(@Param("projectId")Long projectId);
+
+    @Update("update dss_project set `visible` = 1 where `id` = #{projectId}")
+    void restoreProject(@Param("projectId")Long projectId);
 
     List<QueryProjectVo> getListForAdmin(ProjectQueryRequest projectRequest);
 

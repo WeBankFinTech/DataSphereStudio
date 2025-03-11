@@ -234,7 +234,7 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
         List<ProjectResponse> projectResponseList = new ArrayList<>();
         ProjectResponse projectResponse;
         for (QueryProjectVo projectVo : list) {
-            if (projectVo.getVisible() == 0) {
+            if (projectVo.getVisible() != 1) {
                 continue;
             }
             projectResponse = new ProjectResponse();

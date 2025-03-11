@@ -27,6 +27,8 @@ public class DSSProjectVo {
 
     private String description;
 
+    private  Long workspaceId;
+
     public Long getId() {
         return id;
     }
@@ -51,4 +53,12 @@ public class DSSProjectVo {
         this.description = description;
     }
 
+
+    public Long getWorkspaceId() {
+        return workspaceId;
+    }
+
+    public void setWorkspaceId(Long workspaceId) {
+        this.workspaceId = workspaceId;
+    }
 }

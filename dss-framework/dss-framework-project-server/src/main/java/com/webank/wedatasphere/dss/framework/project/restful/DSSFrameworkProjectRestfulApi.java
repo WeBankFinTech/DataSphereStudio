@@ -228,6 +228,7 @@ public class DSSFrameworkProjectRestfulApi {
             dssProjectVo.setDescription(dbProject.getDescription());
             dssProjectVo.setId(dbProject.getId());
             dssProjectVo.setName(dbProject.getName());
+            dssProjectVo.setWorkspaceId(dbProject.getWorkspaceId());
             message = Message.ok().data("project", dssProjectVo);
         }
         return message;

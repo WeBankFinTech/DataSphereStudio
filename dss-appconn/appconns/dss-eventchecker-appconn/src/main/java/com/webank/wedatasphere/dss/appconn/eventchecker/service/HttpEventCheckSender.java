@@ -19,6 +19,7 @@ package com.webank.wedatasphere.dss.appconn.eventchecker.service;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
+import com.webank.wedatasphere.dss.appconn.eventchecker.entity.EventChecker;
 import com.webank.wedatasphere.dss.appconn.eventchecker.entity.HttpMsgSendRequest;
 import com.webank.wedatasphere.dss.appconn.eventchecker.entity.HttpMsgSendResponse;
 import com.webank.wedatasphere.dss.appconn.eventchecker.utils.EventCheckerHttpUtils;
@@ -42,7 +43,10 @@ public class HttpEventCheckSender extends AbstractEventCheck {
     @Override
     public boolean sendMsg(int jobId, Properties props, Logger log) {
         boolean result = false;
-        String url = props.getProperty(HTTP_EVENT_KGAS_SEND_URL);
+        String url=getSendURL(props);
+        if (url == null) {
+            url = props.getProperty(HTTP_EVENT_KGAS_SEND_URL);
+        }
         String key = props.getProperty(HTTP_EVENT_SIGN_KEY);
         String timestamp = String.valueOf(System.currentTimeMillis());
         String sign = EventCheckerHttpUtils.calculateSign(key, timestamp);
@@ -93,5 +97,26 @@ public class HttpEventCheckSender extends AbstractEventCheck {
         }
 
         return result;
+    }
+
+
+    /**
+     * 根据CHANNEL_TYPE来从配置文件中匹配URL
+     * @param propskey
+     * @return
+     */
+    private String getSendURL(Properties propskey) {
+        String channelType = propskey.getProperty(EventChecker.CHANNEL_TYPE);
+
+        String filteredValue = null;
+        for (String key : propskey.stringPropertyNames()) {
+            String value = propskey.getProperty(key);
+            if (channelType != null && key.toLowerCase().contains(channelType.toLowerCase()) && key.endsWith("send.url")) {
+                filteredValue = value;
+                break;
+            }
+        }
+
+        return filteredValue;
     }
 }

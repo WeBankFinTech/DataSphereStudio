@@ -367,7 +367,7 @@ public class DSSFrameworkProjectRestfulApi {
                             dssProjectDO.getId(), dssProjectDO.getName(), OperateTypeEnum.ENABLE, projectRestoreRequest);
                 },
                 () -> Message.ok("恢复工程成功."),
-                String.format("用户 %s 删除工程失败. ", username));
+                String.format("用户 %s 恢复工程失败. ", username));
     }
 
     @RequestMapping(path = "listApplicationAreas", method = RequestMethod.GET)

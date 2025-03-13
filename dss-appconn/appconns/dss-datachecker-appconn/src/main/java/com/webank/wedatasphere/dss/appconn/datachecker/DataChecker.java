@@ -61,7 +61,7 @@ public class DataChecker {
     public DataChecker(Properties p, DataCheckerExecutionAction action) {
         this.p = p;
         dataCheckerAction = action;
-        maxWaitTime = Long.valueOf(p.getProperty(DataChecker.WAIT_TIME, "1")) * 3600 * 1000;
+        maxWaitTime = (long) (Double.valueOf(p.getProperty(DataChecker.WAIT_TIME, "1")) * 3600 * 1000);
         //test over time
 //        maxWaitTime = Long.valueOf(p.getProperty(DataChecker.WAIT_TIME, "1")) * 120 * 1000;
         queryFrequency = Integer.valueOf(p.getProperty(DataChecker.QUERY_FREQUENCY, "60000"));

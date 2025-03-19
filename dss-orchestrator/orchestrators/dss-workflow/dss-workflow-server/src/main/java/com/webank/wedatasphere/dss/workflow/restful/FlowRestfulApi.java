@@ -354,6 +354,7 @@ public class FlowRestfulApi {
         try {
             version = flowService.saveFlow(flowID, jsonFlow, null, userName, workspaceName, projectName, labels);
         }catch (Exception e) {
+            LOGGER.error("保存工作流失败", e);
             return Message.error("保存失败，原因为：" + e.getMessage());
         }
         DSSFlow dssFlow = flowService.getFlowByID(flowID);

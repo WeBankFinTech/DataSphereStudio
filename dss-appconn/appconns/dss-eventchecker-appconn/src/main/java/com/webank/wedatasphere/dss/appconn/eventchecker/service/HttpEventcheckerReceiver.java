@@ -51,6 +51,8 @@ public class HttpEventcheckerReceiver extends AbstractEventCheckReceiver{
         String[] consumedMsgInfo = null;
         String responseBody = null;
         String messageJson = gson.toJson(message);
+        String requestStr = EventCheckerHttpUtils.requestToString(url, "POST", header, null, messageJson);
+        log.error("receive failed,request:{}", requestStr);
         try (Response response = EventCheckerHttpUtils.post(url, header, null, messageJson)) {
             HttpMsgReceiveResponse msgReceiveResponse;
             try {
@@ -92,8 +94,6 @@ public class HttpEventcheckerReceiver extends AbstractEventCheckReceiver{
                 );
                 consumedMsgInfo = null;
             } else {
-                String requestStr = EventCheckerHttpUtils.requestToString(url, "POST", header, null, messageJson);
-                log.error("receive failed,request:{}", requestStr);
                 log.error("receive failed,response:{}", responseBody);
                 String errorMsg = "信号接收失败。详情："+responseBody;
                 throw new RuntimeException(errorMsg);

@@ -62,6 +62,7 @@
         <commons.lang.version>2.6</commons.lang.version>
         <xstream.version>1.4.20</xstream.version>
         <jersey.version>2.30.1</jersey.version>
+        <druid.version>1.2.4</druid.version>
     </properties>
 
     <dependencyManagement>
@@ -115,6 +116,11 @@
                 <artifactId>xstream</artifactId>
                 <groupId>com.thoughtworks.xstream</groupId>
                 <version>${xstream.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid</artifactId>
+                <version>${druid.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

@@ -111,7 +111,6 @@
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>druid</artifactId>
-            <version>1.1.9</version>
         </dependency>
         <dependency>
             <groupId>com.webank.wedatasphere.dss</groupId>

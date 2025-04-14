@@ -122,4 +122,6 @@ public interface DSSFlowService {
 
     void getRootFlowProxy(DSSFlow dssFlow);
 
+    void editNodeContent(EditNodeContentRequest editNodeContentRequest,String ticketId) throws Exception;
+
 }

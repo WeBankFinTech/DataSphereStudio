@@ -409,5 +409,26 @@ public class FlowRestfulApi {
         return Message.ok("批量编辑成功");
     }
 
+    @RequestMapping(value = "/editNodeContent",method = RequestMethod.POST)
+    public Message editNodeContent(@RequestBody EditNodeContentRequest editNodeContentRequest){
+
+        String userName = SecurityFilter.getLoginUsername(httpServletRequest);
+        String nodeName = editNodeContentRequest.getNodeName();
+
+        editNodeContentRequest.setUsername(userName);
+
+
+        try {
+
+            Cookie[] cookies = httpServletRequest.getCookies();
+            String ticketId = Arrays.stream(cookies).filter(cookie -> DSSWorkFlowConstant.BDP_USER_TICKET_ID.equals(cookie.getName())).findFirst().map(Cookie::getValue).get();
+
+            dssFlowService.editNodeContent(editNodeContentRequest,ticketId);
+        } catch (Exception e) {
+            LOGGER.error(String.format("%s 节点编辑失败",nodeName), e);
+            return Message.error(String.format("%s 节点编辑失败，原因为：%s",nodeName , e.getMessage()));
+        }
+        return Message.ok(String.format("%s 节点编辑成功",nodeName));
+    }
 
 }

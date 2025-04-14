@@ -21,6 +21,7 @@ import com.google.common.reflect.TypeToken;
 import com.google.gson.*;
 import com.webank.wedatasphere.dss.common.StaffInfo;
 import com.webank.wedatasphere.dss.common.StaffInfoGetter;
+import com.webank.wedatasphere.dss.common.constant.project.ProjectUserPrivEnum;
 import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.common.entity.Resource;
 import com.webank.wedatasphere.dss.common.entity.node.DSSEdge;
@@ -48,6 +49,7 @@ import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlowRelation;
 import com.webank.wedatasphere.dss.workflow.common.parser.NodeParser;
 import com.webank.wedatasphere.dss.workflow.common.parser.WorkFlowParser;
+import com.webank.wedatasphere.dss.workflow.constant.CodeTypeEnum;
 import com.webank.wedatasphere.dss.workflow.constant.SignalNodeConstant;
 import com.webank.wedatasphere.dss.workflow.constant.WorkflowNodeGroupEnum;
 import com.webank.wedatasphere.dss.workflow.core.WorkflowFactory;
@@ -2636,6 +2638,277 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
         return flowMap;
 
+    }
+
+
+    @Override
+    public void editNodeContent(EditNodeContentRequest editNodeContentRequest,String ticketId) throws Exception {
+
+        Workspace workspace = new Workspace();
+        workspace.setWorkspaceId(editNodeContentRequest.getWorkspaceId());
+        String username = editNodeContentRequest.getUsername();
+        String nodeName = editNodeContentRequest.getNodeName();
+        String nodeContent = editNodeContentRequest.getNodeContent();
+        Map<String,Object> nodeMetadata = editNodeContentRequest.getNodeMetadata();
+
+        // 鉴权
+       DSSProject  dssProject = validateOperation(editNodeContentRequest.getProjectId(),username);
+
+       if(!editNodeContentRequest.getWorkspaceId().equals(Long.valueOf(dssProject.getWorkspaceId()))){
+           DSSExceptionUtils.dealErrorException(90003, "传入的工作空间与项目所属工作空间不一致", DSSErrorException.class);
+       }
+
+        RequestQueryByIdOrchestrator RequestQueryByIdOrchestrator =  new  RequestQueryByIdOrchestrator();
+        RequestQueryByIdOrchestrator.setOrchestratorId(editNodeContentRequest.getOrchestratorId());
+
+        OrchestratorVo orchestratorVo = RpcAskUtils.processAskException(getOrchestratorSender().ask(RequestQueryByIdOrchestrator),
+                OrchestratorVo.class, RequestQueryByIdOrchestrator.class);
+
+        if(orchestratorVo.getDssOrchestratorInfo() == null || orchestratorVo.getDssOrchestratorVersion() == null){
+
+            DSSExceptionUtils.dealErrorException(90003, "工作流不存在", DSSErrorException.class);
+        }
+
+        DSSOrchestratorVersion dssOrchestratorVersion = orchestratorVo.getDssOrchestratorVersion();
+
+        // 获取主工作流下的节点和所有子工作流
+        DSSFlow rootFlow = genDSSFlowTree(dssOrchestratorVersion.getAppId());
+
+        DSSFlow flow = getFLowByNode(rootFlow,nodeName);
+
+        if(flow == null){
+            DSSExceptionUtils.dealErrorException(90003, "工作流下未找到相关节点", DSSErrorException.class);
+        }
+
+        // 校验工作流是否锁定
+        DSSFlowEditLock flowEditLock = lockMapper.getFlowEditLockByID(dssOrchestratorVersion.getAppId());
+        if (flowEditLock != null && !flowEditLock.getOwner().equals(ticketId)) {
+            throw new DSSErrorException(80001, "当前工作流" + rootFlow.getName() +"被用户" + flowEditLock.getUsername() + "已锁定编辑，您编辑的内容不能再被保存。如有疑问，请与" + flowEditLock.getUsername() + "确认");
+        }
+
+        lockFlow(rootFlow, username, ticketId);
+
+        try {
+
+            updateNodeContent(flow,nodeName,nodeContent,nodeMetadata,dssProject.getName());
+
+            modifyFlowJsonTime(flow.getFlowJson(),System.currentTimeMillis(),flow.getCreator());
+
+
+        } finally {
+            // 解锁工作流
+            workFlowManager.unlockWorkflow(username,dssOrchestratorVersion.getAppId(),true,workspace);
+        }
+
+
+        saveFlow(flow.getId(),flow.getFlowJson(),flow.getDescription(),flow.getCreator(),
+                dssProject.getWorkspaceName(),dssProject.getName(),null);
+    }
+
+    public DSSFlow getFLowByNode(DSSFlow dssFlow,String nodeName){
+
+        List<DSSNodeDefault> nodeList = DSSCommonUtils.getWorkFlowNodes(dssFlow.getFlowJson());
+
+        if(CollectionUtils.isNotEmpty(nodeList)){
+
+            DSSNodeDefault dssNodeDefault = getNode(dssFlow,nodeName);
+
+            if(dssNodeDefault != null){
+                return  dssFlow;
+            }
+
+        }
+
+        if(!CollectionUtils.isNotEmpty(dssFlow.getChildren())){
+
+            for(DSSFlow flow: dssFlow.getChildren()){
+
+                DSSFlow childFlow = getFLowByNode(flow,nodeName);
+                if (null != childFlow){
+                    return childFlow;
+                }
+            }
+        }
+
+        return  null;
+    }
+
+
+    public void updateNodeContent(DSSFlow dssFlow,String nodeName,String nodeContent,Map<String,Object> nodeMetaData,String projectName) throws DSSErrorException{
+
+        DSSNodeDefault dssNodeDefault = getNode(dssFlow,nodeName);
+
+        // 节点不存在
+        if(dssNodeDefault == null){
+            DSSExceptionUtils.dealErrorException(90003, String.format("工作流下未找到 %s 节点",nodeName), DSSErrorException.class);
+        }
+
+        Resource resource = null;
+
+        if(StringUtils.isNotEmpty(nodeContent)){
+            resource = updateScriptContent(dssFlow,dssNodeDefault,nodeContent,projectName);
+        }
+
+        updateNodeMetadata(dssFlow,dssNodeDefault,nodeMetaData,resource);
+
+        logger.info("flow id is {}, {} workflow json is {}",dssFlow.getId(),dssFlow.getName(),dssFlow.getFlowJson());
+
+    }
+
+    public Resource updateScriptContent(DSSFlow dssFlow,DSSNodeDefault dssNodeDefault,String nodeContent,String projectName){
+
+        logger.info("update script node info is {}",dssNodeDefault.toString());
+
+        // 判断节点类型(spark、pyspark、hive) 三种类型可以更改内容
+        if(!CodeTypeEnum.isMatchDataNode(dssNodeDefault.getJobType())){
+            logger.warn("{} node job type is {}, not update script",dssNodeDefault.getTitle(),dssNodeDefault.getJobType());
+            DSSExceptionUtils.dealErrorException(90003, String.format("%s 所属节点类型不是【spark、pyspark、hive】,不能进行内容修改",dssNodeDefault.getTitle()), DSSErrorException.class);
+        }
+
+        // 节点是否在脚本信息
+        if(dssNodeDefault.getJobContent() == null || !dssNodeDefault.getJobContent().containsKey("script") ){
+            logger.error("{} node jobContent not contains script key ", dssNodeDefault.getTitle());
+            DSSExceptionUtils.dealErrorException(90003, String.format("%s 节点不存在内容信息,不能进行内容修改",dssNodeDefault.getTitle()), DSSErrorException.class);
+        }
+
+        Object script = dssNodeDefault.getJobContent().get("script");
+
+        if(script == null || StringUtils.isEmpty(String.valueOf(script))){
+            logger.error("{} node script info is empty", dssNodeDefault.getTitle());
+            DSSExceptionUtils.dealErrorException(90003, String.format("%s 节点不存在内容信息,不能进行内容修改",dssNodeDefault.getTitle()), DSSErrorException.class);
+        }
+
+        logger.info("{} node start upload bml {} script content",dssNodeDefault.getTitle(),script);
+        // 更改脚本内容
+        if(dssNodeDefault.getResources() == null){
+            dssNodeDefault.setResources(new ArrayList<>());
+        }
+
+
+        Resource source = dssNodeDefault.getResources().stream()
+                .filter(resource -> resource.getFileName().equals(String.valueOf(script))
+                        && StringUtils.isNotEmpty(resource.getResourceId()))
+                .findFirst().orElse(null);
+
+
+        Map<String,Object> map;
+        if(source == null ){
+            logger.info("{} node upload script content, content is {}",dssNodeDefault.getTitle(),nodeContent);
+            map = bmlService.upload(dssFlow.getCreator(),nodeContent,String.valueOf(script),projectName);
+
+        }else{
+            logger.info("{} node update script content,content is {}",dssNodeDefault.getTitle(),nodeContent);
+            map = bmlService.update(dssFlow.getCreator(),source.getResourceId(),nodeContent);
+        }
+
+        logger.info("{} node end upload bml {} script content, resourceId is {}, version is {}",
+                dssNodeDefault.getTitle(),script,map.get("resourceId"),map.get("version"));
+
+        if(map.get("resourceId") == null || map.get("version") == null){
+            DSSExceptionUtils.dealErrorException(90003, String.format("%s 节点修改失败,bml response data is empty",dssNodeDefault.getTitle()), DSSErrorException.class);
+        }
+
+        Resource resource = new Resource();
+        resource.setResourceId(map.get("resourceId").toString());
+        resource.setFileName(String.valueOf(script));
+        resource.setVersion(map.get("version").toString());
+
+        return resource;
+
+    }
+
+    public void updateNodeMetadata(DSSFlow dssFlow,DSSNodeDefault dssNodeDefault,Map<String,Object> nodeMetaData,Resource resource){
+
+
+        logger.info("node info is {}, input meta data is {}",dssNodeDefault.toString(),DSSCommonUtils.COMMON_GSON.toJson(nodeMetaData));
+
+        // 判断节点类型(spark、pyspark、hive) + 信号节点 可以更改配置
+        if(!CodeTypeEnum.isMatchDataOrSignalNode(dssNodeDefault.getJobType())){
+            logger.error("{} node job type is {}, not update metadata",dssNodeDefault.getTitle(),dssNodeDefault.getJobType());
+            DSSExceptionUtils.dealErrorException(90003,
+                    String.format("%s 所属节点类型不是【spark、pyspark、hive、SignalNode】,不能进行配置修改",
+                            dssNodeDefault.getTitle()), DSSErrorException.class);
+        }
+
+        JsonObject jsonObject = new JsonParser().parse(dssFlow.getFlowJson()).getAsJsonObject();
+        JsonArray nodeJsonArray = jsonObject.getAsJsonArray("nodes");
+
+        for(JsonElement nodeJson: nodeJsonArray){
+            JsonObject json = nodeJson.getAsJsonObject();
+            String title = json.get("title").getAsString();
+
+            if(title.equals(dssNodeDefault.getTitle())){
+                // 修改配置
+                if(!MapUtils.isEmpty(nodeMetaData)){
+                    json.add("params", new Gson().toJsonTree(nodeMetaData));
+                } else{
+                    logger.warn("input meta data is empty , node is {}", dssNodeDefault.getTitle());
+                }
+
+                if(resource != null && json.keySet().contains("resources")){
+                    JsonArray resources = json.getAsJsonArray("resources");
+                    // 更改resource版本addProperty
+                    for(JsonElement element: resources){
+                        JsonObject sourceJson = element.getAsJsonObject();
+                        if(resource.getFileName().equals(sourceJson.get("fileName").getAsString())
+                                && resource.getResourceId().equals(sourceJson.get("resourceId").getAsString())){
+
+                            sourceJson.addProperty("version",resource.getVersion());
+                        }
+                    }
+                }
+
+                json.addProperty("modifyTime",System.currentTimeMillis());
+                json.addProperty("modifyUser",dssNodeDefault.getModifyUser());
+
+                break;
+            }
+
+        }
+
+        dssFlow.setFlowJson(DSSCommonUtils.COMMON_GSON.toJson(jsonObject));
+
+    }
+
+    public DSSNodeDefault getNode(DSSFlow dssFlow, String nodeName){
+
+        List<DSSNodeDefault> nodeList = DSSCommonUtils.getWorkFlowNodes(dssFlow.getFlowJson());
+
+        if(CollectionUtils.isNotEmpty(nodeList)){
+
+            return  nodeList.stream()
+                    .filter(node-> node.getTitle().equals(nodeName)).findFirst().orElse(null);
+        }
+
+        return  null;
+
+    }
+
+
+
+    private static DSSProject validateOperation(long projectId, String username) {
+        ProjectInfoRequest projectInfoRequest = new ProjectInfoRequest();
+        projectInfoRequest.setProjectId(projectId);
+        DSSProject dssProject = RpcAskUtils.processAskException(DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender()
+                .ask(projectInfoRequest), DSSProject.class, ProjectInfoRequest.class);
+        if (dssProject == null) {
+            DSSExceptionUtils.dealErrorException(90003, "工程不存在", DSSErrorException.class);
+        }
+        if (!hasProjectEditPriv(projectId, username)) {
+            DSSExceptionUtils.dealErrorException(90004, "用户没有工程编辑权限", DSSErrorException.class);
+        }
+        return dssProject;
+    }
+
+    private static boolean hasProjectEditPriv(Long projectId, String username) {
+        ProjectUserAuthResponse projectUserAuthResponse = RpcAskUtils.processAskException(DSSSenderServiceFactory.getOrCreateServiceInstance()
+                .getProjectServerSender().ask(new ProjectUserAuthRequest(projectId, username)), ProjectUserAuthResponse.class, ProjectUserAuthRequest.class);
+        boolean hasEditPriv = false;
+        if (!CollectionUtils.isEmpty(projectUserAuthResponse.getPrivList())) {
+            hasEditPriv = projectUserAuthResponse.getPrivList().contains(ProjectUserPrivEnum.PRIV_EDIT.getRank()) ||
+                    projectUserAuthResponse.getPrivList().contains(ProjectUserPrivEnum.PRIV_RELEASE.getRank());
+        }
+        return hasEditPriv || projectUserAuthResponse.getProjectOwner().equals(username);
     }
 
 }

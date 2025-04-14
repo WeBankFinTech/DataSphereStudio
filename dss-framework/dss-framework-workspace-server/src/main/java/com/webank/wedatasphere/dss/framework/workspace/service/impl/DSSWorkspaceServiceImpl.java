@@ -16,7 +16,6 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.service.impl;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.github.pagehelper.page.PageMethod;
@@ -36,6 +35,7 @@ import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.Workspa
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceFavoriteVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceMenuAppconnVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceMenuVo;
+import com.webank.wedatasphere.dss.framework.workspace.bean.request.UpdateWorkspaceStarRocksClusterRequest;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.*;
 import com.webank.wedatasphere.dss.framework.workspace.constant.ApplicationConf;
 import com.webank.wedatasphere.dss.framework.workspace.dao.*;
@@ -56,18 +56,22 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.linkis.common.exception.ErrorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.function.Supplier;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.webank.wedatasphere.dss.framework.workspace.util.DSSWorkspaceConstant.DEFAULT_DEMO_WORKSPACE_NAME;
 
 public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     private static final Logger LOGGER = LoggerFactory.getLogger(DSSWorkspaceServiceImpl.class);
-
+    private static final Pattern IPV4_PATTERN = Pattern.compile(
+            "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
+    );
     @Autowired
     private DSSWorkspaceMapper dssWorkspaceMapper;
     @Autowired
@@ -100,6 +104,8 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     @Autowired
     private DSSWorkspaceRoleCheckService roleCheckService;
 
+    @Autowired
+    private DSSWorkspaceStarRocksClusterMapper dssWorkspaceStarRocksClusterMapper;
     //创建工作空间
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -865,5 +871,95 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     @Override
     public void updateWorkspaceInfo(DSSWorkspace dssWorkspace){
         dssWorkspaceMapper.updateWorkspaceInfo(dssWorkspace);
+    }
+
+    @Override
+    public List<DSSWorkspaceStarRocksCluster> updateStarRocksCluster(List<UpdateWorkspaceStarRocksClusterRequest> request) {
+
+        Long workspaceId = request.get(0).getWorkspaceId();
+        List<DSSWorkspaceStarRocksCluster> starRocksClusters = new ArrayList<>();
+        HashMap<String, UpdateWorkspaceStarRocksClusterRequest> seenKeys = new HashMap<>();
+        int count = 0;
+        for (UpdateWorkspaceStarRocksClusterRequest r : request) {
+
+            if (StringUtils.isEmpty(r.getClusterName()) || StringUtils.isEmpty(r.getClusterIp())) {
+                LOGGER.warn("工作空间{} StarRocks集群名和ip不能为空", r.getWorkspaceName());
+                throw new DSSErrorException(90054, String.format("%s workspace StarRocks cluster name and ip cannot be empty.", r.getWorkspaceName()));
+            }
+
+            if (StringUtils.length(r.getClusterName()) > 128) {
+                LOGGER.warn("工作空间{}StarRocks集群名称{}超过128字符", r.getWorkspaceName(), r.getClusterName());
+                throw new DSSErrorException(90054, String.format("StarRocks cluster %s length cannot exceed 128 in workspace %s", r.getClusterName(), r.getWorkspaceName()));
+            }
+
+            if (r.getHttpPort() < 0 || r.getHttpPort() > 65535 || r.getTcpPort() < 0 || r.getTcpPort() > 65535) {
+                LOGGER.warn("工作空间{}StarRocks集群端口必须在0-65535之间", r.getWorkspaceName());
+                throw new DSSErrorException(90054, String.format("%s workspace StarRocks cluster port must be between 0 and 65535", r.getWorkspaceName()));
+            }
+
+            if (!IPV4_PATTERN.matcher(r.getClusterIp()).matches()) {
+                LOGGER.warn("工作空间{}StarRocks集群ip格式不准确", r.getWorkspaceName());
+                throw new DSSErrorException(90054, String.format("%s workspace StarRocks cluster ip is illegal", r.getWorkspaceName()));
+            }
+
+
+            if (r.getDefaultCluster()) {
+                count++;
+            }
+            if (count > 1) {
+                LOGGER.warn("工作空间{}不允许设置两个默认集群", r.getWorkspaceName());
+                throw new DSSErrorException(90054, String.format("%s workspace cannot set multiple default StarRocks cluster!", r.getWorkspaceName()) );
+            }
+
+            String key = r.getClusterIp() + "|" + r.getHttpPort() + "|" + r.getTcpPort();
+            if (seenKeys.containsKey(key)) {
+                LOGGER.warn("存在相同的集群配置，ip为{}，http端口为{}，tcp端口为{}", r.getClusterIp(), r.getHttpPort(), r.getTcpPort());
+                throw new DSSErrorException(90054, String.format("%s workspace cannot exist same ip and port!", r.getWorkspaceName()) );
+            } else {
+                seenKeys.put(key, r);
+            }
+        }
+
+        List<DSSWorkspaceStarRocksCluster> itemsByWorkspaceId = dssWorkspaceStarRocksClusterMapper.getItemsByWorkspaceId(workspaceId);
+        if (CollectionUtils.isNotEmpty(itemsByWorkspaceId)) {
+            for (DSSWorkspaceStarRocksCluster item : itemsByWorkspaceId) {
+                String key = item.getClusterIp() + "|" + item.getHttpPort() + "|" + item.getTcpPort();
+                if (seenKeys.containsKey(key)) {
+                    UpdateWorkspaceStarRocksClusterRequest requestItem = seenKeys.get(key);
+                    item.setClusterName(requestItem.getClusterName());
+                    item.setDefaultCluster(requestItem.getDefaultCluster());
+                    item.setUpdateUser(requestItem.getUsername());
+                    item.setUpdateTime(new Date());
+                    dssWorkspaceStarRocksClusterMapper.updateStarRocksCluster(item);
+                    starRocksClusters.add(item);
+                    seenKeys.remove(key);
+                } else {
+                    dssWorkspaceStarRocksClusterMapper.deleteItemById(item.getId());
+                }
+            }
+        }
+
+        //新增的写入
+        if (!seenKeys.isEmpty()) {
+            for (Map.Entry<String, UpdateWorkspaceStarRocksClusterRequest> entry : seenKeys.entrySet()) {
+                UpdateWorkspaceStarRocksClusterRequest value = entry.getValue();
+                DSSWorkspaceStarRocksCluster dssWorkspaceStarRocksCluster = new DSSWorkspaceStarRocksCluster();
+                BeanUtils.copyProperties(value, dssWorkspaceStarRocksCluster);
+                dssWorkspaceStarRocksCluster.setCreateUser(value.getUsername());
+                dssWorkspaceStarRocksCluster.setUpdateUser(value.getUsername());
+                dssWorkspaceStarRocksCluster.setCreateTime(new Date());
+                dssWorkspaceStarRocksCluster.setUpdateTime(new Date());
+                Integer id = dssWorkspaceStarRocksClusterMapper.insertStarRocksCluster(dssWorkspaceStarRocksCluster);
+                dssWorkspaceStarRocksCluster.setId(id);
+                starRocksClusters.add(dssWorkspaceStarRocksCluster);
+            }
+        }
+
+        return starRocksClusters;
+    }
+
+    @Override
+    public List<DSSWorkspaceStarRocksCluster> getStarRocksCluster(Long workspaceId) {
+        return dssWorkspaceStarRocksClusterMapper.getItemsByWorkspaceId(workspaceId);
     }
 }

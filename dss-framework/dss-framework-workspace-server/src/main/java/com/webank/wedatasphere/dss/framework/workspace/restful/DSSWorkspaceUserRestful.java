@@ -367,8 +367,9 @@ public class DSSWorkspaceUserRestful {
     }
 
     @RequestMapping(path = "/updateWorkspaceStarRocksCluster", method = RequestMethod.POST)
-    public Message updateWorkspaceStarRocksCluster(@RequestBody List<UpdateWorkspaceStarRocksClusterRequest> request) throws DSSErrorException {
+    public Message updateWorkspaceStarRocksCluster(@RequestBody UpdateWorkspaceStarRocksClusterRequestList requestWrapper) throws DSSErrorException {
 
+        List<UpdateWorkspaceStarRocksClusterRequest> request = requestWrapper.getStarRocksUpdateRequest();
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
 
         if (CollectionUtils.isEmpty(request)) {

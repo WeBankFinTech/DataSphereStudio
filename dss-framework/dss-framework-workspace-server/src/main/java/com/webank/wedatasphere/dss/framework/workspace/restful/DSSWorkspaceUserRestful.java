@@ -16,6 +16,7 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.restful;
 
+import com.google.common.collect.Lists;
 import com.webank.wedatasphere.dss.common.auditlog.OperateTypeEnum;
 import com.webank.wedatasphere.dss.common.auditlog.TargetTypeEnum;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
@@ -23,10 +24,8 @@ import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
 import com.webank.wedatasphere.dss.framework.admin.service.DssAdminUserService;
 import com.webank.wedatasphere.dss.common.StaffInfo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSUserDefaultWorkspace;
-import com.webank.wedatasphere.dss.framework.workspace.bean.request.DeleteWorkspaceUserRequest;
-import com.webank.wedatasphere.dss.framework.workspace.bean.request.RevokeUserRole;
-import com.webank.wedatasphere.dss.framework.workspace.bean.request.UpdateUserDefaultWorkspaceRequest;
-import com.webank.wedatasphere.dss.framework.workspace.bean.request.UpdateWorkspaceUserRequest;
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceStarRocksCluster;
+import com.webank.wedatasphere.dss.framework.workspace.bean.request.*;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.*;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceRoleCheckService;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceService;
@@ -36,6 +35,7 @@ import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceDBHelper;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.common.exception.AppStandardWarnException;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
@@ -364,6 +364,48 @@ public class DSSWorkspaceUserRestful {
                 OperateTypeEnum.UPDATE, request);
 
         return Message.ok().data("dssUserDefaultWorkspace", dssUserDefaultWorkspace);
+    }
+
+    @RequestMapping(path = "/updateWorkspaceStarRocksCluster", method = RequestMethod.POST)
+    public Message updateWorkspaceStarRocksCluster(@RequestBody List<UpdateWorkspaceStarRocksClusterRequest> request) throws DSSErrorException {
+
+        String username = SecurityFilter.getLoginUsername(httpServletRequest);
+
+        if (CollectionUtils.isEmpty(request)) {
+            return Message.ok().data("dssWorkspaceStarRocksCluster", Lists.newArrayList());
+        }
+
+        request.forEach(r -> {
+            String workspaceName = dssWorkspaceService.getWorkspaceName(r.getWorkspaceId());
+            if (StringUtils.isEmpty(workspaceName)) {
+                LOGGER.error("updateUserDefaultWorkspace workspaceId is {} , workspaceName is {}",r.getWorkspaceId(), workspaceName);
+                throw new DSSErrorException(90054, String.format("%s workspace not exists!", workspaceName) );
+            }
+            r.setWorkspaceName(workspaceName);
+            r.setUsername(username);
+        });
+
+        List<DSSWorkspaceStarRocksCluster> dssWorkspaceStarRocksCluster = dssWorkspaceService.updateStarRocksCluster(request);
+
+        AuditLogUtils.printLog(username, request.get(0).getWorkspaceId(), request.get(0).getWorkspaceName(), TargetTypeEnum.WORKSPACE, request.get(0).getWorkspaceId(), request.get(0).getWorkspaceName(),
+                OperateTypeEnum.UPDATE, request);
+
+        return Message.ok().data("dssWorkspaceStarRocksCluster", dssWorkspaceStarRocksCluster);
+    }
+
+
+    @RequestMapping(path = "/getWorkspaceStarRocksCluster", method = RequestMethod.GET)
+    public Message getWorkspaceStarRocksCluster(@RequestParam(value = WORKSPACE_ID_STR, required = false) Long workspaceId) throws DSSErrorException {
+
+        if (workspaceId == null) {
+            workspaceId = SSOHelper.getWorkspace(httpServletRequest).getWorkspaceId();
+        }
+
+        LOGGER.info("getWorkspaceStarRocksCluster workspaceId is {}", workspaceId);
+
+        List<DSSWorkspaceStarRocksCluster> starRocksCluster = dssWorkspaceService.getStarRocksCluster(workspaceId);
+
+        return Message.ok().data("dssWorkspaceStarRocksCluster", starRocksCluster);
     }
 
 

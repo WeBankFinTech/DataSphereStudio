@@ -9,7 +9,9 @@ import com.webank.wedatasphere.dss.scriptis.service.ScriptisProxyUserService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -20,7 +22,8 @@ public class ScriptisProxyUserServiceImpl implements DssProxyUserService, Script
 
     @Override
     public List<DssProxyUser> selectProxyUserList(String userName, DSSWorkspace workspace) {
-        return new ArrayList<>(dssProxyUserMapper.selectProxyUserList(userName));
+        String expireTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+        return new ArrayList<>(dssProxyUserMapper.selectProxyUserList(userName,expireTime));
     }
 
     @Override

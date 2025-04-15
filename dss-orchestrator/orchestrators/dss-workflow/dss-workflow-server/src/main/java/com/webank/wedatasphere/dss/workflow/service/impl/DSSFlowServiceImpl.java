@@ -83,12 +83,16 @@ import com.webank.wedatasphere.dss.workflow.service.WorkflowNodeService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.http.Consts;
 import org.apache.linkis.common.exception.ErrorException;
+import org.apache.linkis.common.io.FsPath;
 import org.apache.linkis.cs.client.utils.SerializeHelper;
 import org.apache.linkis.cs.common.utils.CSCommonUtils;
 import org.apache.linkis.rpc.Sender;
 import org.apache.linkis.server.BDPJettyServerHelper;
 import org.apache.linkis.server.Message;
+import org.apache.linkis.storage.script.*;
+import org.apache.linkis.storage.script.writer.StorageScriptFsWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -2690,10 +2694,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
         try {
 
-            updateNodeContent(flow,nodeName,nodeContent,nodeMetadata,dssProject.getName());
-
-            modifyFlowJsonTime(flow.getFlowJson(),System.currentTimeMillis(),flow.getCreator());
-
+            updateNodeContent(flow,nodeName,nodeContent,nodeMetadata,dssProject.getName(),username);
 
         } finally {
             // 解锁工作流
@@ -2734,7 +2735,8 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     }
 
 
-    public void updateNodeContent(DSSFlow dssFlow,String nodeName,String nodeContent,Map<String,Object> nodeMetaData,String projectName) throws DSSErrorException{
+    public void updateNodeContent(DSSFlow dssFlow,String nodeName,String nodeContent,Map<String,Object> nodeMetaData,
+                                  String projectName,String username) throws DSSErrorException,IOException {
 
         DSSNodeDefault dssNodeDefault = getNode(dssFlow,nodeName);
 
@@ -2746,16 +2748,20 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         Resource resource = null;
 
         if(StringUtils.isNotEmpty(nodeContent)){
-            resource = updateScriptContent(dssFlow,dssNodeDefault,nodeContent,projectName);
+            // 修改脚本内容
+            resource = updateScriptContent(dssFlow,dssNodeDefault,nodeContent,projectName,username,nodeMetaData);
         }
 
-        updateNodeMetadata(dssFlow,dssNodeDefault,nodeMetaData,resource);
+        // 修改json信息
+        updateNodeMetadata(dssFlow,dssNodeDefault,nodeMetaData,resource,username);
+
 
         logger.info("flow id is {}, {} workflow json is {}",dssFlow.getId(),dssFlow.getName(),dssFlow.getFlowJson());
 
     }
 
-    public Resource updateScriptContent(DSSFlow dssFlow,DSSNodeDefault dssNodeDefault,String nodeContent,String projectName){
+    public Resource updateScriptContent(DSSFlow dssFlow,DSSNodeDefault dssNodeDefault,String nodeContent,
+                                        String projectName,String username,Map<String,Object> nodeMetaData) throws IOException{
 
         logger.info("update script node info is {}",dssNodeDefault.toString());
 
@@ -2791,14 +2797,50 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                 .findFirst().orElse(null);
 
 
-        Map<String,Object> map;
-        if(source == null ){
-            logger.info("{} node upload script content, content is {}",dssNodeDefault.getTitle(),nodeContent);
-            map = bmlService.upload(dssFlow.getCreator(),nodeContent,String.valueOf(script),projectName);
+        Map<String,Object> params;
 
+        if(MapUtils.isEmpty(nodeMetaData)){
+            params = nodeMetaData;
         }else{
-            logger.info("{} node update script content,content is {}",dssNodeDefault.getTitle(),nodeContent);
-            map = bmlService.update(dssFlow.getCreator(),source.getResourceId(),nodeContent);
+            params = dssNodeDefault.getParams();
+        }
+
+        if(params == null){
+            params = new HashMap<>();
+        }
+
+        // 保存bml的内容和metadata 根据linkis saveScriptToBML接口
+        ScriptFsWriter writer =
+                StorageScriptFsWriter.getScriptFsWriter(
+                        new FsPath(String.valueOf(script)), Consts.UTF_8.toString(), null);
+
+        Variable[] v = VariableParser.getVariables(params);
+
+        List<Variable> variableList =
+                Arrays.stream(v)
+                        .filter(var -> !org.springframework.util.StringUtils.isEmpty(var.value()))
+                        .collect(Collectors.toList());
+
+        // 保存代码和文件
+        writer.addMetaData(new ScriptMetaData(variableList.toArray(new Variable[0])));
+        writer.addRecord(new ScriptRecord(nodeContent));
+
+        Map<String, Object> map = new HashMap<>();
+
+        try (InputStream inputStream = writer.getInputStream()) {
+
+            if (source == null) {
+                logger.info("{} node upload script content, content is {}",dssNodeDefault.getTitle(),nodeContent);
+                //  新增文件
+                BmlResource bmlResource =  bmlService.upload(dssFlow.getCreator(),inputStream,String.valueOf(script),projectName);
+                map.put("resourceId",bmlResource.getResourceId());
+                map.put("version",bmlResource.getVersion());
+
+            } else {
+                logger.info("{} node update script content,content is {}",dssNodeDefault.getTitle(),nodeContent);
+                //  更新文件
+                map = bmlService.update(dssFlow.getCreator(),source.getResourceId(),inputStream);
+            }
         }
 
         logger.info("{} node end upload bml {} script content, resourceId is {}, version is {}",
@@ -2817,7 +2859,8 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
     }
 
-    public void updateNodeMetadata(DSSFlow dssFlow,DSSNodeDefault dssNodeDefault,Map<String,Object> nodeMetaData,Resource resource){
+    public void updateNodeMetadata(DSSFlow dssFlow,DSSNodeDefault dssNodeDefault,Map<String,Object> nodeMetaData,
+                                   Resource resource,String username){
 
 
         logger.info("node info is {}, input meta data is {}",dssNodeDefault.toString(),DSSCommonUtils.COMMON_GSON.toJson(nodeMetaData));
@@ -2846,8 +2889,9 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                 }
 
                 if(resource != null && json.keySet().contains("resources")){
+                    // 修改内容后 更新 resource版本
                     JsonArray resources = json.getAsJsonArray("resources");
-                    // 更改resource版本addProperty
+                    // 更改resource版本
                     for(JsonElement element: resources){
                         JsonObject sourceJson = element.getAsJsonObject();
                         if(resource.getFileName().equals(sourceJson.get("fileName").getAsString())
@@ -2858,13 +2902,18 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                     }
                 }
 
+                // 修改节点的更新时间
                 json.addProperty("modifyTime",System.currentTimeMillis());
-                json.addProperty("modifyUser",dssNodeDefault.getModifyUser());
+                json.addProperty("modifyUser", username);
 
                 break;
             }
 
         }
+
+        // 修改工作流的更新时间
+        jsonObject.addProperty("updateTime", System.currentTimeMillis());
+        jsonObject.addProperty("updateUser", username);
 
         dssFlow.setFlowJson(DSSCommonUtils.COMMON_GSON.toJson(jsonObject));
 

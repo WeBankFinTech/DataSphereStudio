@@ -10,7 +10,7 @@ import java.util.List;
 @Mapper
 public interface ScriptisProxyUserMapper extends BaseMapper<ScriptisProxyUser> {
 
-    List<ScriptisProxyUser> selectProxyUserList(String userName,String expireTime);
+    List<ScriptisProxyUser> selectProxyUserList(@Param("userName")String userName,@Param("expireTime") String expireTime);
 
     int insertUser(ScriptisProxyUser user);
 

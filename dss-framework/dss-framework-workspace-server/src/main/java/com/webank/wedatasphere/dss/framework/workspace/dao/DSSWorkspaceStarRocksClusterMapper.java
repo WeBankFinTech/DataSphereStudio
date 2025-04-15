@@ -29,7 +29,7 @@ public interface DSSWorkspaceStarRocksClusterMapper {
 
     void updateStarRocksCluster(DSSWorkspaceStarRocksCluster updateCluster);
 
-    Integer insertStarRocksCluster(DSSWorkspaceStarRocksCluster addCluster);
+    void insertStarRocksCluster(DSSWorkspaceStarRocksCluster addCluster);
 
     List<DSSWorkspaceStarRocksCluster> getItemsByWorkspaceId(@Param("workspaceId") Long workspaceId);
 

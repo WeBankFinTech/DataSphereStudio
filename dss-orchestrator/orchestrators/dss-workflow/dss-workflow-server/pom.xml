@@ -166,6 +166,13 @@
             <version>5.8.21</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.linkis</groupId>
+            <artifactId>linkis-storage</artifactId>
+            <version>${linkis.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
     </dependencies>
     <build>
         <plugins>

@@ -949,8 +949,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
                 dssWorkspaceStarRocksCluster.setUpdateUser(value.getUsername());
                 dssWorkspaceStarRocksCluster.setCreateTime(new Date());
                 dssWorkspaceStarRocksCluster.setUpdateTime(new Date());
-                Integer id = dssWorkspaceStarRocksClusterMapper.insertStarRocksCluster(dssWorkspaceStarRocksCluster);
-                dssWorkspaceStarRocksCluster.setId(id);
+                dssWorkspaceStarRocksClusterMapper.insertStarRocksCluster(dssWorkspaceStarRocksCluster);
                 starRocksClusters.add(dssWorkspaceStarRocksCluster);
             }
         }

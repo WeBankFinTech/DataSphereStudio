@@ -63,4 +63,6 @@ public interface OrchestratorFrameworkService {
 
     DSSOrchestratorVersion getLatestOrchestratorVersion(Long orchestratorId);
 
+    DSSOrchestratorCopyInfo encryptCopyOrchestrator(EncryptCopyOrchestratorRequest request) throws  Exception;
+
 }

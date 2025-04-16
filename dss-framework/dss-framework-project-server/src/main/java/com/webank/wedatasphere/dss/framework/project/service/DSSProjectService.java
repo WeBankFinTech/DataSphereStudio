@@ -22,6 +22,7 @@ import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectListQueryRequest;
+import com.webank.wedatasphere.dss.common.protocol.project.ProjectUserAuthModifyRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectDO;
 import com.webank.wedatasphere.dss.framework.project.entity.request.*;
 import com.webank.wedatasphere.dss.framework.project.entity.response.ProjectResponse;
@@ -114,5 +115,7 @@ public interface DSSProjectService  extends IService<DSSProjectDO> {
     List<String> queryProjectName(ProjectQueryRequest projectRequest);
 
     List<DSSProject> queryProject(ProjectListQueryRequest projectListQueryRequest);
+
+    DSSProject projectAuthModify(ProjectUserAuthModifyRequest projectUserAuthModifyRequest) throws  Exception;
 
 }

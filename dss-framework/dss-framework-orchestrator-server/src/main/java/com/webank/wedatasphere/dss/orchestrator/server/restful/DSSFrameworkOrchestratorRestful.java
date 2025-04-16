@@ -63,6 +63,7 @@ import com.webank.wedatasphere.dss.workflow.dao.LockMapper;
 import com.webank.wedatasphere.dss.workflow.entity.DSSFlowEditLock;
 import com.webank.wedatasphere.dss.workflow.lock.DSSFlowEditLockManager;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.math3.util.Pair;
 import org.apache.linkis.rpc.Sender;
 import org.apache.linkis.server.Message;
@@ -72,13 +73,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
+
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
@@ -779,6 +781,46 @@ public class DSSFrameworkOrchestratorRestful {
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
 
         return  Message.ok().data("data",orchestratorPluginService.batchPublishFlowCheck(batchPublishFlowCheckRequest,workspace));
+    }
+
+
+    @RequestMapping(value = "encryptCopyOrchestrator",method = RequestMethod.POST)
+    public Message encryptCopyOrchestrator(EncryptCopyOrchestratorRequest encryptCopyOrchestratorRequest) throws  Exception{
+
+        String minutes = new SimpleDateFormat("MMddHHmm").format(new Date());
+        if(StringUtils.isEmpty(encryptCopyOrchestratorRequest.getCopyFlowSuffix())){
+            encryptCopyOrchestratorRequest.setCopyFlowSuffix("copy_cib"  + minutes);
+        }
+
+        if(StringUtils.isEmpty(encryptCopyOrchestratorRequest.getCopyNodeSuffix())){
+
+            encryptCopyOrchestratorRequest.setCopyNodeSuffix("cp" + minutes);
+        }
+
+        String username = SecurityFilter.getLoginUsername(httpServletRequest);
+        encryptCopyOrchestratorRequest.setUsername(username);
+        encryptCopyOrchestratorRequest.setAccessUser("hadoop");
+
+        LOGGER.info("request encryptCopyOrchestrator body is {}",encryptCopyOrchestratorRequest);
+
+        String workspaceName = dssWorkspaceService.getWorkspaceName(encryptCopyOrchestratorRequest.getWorkspaceId());
+
+        if(StringUtils.isEmpty(workspaceName)){
+            return Message.error("工作空间不存在");
+        }
+
+        if (orchestratorFrameworkService.getOrchestratorCopyStatus(encryptCopyOrchestratorRequest.getOrchestratorId())) {
+            return Message.error("当前工作流正在被复制，不允许编辑");
+        }
+
+
+        DSSOrchestratorCopyInfo  dssOrchestratorCopyInfo = orchestratorFrameworkService.encryptCopyOrchestrator(encryptCopyOrchestratorRequest);
+
+        AuditLogUtils.printLog("hadoop", encryptCopyOrchestratorRequest.getWorkspaceId(), workspaceName, TargetTypeEnum.ORCHESTRATOR,
+                dssOrchestratorCopyInfo.getSourceOrchestratorId(), dssOrchestratorCopyInfo.getSourceOrchestratorName(), OperateTypeEnum.COPY, encryptCopyOrchestratorRequest);
+
+        return Message.ok("复制工作流已经开始，正在后台复制中，复制状态可以从复制历史查看...").data("copyJobId", dssOrchestratorCopyInfo.getId());
+
     }
 
 }

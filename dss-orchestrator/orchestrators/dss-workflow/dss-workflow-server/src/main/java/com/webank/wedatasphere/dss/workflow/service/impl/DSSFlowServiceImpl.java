@@ -412,7 +412,6 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             if (rollBackNode != null) {
                 throw new DSSErrorException(80001, "工作流中存在节点：" + rollBackNode + "，此次保存会导致该节点的代码版本被回退，请刷新页面，确认代码无误后再保存");
             }
-            return dssFlow.getBmlVersion();
         }
 
         checkSubflowDependencies(userName, flowID, jsonFlow);

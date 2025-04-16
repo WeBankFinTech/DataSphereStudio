@@ -999,4 +999,107 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         }
     }
 
+
+
+    public DSSOrchestratorCopyInfo encryptCopyOrchestrator(EncryptCopyOrchestratorRequest request) throws  Exception{
+
+        Long projectId = request.getProjectId();
+        Long workspaceId = request.getWorkspaceId();
+        String username = request.getUsername();
+        Long orchestratorId = request.getOrchestratorId();
+
+        // 项目权限校验
+        DSSProject dssProject = validateOperation(projectId,username);
+
+        if(workspaceId.intValue() != dssProject.getWorkspaceId()){
+            LOGGER.error("project id is {}, workspace id is {},{} project not in workspace",
+                    workspaceId,projectId,dssProject.getName());
+            throw  new DSSErrorException(90003,"项目不存在于当前工作空间中");
+        }
+
+        // 工作流校验
+        DSSOrchestratorInfo dssOrchestratorInfo =  orchestratorMapper.getOrchestrator(orchestratorId);
+
+        if(dssOrchestratorInfo == null){
+            LOGGER.error("{} orchestrator not exists",orchestratorId);
+            throw  new DSSErrorException(90003,"复制的工作流不存在");
+        }
+
+        if(dssOrchestratorInfo.getProjectId() != dssProject.getId()){
+            LOGGER.error("project id is {},orchestrator id is {},{} orchestrator not in {} project",
+                    projectId,orchestratorId,dssOrchestratorInfo.getName(),dssProject.getName());
+            throw new DSSErrorException(90003,String.format("%s工作流不属于%s项目",dssOrchestratorInfo.getName(),dssProject.getName()));
+        }
+        String targetOrchestratorName = String.format("%s_%s",dssOrchestratorInfo.getName(),request.getCopyFlowSuffix());
+
+        //添加hadoop为查看权限
+        addAccessUserToProject(dssProject, request.getAccessUser(),username,workspaceId);
+
+        // 复制工作流
+        Workspace workspace = new Workspace();
+        workspace.setWorkspaceName(dssProject.getWorkspaceName());
+        workspace.setWorkspaceId(Long.valueOf(dssProject.getWorkspaceId()));
+        OrchestratorCopyRequest orchestratorCopyRequest = new OrchestratorCopyRequest();
+        orchestratorCopyRequest.setSourceOrchestratorId(dssOrchestratorInfo.getId());
+        orchestratorCopyRequest.setSourceOrchestratorName(dssOrchestratorInfo.getName());
+        orchestratorCopyRequest.setSourceProjectId(dssProject.getId());
+        orchestratorCopyRequest.setSourceProjectName(dssProject.getName());
+        orchestratorCopyRequest.setTargetOrchestratorName(targetOrchestratorName);
+        orchestratorCopyRequest.setTargetProjectId(dssProject.getId());
+        orchestratorCopyRequest.setTargetProjectName(dssProject.getName());
+
+        String copyJobId = copyOrchestrator(username,orchestratorCopyRequest,workspace);
+
+        DSSOrchestratorCopyInfo dssOrchestratorCopyInfo = new DSSOrchestratorCopyInfo();
+        dssOrchestratorCopyInfo.setId(copyJobId);
+        dssOrchestratorCopyInfo.setSourceOrchestratorId(dssOrchestratorInfo.getId());
+        dssOrchestratorCopyInfo.setSourceOrchestratorName(dssOrchestratorInfo.getName());
+        dssOrchestratorCopyInfo.setSourceProjectName(dssProject.getName());
+        dssOrchestratorCopyInfo.setTargetOrchestratorName(targetOrchestratorName);
+        dssOrchestratorCopyInfo.setTargetProjectName(dssProject.getName());
+
+
+        return dssOrchestratorCopyInfo;
+
+
+
+    }
+
+
+    public void addAccessUserToProject(DSSProject dssProject,String accessUser,String username,Long workspaceId){
+
+        ProjectUserAuthResponse projectUserAuthResponse = RpcAskUtils.processAskException(DSSSenderServiceFactory.getOrCreateServiceInstance()
+                .getProjectServerSender().ask(new ProjectUserAuthRequest(dssProject.getId(), accessUser)), ProjectUserAuthResponse.class, ProjectUserAuthRequest.class);
+
+        if (CollectionUtils.isEmpty(projectUserAuthResponse.getPrivList())) {
+            projectUserAuthResponse.setPrivList(new ArrayList<>());
+        }
+
+        if ( projectUserAuthResponse.getPrivList().contains(ProjectUserPrivEnum.PRIV_EDIT.getRank()) ||
+                projectUserAuthResponse.getPrivList().contains(ProjectUserPrivEnum.PRIV_RELEASE.getRank()) ||
+                projectUserAuthResponse.getPrivList().contains(ProjectUserPrivEnum.PRIV_ACCESS.getRank()) ||
+                projectUserAuthResponse.getProjectOwner().equals(accessUser)
+        ){
+            LOGGER.info("{} 用户已拥有 {} 项目查看权限",accessUser,dssProject.getName());
+            return;
+        }
+
+        LOGGER.info("{} 用户没有 {} 项目查看权限,添加用户为查看权限",accessUser,dssProject.getName());
+
+        ProjectUserAuthModifyRequest projectUserAuthModifyRequest = new ProjectUserAuthModifyRequest();
+        projectUserAuthModifyRequest.setAccessUser(accessUser);
+        projectUserAuthModifyRequest.setProjectName(dssProject.getName());
+        projectUserAuthModifyRequest.setProjectId(dssProject.getId());
+        projectUserAuthModifyRequest.setUsername(username);
+        projectUserAuthModifyRequest.setWorkspaceId(workspaceId);
+        projectUserAuthModifyRequest.setWorkspaceName(dssProject.getWorkspaceName());
+
+
+        DSSProject responseProject =  RpcAskUtils.processAskException(DSSSenderServiceFactory.getOrCreateServiceInstance()
+                .getProjectServerSender().ask(projectUserAuthModifyRequest),DSSProject.class,ProjectUserAuthModifyRequest.class);
+
+
+
+    }
+
 }

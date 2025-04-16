@@ -17,10 +17,11 @@
 package com.webank.wedatasphere.dss.framework.project.server.rpc
 
 import com.webank.wedatasphere.dss.common.protocol.ProxyUserCheckRequest
-import com.webank.wedatasphere.dss.common.protocol.project.{ProjectInfoRequest, ProjectRelationRequest}
+import com.webank.wedatasphere.dss.common.protocol.project.{ProjectInfoRequest, ProjectRelationRequest, ProjectUserAuthModifyRequest}
 import com.webank.wedatasphere.dss.framework.project.service.{DSSProjectService, DSSProjectUserService}
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceUserService
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.{RequestProjectImportOrchestrator, RequestProjectUpdateOrcVersion}
+
 import javax.annotation.PostConstruct
 import org.apache.linkis.protocol.usercontrol.{RequestUserListFromWorkspace, RequestUserWorkspace}
 import org.apache.linkis.rpc.{RPCMessageEvent, Receiver, ReceiverChooser}
@@ -54,6 +55,7 @@ class ProjectReceiverChooser extends ReceiverChooser {
     case _: RequestProjectUpdateOrcVersion => receiver
     case _: ProxyUserCheckRequest => receiver
     case _: ProjectInfoRequest => receiver
+    case _: ProjectUserAuthModifyRequest => receiver
     case _ => None
   }
 }

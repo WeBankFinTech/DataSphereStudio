@@ -84,6 +84,9 @@ class ProjectReceiver(projectService: DSSProjectService,
       case projectListQueryRequest: ProjectListQueryRequest =>
         val projectList = projectService.queryProject(projectListQueryRequest)
         new ProjectListQueryResponse(projectList)
+      case projectUserAuthModifyRequest : ProjectUserAuthModifyRequest =>
+          projectService.projectAuthModify(projectUserAuthModifyRequest)
+
 
     }
   }

@@ -402,6 +402,18 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         } else {
             logger.info("saveFlow is change");
         }
+        if (StringUtils.isNotEmpty(flowJsonOld) ) {
+            String rollBackNode = null;
+            try {
+                rollBackNode = checkFlowVersionDowngrade(flowJsonOld, jsonFlow);
+            }catch (Exception e){
+                logger.error("check roll back node failed",e);
+            }
+            if (rollBackNode != null) {
+                throw new DSSErrorException(80001, "工作流中存在节点：" + rollBackNode + "，此次保存会导致该节点的代码版本被回退，请刷新页面，确认代码无误后再保存");
+            }
+            return dssFlow.getBmlVersion();
+        }
 
         checkSubflowDependencies(userName, flowID, jsonFlow);
         String resourceId = dssFlow.getResourceId();
@@ -805,6 +817,81 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         jsonObject2.remove("comment");
         String tempNewJson = gson.toJson(jsonObject2);
         return tempOldJson.equals(tempNewJson);
+    }
+
+    public String checkFlowVersionDowngrade(String oldFlowJson, String newFlowJson) {
+        // 解析JSON字符串
+        JsonObject oldFlow = JsonParser.parseString(oldFlowJson).getAsJsonObject();
+        JsonObject newFlow = JsonParser.parseString(newFlowJson).getAsJsonObject();
+
+        // 获取nodes数组
+        JsonArray oldNodes = oldFlow.getAsJsonArray("nodes");
+        JsonArray newNodes = newFlow.getAsJsonArray("nodes");
+
+        // 将old nodes转换为map方便查找,key为node id
+        Map<String, JsonObject> oldNodesMap = new HashMap<>();
+        for (JsonElement nodeElement : oldNodes) {
+            JsonObject node = nodeElement.getAsJsonObject();
+            oldNodesMap.put(node.get("id").getAsString(), node);
+        }
+
+        // 遍历new nodes
+        for (JsonElement nodeElement : newNodes) {
+            JsonObject newNode = nodeElement.getAsJsonObject();
+            String nodeId = newNode.get("id").getAsString();
+
+            // 如果node在old flow中存在
+            if (oldNodesMap.containsKey(nodeId)) {
+                JsonObject oldNode = oldNodesMap.get(nodeId);
+
+                // 获取resources数组
+                JsonArray oldResources = oldNode.getAsJsonArray("resources");
+                JsonArray newResources = newNode.getAsJsonArray("resources");
+
+                // 如果resources为空则跳过
+                if (oldResources == null || newResources == null) {
+                    continue;
+                }
+
+                // 将old resources转换为map,key为resourceId
+                Map<String, JsonObject> oldResourcesMap = new HashMap<>();
+                for (JsonElement resourceElement : oldResources) {
+                    JsonObject resource = resourceElement.getAsJsonObject();
+                    oldResourcesMap.put(resource.get("resourceId").getAsString(), resource);
+                }
+
+                // 遍历new resources
+                for (JsonElement resourceElement : newResources) {
+                    JsonObject newResource = resourceElement.getAsJsonObject();
+                    String resourceId = newResource.get("resourceId").getAsString();
+
+                    // 如果resource在old node中存在
+                    if (oldResourcesMap.containsKey(resourceId)) {
+                        JsonObject oldResource = oldResourcesMap.get(resourceId);
+
+                        // 比较version (格式为v000001)
+                        String oldVersion = oldResource.get("version").getAsString();
+                        String newVersion = newResource.get("version").getAsString();
+                        // 比较版本号
+                        if (compareVersions(newVersion, oldVersion) < 0) {
+                            // 发现版本降级，返回node的title
+                            return newNode.get("title").getAsString();
+                        }
+                    }
+                }
+            }
+        }
+        // 没有发现version降级的情况
+        return null;
+    }
+
+
+
+    // 比较版本号
+    private int compareVersions(String version1, String version2) {
+        String v1 = version1.substring(1);
+        String v2 = version2.substring(1);
+        return Integer.compare(Integer.parseInt(v1), Integer.parseInt(v2));
     }
 
     @Override

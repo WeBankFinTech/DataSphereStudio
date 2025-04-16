@@ -2799,7 +2799,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
         Map<String,Object> params;
 
-        if(MapUtils.isEmpty(nodeMetaData)){
+        if(!MapUtils.isEmpty(nodeMetaData)){
             params = nodeMetaData;
         }else{
             params = dssNodeDefault.getParams();
@@ -2821,7 +2821,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                         .filter(var -> !org.springframework.util.StringUtils.isEmpty(var.value()))
                         .collect(Collectors.toList());
 
-        // 保存代码和文件
+        // 保存代码和配置信息
         writer.addMetaData(new ScriptMetaData(variableList.toArray(new Variable[0])));
         writer.addRecord(new ScriptRecord(nodeContent));
 

@@ -61,4 +61,6 @@ public interface OrchestratorRefConstant {
 
     public static final String FLOW_STATUS_UNPUBLISHED = "unpublished";
 
+    public static final String ORCHESTRATION_ENABLE_NODE = "autoEnableNodeId";
+
 }

@@ -75,7 +75,8 @@ public class OrchestratorCopyJob implements Runnable {
 
         try {
             doOrchestratorCopy(orchestratorCopyVo.getUsername(), orchestratorCopyVo.getWorkspace(), newOrchestrator,
-                    orchestratorCopyVo.getTargetProjectName(), Lists.newArrayList(orchestratorCopyVo.getDssLabel()), appId);
+                    orchestratorCopyVo.getTargetProjectName(), Lists.newArrayList(orchestratorCopyVo.getDssLabel()), appId,
+                    orchestratorCopyVo.getEnableNodeIdList());
         } catch (Exception e) {
             //保存错误信息
             String errorMsg = "CopyOrcError: " + e.getMessage();
@@ -103,7 +104,8 @@ public class OrchestratorCopyJob implements Runnable {
                                     Workspace workspace,
                                     DSSOrchestratorInfo dssOrchestratorInfo,
                                     String projectName,
-                                    List<DSSLabel> dssLabels, Long appId) throws Exception {
+                                    List<DSSLabel> dssLabels, Long appId,
+                                    List<String> enableNodeIdList) throws Exception {
         String copyInitVersion = OrchestratorUtils.generateNewCopyVersion(orchestratorCopyVo.getWorkflowNodeSuffix());
         String contextId = orchestratorCopyEnv.getContextService().createContextID(workspace.getWorkspaceName(), projectName, dssOrchestratorInfo.getName(), copyInitVersion, userName);
         DSSOrchestratorVersion dssOrchestratorVersion = new DSSOrchestratorVersion();
@@ -129,6 +131,8 @@ public class OrchestratorCopyJob implements Runnable {
                             OrchestratorRefConstant.ORCHESTRATION_DESCRIPTION, dssOrchestratorVersion.getComment());
                     refJobContent.put(OrchestratorRefConstant.ORCHESTRATION_NAME, dssOrchestratorInfo.getName());
                     refJobContent.put(OrchestratorRefConstant.ORCHESTRATION_NODE_SUFFIX, orchestratorCopyVo.getWorkflowNodeSuffix());
+                    // 添加启用节点ID列表
+                    refJobContent.put(OrchestratorRefConstant.ORCHESTRATION_ENABLE_NODE, enableNodeIdList);
                     requestRef.setNewVersion(dssOrchestratorVersion.getVersion()).setRefJobContent(refJobContent);
                     return ((RefCopyOperation) developmentOperation).copyRef(requestRef);
                 }, "copy");

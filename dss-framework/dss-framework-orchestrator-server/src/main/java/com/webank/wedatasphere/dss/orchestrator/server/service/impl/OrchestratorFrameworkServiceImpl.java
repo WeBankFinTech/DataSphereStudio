@@ -94,6 +94,7 @@ import org.apache.linkis.protocol.util.ImmutablePair;
 import org.apache.linkis.rpc.Sender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -184,9 +185,9 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         DSSProject dssProject = validateOperation(orchestratorCreateRequest.getProjectId(), username);
         Integer dssProjectWorkspaceId = dssProject.getWorkspaceId();
         long workspaceId = workspace.getWorkspaceId();
-        if(dssProjectWorkspaceId == null || !String.valueOf(dssProjectWorkspaceId).equals(String.valueOf(workspaceId))){
-            LOGGER.error("createOrchestrator projectId is {},project workspaceId is {}, workspace params is {}",dssProject.getId(),dssProject.getName(), workspaceId);
-            DSSFrameworkErrorException.dealErrorException(60000, "无法在当前工作空间创建工作流,"+dssProject.getName()+"项目不属于"+workspace.getWorkspaceName()+"工作空间");
+        if (dssProjectWorkspaceId == null || !String.valueOf(dssProjectWorkspaceId).equals(String.valueOf(workspaceId))) {
+            LOGGER.error("createOrchestrator projectId is {},project workspaceId is {}, workspace params is {}", dssProject.getId(), dssProject.getName(), workspaceId);
+            DSSFrameworkErrorException.dealErrorException(60000, "无法在当前工作空间创建工作流," + dssProject.getName() + "项目不属于" + workspace.getWorkspaceName() + "工作空间");
         }
         //1.创建编排实体bean
         DSSOrchestratorRelation dssOrchestratorRelation = DSSOrchestratorRelationManager.getDSSOrchestratorRelationByMode(orchestratorCreateRequest.getOrchestratorMode());
@@ -288,9 +289,9 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         }
         //判断工程是否存在,并且取出工程名称和空间名称
         DSSProject dssProject = validateOperation(orchestratorModifyRequest.getProjectId(), username);
-        if(dssProject.getWorkspaceId() == null || !String.valueOf(dssProject.getWorkspaceId()).equals(String.valueOf(workspace.getWorkspaceId()))){
-            LOGGER.error("modifyOrchestrator projectId is {},project workspaceId is {}, workspace params is {}",dssProject.getId(),dssProject.getName(),workspace.getWorkspaceId());
-            DSSFrameworkErrorException.dealErrorException(60000, "无法在当前工作空间修改工作流,"+dssProject.getName()+"项目不属于"+workspace.getWorkspaceName()+"工作空间");
+        if (dssProject.getWorkspaceId() == null || !String.valueOf(dssProject.getWorkspaceId()).equals(String.valueOf(workspace.getWorkspaceId()))) {
+            LOGGER.error("modifyOrchestrator projectId is {},project workspaceId is {}, workspace params is {}", dssProject.getId(), dssProject.getName(), workspace.getWorkspaceId());
+            DSSFrameworkErrorException.dealErrorException(60000, "无法在当前工作空间修改工作流," + dssProject.getName() + "项目不属于" + workspace.getWorkspaceName() + "工作空间");
         }
         workspace.setWorkspaceName(dssProject.getWorkspaceName());
         //是否存在相同的编排名称 //todo 返回orchestratorInfo而不是id
@@ -403,7 +404,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
     }
 
     @Override
-    public String copyOrchestrator(String username, OrchestratorCopyRequest orchestratorCopyRequest, Workspace workspace) throws Exception {
+    public String copyOrchestrator(String username, OrchestratorCopyRequest orchestratorCopyRequest, Workspace workspace, List<String> enableNodeIdList) throws Exception {
         if (orchestratorCopyRequest.getTargetOrchestratorName().length() > MAX_NAME_LENGTH) {
             DSSFrameworkErrorException.dealErrorException(60000, "编排名称过长，请限制在" + MAX_NAME_LENGTH + "以内");
         }
@@ -432,7 +433,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         OrchestratorCopyVo orchestratorCopyVo = new OrchestratorCopyVo.Builder(username, sourceProject.getId(), sourceProject.getName(), targetProject.getId(),
                 targetProject.getName(), sourceOrchestratorInfo, orchestratorCopyRequest.getTargetOrchestratorName(),
                 orchestratorCopyRequest.getWorkflowNodeSuffix(), new EnvDSSLabel(dssLabel),
-                workspace, Sender.getThisInstance()).setCopyTaskId(null).build();
+                workspace, Sender.getThisInstance(), enableNodeIdList).setCopyTaskId(null).build();
         OrchestratorCopyJob orchestratorCopyJob = new OrchestratorCopyJob();
         orchestratorCopyJob.setTargetProject(targetProject);
         orchestratorCopyJob.setOrchestratorCopyVo(orchestratorCopyVo);
@@ -577,9 +578,9 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         //判断工程是否存在,并且取出工程名称和空间名称
         DSSProject dssProject = validateOperation(modifyOrchestratorMetaRequest.getProjectId(), username);
 
-        if(dssProject.getWorkspaceId() == null || !String.valueOf(dssProject.getWorkspaceId()).equals(String.valueOf(workspace.getWorkspaceId()))){
-            LOGGER.error("modifyOrchestratorMeta projectId is {},project workspaceId is {}, workspace params is {}",dssProject.getId(),dssProject.getName(),workspace.getWorkspaceId());
-            DSSFrameworkErrorException.dealErrorException(60000, "无法在当前工作空间修改工作流,"+dssProject.getName()+"项目不属于"+workspace.getWorkspaceName()+"工作空间");
+        if (dssProject.getWorkspaceId() == null || !String.valueOf(dssProject.getWorkspaceId()).equals(String.valueOf(workspace.getWorkspaceId()))) {
+            LOGGER.error("modifyOrchestratorMeta projectId is {},project workspaceId is {}, workspace params is {}", dssProject.getId(), dssProject.getName(), workspace.getWorkspaceId());
+            DSSFrameworkErrorException.dealErrorException(60000, "无法在当前工作空间修改工作流," + dssProject.getName() + "项目不属于" + workspace.getWorkspaceName() + "工作空间");
         }
 
         workspace.setWorkspaceName(dssProject.getWorkspaceName());
@@ -605,7 +606,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
                 (structureOperation, structureRequestRef) -> ((OrchestrationUpdateOperation) structureOperation)
                         .updateOrchestration((OrchestrationUpdateRequestRef) structureRequestRef), "update");
 
-        updateBmlResource(orchestratorMetaInfo, username, orchestratorVersion,dssProject);
+        updateBmlResource(orchestratorMetaInfo, username, orchestratorVersion, dssProject);
 
         orchestratorService.updateOrchestrator(username, workspace, dssOrchestratorInfo, dssLabels);
 
@@ -621,9 +622,9 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         dssOrchestratorInfo.setCreator(orchestratorMetaInfo.getCreator());
         dssOrchestratorInfo.setProjectId(orchestratorMetaInfo.getProjectId());
         dssOrchestratorInfo.setComment(orchestratorMetaInfo.getDescription());
-        if(StringUtils.isEmpty(orchestratorMetaInfo.getIsDefaultReference())){
+        if (StringUtils.isEmpty(orchestratorMetaInfo.getIsDefaultReference())) {
             dssOrchestratorInfo.setIsDefaultReference(null);
-        }else{
+        } else {
             dssOrchestratorInfo.setIsDefaultReference(orchestratorMetaInfo.getIsDefaultReference());
         }
         dssOrchestratorInfo.setType(dssOrchestratorRelation.getDSSOrchestratorName());
@@ -649,22 +650,22 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         List<Long> orchestratorIdList = orchestratorMetaList.stream().map(OrchestratorMeta::getOrchestratorId).collect(Collectors.toList());
         List<OrchestratorReleaseVersionInfo> releaseVersionInfos = orchestratorMapper.getOrchestratorReleaseVersionInfo(orchestratorIdList);
 
-        Map<Long,OrchestratorReleaseVersionInfo> versionMap = new HashMap<>();
+        Map<Long, OrchestratorReleaseVersionInfo> versionMap = new HashMap<>();
         if (!CollectionUtils.isEmpty(releaseVersionInfos)) {
             // 根据orchestratorId 分组
-            Map<Long,List<OrchestratorReleaseVersionInfo>>  map = releaseVersionInfos.stream()
+            Map<Long, List<OrchestratorReleaseVersionInfo>> map = releaseVersionInfos.stream()
                     .collect(Collectors.groupingBy(OrchestratorReleaseVersionInfo::getOrchestratorId));
             // 取编排的第一条记录
-            for(Long orchestratorId: map.keySet()){
+            for (Long orchestratorId : map.keySet()) {
 
-                OrchestratorReleaseVersionInfo  orchestratorReleaseVersionInfo = map.get(orchestratorId).stream()
+                OrchestratorReleaseVersionInfo orchestratorReleaseVersionInfo = map.get(orchestratorId).stream()
                         .max(Comparator.comparing(OrchestratorReleaseVersionInfo::getReleaseTaskId)).orElse(null);
 
-                if(orchestratorReleaseVersionInfo == null){
+                if (orchestratorReleaseVersionInfo == null) {
                     continue;
                 }
 
-                versionMap.put(orchestratorId,orchestratorReleaseVersionInfo);
+                versionMap.put(orchestratorId, orchestratorReleaseVersionInfo);
             }
 
         }
@@ -678,7 +679,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         }
 
         List<OrchestratorSubmitJob> orchestratorSubmitJobList = orchestratorMapper.getSubmitJobStatus(orchestratorIdList);
-        Map<Long,OrchestratorSubmitJob> submitJobMap = new HashMap<>();
+        Map<Long, OrchestratorSubmitJob> submitJobMap = new HashMap<>();
         if (!CollectionUtils.isEmpty(orchestratorSubmitJobList)) {
             // 分组排序 获取编排最新的第一条记录信息
             submitJobMap = orchestratorSubmitJobList.stream()
@@ -694,12 +695,12 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
             OrchestratorReleaseVersionInfo releaseVersion = versionMap.getOrDefault(orchestratorMeta.getOrchestratorId(),
                     new OrchestratorReleaseVersionInfo());
 
-            OrchestratorSubmitJob orchestratorSubmitJob =  submitJobMap.get(orchestratorMeta.getOrchestratorId());
+            OrchestratorSubmitJob orchestratorSubmitJob = submitJobMap.get(orchestratorMeta.getOrchestratorId());
 
             orchestratorMeta.setVersion(releaseVersion.getVersion());
             orchestratorMeta.setUpdateTime(releaseVersion.getReleaseTime());
             orchestratorMeta.setUpdateUser(releaseVersion.getReleaseUser());
-            orchestratorStatus(orchestratorMeta,orchestratorSubmitJob,releaseVersion);
+            orchestratorStatus(orchestratorMeta, orchestratorSubmitJob, releaseVersion);
 
             if (templateMap.containsKey(orchestratorMeta.getOrchestratorId())) {
                 orchestratorMeta.setTemplateName(templateMap.get(orchestratorMeta.getOrchestratorId()));
@@ -735,7 +736,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         int page = orchestratorMetaRequest.getPageNow() >= 1 ? orchestratorMetaRequest.getPageNow() : 1;
         int pageSize = orchestratorMetaRequest.getPageSize() >= 1 ? orchestratorMetaRequest.getPageSize() : 10;
         int start = (page - 1) * pageSize;
-        int end = Math.min(page * pageSize , orchestratorMetaList.size());
+        int end = Math.min(page * pageSize, orchestratorMetaList.size());
         Map<Long, Boolean> map = new HashMap<>();
         for (int i = start; i < end; i++) {
             OrchestratorMeta orchestratorMeta = orchestratorMetaList.get(i);
@@ -764,8 +765,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
     }
 
 
-
-    public void updateBmlResource(OrchestratorMeta orchestratorMeta, String username, DSSOrchestratorVersion orchestratorVersion, DSSProject dssProject) throws  Exception {
+    public void updateBmlResource(OrchestratorMeta orchestratorMeta, String username, DSSOrchestratorVersion orchestratorVersion, DSSProject dssProject) throws Exception {
         // 查询dss工作流信息
         DSSFlow dssFlow = flowMapper.selectFlowByID(orchestratorVersion.getAppId());
         if (StringUtils.isEmpty(dssFlow.getCreator())) {
@@ -778,9 +778,9 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         JsonObject jsonObject = jsonParser.parse(flowJsonOld).getAsJsonObject();
         String proxyUser = orchestratorMeta.getProxyUser();
 
-        if(!jsonObject.keySet().contains("nodes")){
-            LOGGER.error("flowJson not contains nodes, json is {}",flowJsonOld);
-            throw new DSSRuntimeException(6005, orchestratorMeta.getOrchestratorName()+ " 工作流未进行保存,请保存后在重新编辑！！！");
+        if (!jsonObject.keySet().contains("nodes")) {
+            LOGGER.error("flowJson not contains nodes, json is {}", flowJsonOld);
+            throw new DSSRuntimeException(6005, orchestratorMeta.getOrchestratorName() + " 工作流未进行保存,请保存后在重新编辑！！！");
         }
 
         JsonObject scheduleParams = jsonObject.getAsJsonObject("scheduleParams");
@@ -788,7 +788,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
 
         // 更新user.to.proxy用户和proxyuser用户 信息
         JsonArray props = jsonObject.getAsJsonArray("props");
-        if(props == null){
+        if (props == null) {
             props = new JsonArray();
             jsonObject.add("props", props);
         }
@@ -811,14 +811,14 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
 
         String jsonFlow = jsonObject.toString();
 
-        flowService.saveFlow(orchestratorVersion.getAppId(),jsonFlow
-                ,dssFlow.getDescription(),username
-                ,dssProject.getWorkspaceName(),dssProject.getName(),null);
+        flowService.saveFlow(orchestratorVersion.getAppId(), jsonFlow
+                , dssFlow.getDescription(), username
+                , dssProject.getWorkspaceName(), dssProject.getName(), null);
 
     }
 
 
-    public void getGitOrchestratorSubmitStatus(OrchestratorSubmitJob orchestratorSubmitJob,OrchestratorMeta orchestratorMeta){
+    public void getGitOrchestratorSubmitStatus(OrchestratorSubmitJob orchestratorSubmitJob, OrchestratorMeta orchestratorMeta) {
 
         if (OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED.equalsIgnoreCase(orchestratorSubmitJob.getStatus())) {
             // 提交失败 -> 待提交
@@ -836,7 +836,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
     }
 
 
-    public void getGitOrchestratorReleaseStatus(OrchestratorReleaseVersionInfo releaseVersion,OrchestratorMeta orchestratorMeta){
+    public void getGitOrchestratorReleaseStatus(OrchestratorReleaseVersionInfo releaseVersion, OrchestratorMeta orchestratorMeta) {
 
         // 查询 dss_release_task，根据编排Id获取
         if (OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED.equalsIgnoreCase(releaseVersion.getStatus())) {
@@ -850,14 +850,14 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
             // 发布中状态
             orchestratorMeta.setStatus(OrchestratorRefConstant.FLOW_STATUS_PUBLISHING);
 
-        }else if (OrchestratorRefConstant.FLOW_STATUS_PUBLISH.equalsIgnoreCase(orchestratorMeta.getStatus())
+        } else if (OrchestratorRefConstant.FLOW_STATUS_PUBLISH.equalsIgnoreCase(orchestratorMeta.getStatus())
                 && OrchestratorRefConstant.FLOW_STATUS_PUSH_SUCCESS.equalsIgnoreCase(releaseVersion.getStatus())) {
 
             orchestratorMeta.setStatus(OrchestratorStatusEnum.PUBLISH.getStatus());
             orchestratorMeta.setNewStatus(OrchestratorStatusEnum.SUCCESS.getStatus());
             orchestratorMeta.setNewStatusName(OrchestratorStatusEnum.SUCCESS.getName());
 
-        } else{
+        } else {
             // 待发布
             orchestratorMeta.setStatus(OrchestratorRefConstant.FLOW_STATUS_PUSH);
         }
@@ -874,7 +874,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
 
         OrchestratorReleaseVersionInfo releaseVersion = orchestratorMapper.getOrchestratorVersionById(orchestratorInfo.getOrchestratorId());
         OrchestratorSubmitJob orchestratorSubmitJob = orchestratorMapper.selectSubmitJobStatus(orchestratorInfo.getOrchestratorId());
-        orchestratorStatus(orchestratorInfo,orchestratorSubmitJob,releaseVersion);
+        orchestratorStatus(orchestratorInfo, orchestratorSubmitJob, releaseVersion);
 
         // 发布中和提交中的工作流不允许进行更新
         if (OrchestratorRefConstant.FLOW_STATUS_PUSHING.equalsIgnoreCase(orchestratorInfo.getStatus())
@@ -912,8 +912,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
     }
 
 
-
-    public void orchestratorStatus(OrchestratorMeta orchestratorMeta,OrchestratorSubmitJob orchestratorSubmitJob, OrchestratorReleaseVersionInfo releaseVersion){
+    public void orchestratorStatus(OrchestratorMeta orchestratorMeta, OrchestratorSubmitJob orchestratorSubmitJob, OrchestratorReleaseVersionInfo releaseVersion) {
 
         /*
          * 对于接入git的项目下，并且当前状态为save的编排，dss_orchestrator_submit_job_info根据编排Id获取最新的提交记录，
@@ -929,31 +928,31 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
 
         if (orchestratorMeta.getAssociateGit() != null && orchestratorMeta.getAssociateGit()) {
             //  git项目下的工作流才有这四个状态：待提交 待发布 提交中 发布中
-            if(OrchestratorRefConstant.FLOW_STATUS_SAVE.equalsIgnoreCase(orchestratorMeta.getStatus()) && orchestratorSubmitJob!= null){
+            if (OrchestratorRefConstant.FLOW_STATUS_SAVE.equalsIgnoreCase(orchestratorMeta.getStatus()) && orchestratorSubmitJob != null) {
 
-                getGitOrchestratorSubmitStatus(orchestratorSubmitJob,orchestratorMeta);
+                getGitOrchestratorSubmitStatus(orchestratorSubmitJob, orchestratorMeta);
 
-            }else if (StringUtils.isBlank(orchestratorMeta.getStatus())
+            } else if (StringUtils.isBlank(orchestratorMeta.getStatus())
                     || OrchestratorRefConstant.FLOW_STATUS_PUSH.equalsIgnoreCase(orchestratorMeta.getStatus())
                     || OrchestratorRefConstant.FLOW_STATUS_PUBLISH.equalsIgnoreCase(orchestratorMeta.getStatus())) {
 
-                getGitOrchestratorReleaseStatus(releaseVersion,orchestratorMeta);
+                getGitOrchestratorReleaseStatus(releaseVersion, orchestratorMeta);
 
-            }else{
+            } else {
                 orchestratorMeta.setStatus(OrchestratorRefConstant.FLOW_STATUS_SAVE);
             }
 
 
             // 获取最近一次的发布状态 |发布成功 or 发布失败 or 未发布
-            if(StringUtils.isEmpty(orchestratorMeta.getNewStatus())){
+            if (StringUtils.isEmpty(orchestratorMeta.getNewStatus())) {
 
                 // 未发布
-                if(StringUtils.isEmpty(releaseVersion.getStatus())){
+                if (StringUtils.isEmpty(releaseVersion.getStatus())) {
                     orchestratorMeta.setNewStatus(OrchestratorStatusEnum.UNPUBLISHED.getStatus());
                     orchestratorMeta.setNewStatusName(OrchestratorStatusEnum.UNPUBLISHED.getName());
                     orchestratorMeta.setVersion(null);
 
-                }else if (OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED.equalsIgnoreCase(releaseVersion.getStatus())){
+                } else if (OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED.equalsIgnoreCase(releaseVersion.getStatus())) {
 
                     orchestratorMeta.setNewStatus(OrchestratorStatusEnum.FAILED.getStatus());
                     orchestratorMeta.setNewStatusName(OrchestratorStatusEnum.FAILED.getName());
@@ -967,7 +966,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
 
             }
 
-        }else {
+        } else {
             // 非git项目的工作流只有：发布中、无状态
             if (OrchestratorRefConstant.FLOW_STATUS_PUSHING.equalsIgnoreCase(releaseVersion.getStatus())) {
                 // 发布中
@@ -1000,40 +999,40 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
     }
 
 
-
-    public DSSOrchestratorCopyInfo encryptCopyOrchestrator(EncryptCopyOrchestratorRequest request) throws  Exception{
+    public DSSOrchestratorCopyInfo encryptCopyOrchestrator(EncryptCopyOrchestratorRequest request) throws Exception {
 
         Long projectId = request.getProjectId();
         Long workspaceId = request.getWorkspaceId();
         String username = request.getUsername();
         Long orchestratorId = request.getOrchestratorId();
+        List<String> enableNodeIdList = request.getEnableNodeIdList();
 
         // 项目权限校验
-        DSSProject dssProject = validateOperation(projectId,username);
+        DSSProject dssProject = validateOperation(projectId, username);
 
-        if(workspaceId.intValue() != dssProject.getWorkspaceId()){
+        if (workspaceId.intValue() != dssProject.getWorkspaceId()) {
             LOGGER.error("project id is {}, workspace id is {},{} project not in workspace",
-                    workspaceId,projectId,dssProject.getName());
-            throw  new DSSErrorException(90003,"项目不存在于当前工作空间中");
+                    workspaceId, projectId, dssProject.getName());
+            throw new DSSErrorException(90003, "项目不存在于当前工作空间中");
         }
 
         // 工作流校验
-        DSSOrchestratorInfo dssOrchestratorInfo =  orchestratorMapper.getOrchestrator(orchestratorId);
+        DSSOrchestratorInfo dssOrchestratorInfo = orchestratorMapper.getOrchestrator(orchestratorId);
 
-        if(dssOrchestratorInfo == null){
-            LOGGER.error("{} orchestrator not exists",orchestratorId);
-            throw  new DSSErrorException(90003,"复制的工作流不存在");
+        if (dssOrchestratorInfo == null) {
+            LOGGER.error("{} orchestrator not exists", orchestratorId);
+            throw new DSSErrorException(90003, "复制的工作流不存在");
         }
 
-        if(dssOrchestratorInfo.getProjectId() != dssProject.getId()){
+        if (dssOrchestratorInfo.getProjectId() != dssProject.getId()) {
             LOGGER.error("project id is {},orchestrator id is {},{} orchestrator not in {} project",
-                    projectId,orchestratorId,dssOrchestratorInfo.getName(),dssProject.getName());
-            throw new DSSErrorException(90003,String.format("%s工作流不属于%s项目",dssOrchestratorInfo.getName(),dssProject.getName()));
+                    projectId, orchestratorId, dssOrchestratorInfo.getName(), dssProject.getName());
+            throw new DSSErrorException(90003, String.format("%s工作流不属于%s项目", dssOrchestratorInfo.getName(), dssProject.getName()));
         }
-        String targetOrchestratorName = String.format("%s_%s",dssOrchestratorInfo.getName(),request.getCopyFlowSuffix());
+        String targetOrchestratorName = String.format("%s_%s", dssOrchestratorInfo.getName(), request.getCopyFlowSuffix());
 
         //添加hadoop为查看权限
-        addAccessUserToProject(dssProject, request.getAccessUser(),username,workspaceId);
+        addAccessUserToProject(dssProject, request.getAccessUser(), username, workspaceId);
 
         // 复制工作流
         Workspace workspace = new Workspace();
@@ -1047,8 +1046,9 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         orchestratorCopyRequest.setTargetOrchestratorName(targetOrchestratorName);
         orchestratorCopyRequest.setTargetProjectId(dssProject.getId());
         orchestratorCopyRequest.setTargetProjectName(dssProject.getName());
+        orchestratorCopyRequest.setWorkflowNodeSuffix(request.getCopyNodeSuffix());
 
-        String copyJobId = copyOrchestrator(username,orchestratorCopyRequest,workspace);
+        String copyJobId = copyOrchestrator(username, orchestratorCopyRequest, workspace, enableNodeIdList);
 
         DSSOrchestratorCopyInfo dssOrchestratorCopyInfo = new DSSOrchestratorCopyInfo();
         dssOrchestratorCopyInfo.setId(copyJobId);
@@ -1062,44 +1062,92 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         return dssOrchestratorCopyInfo;
 
 
+    }
+
+
+    public void addAccessUserToProject(DSSProject dssProject, String accessUser, String username, Long workspaceId) {
+
+        try {
+
+            ProjectUserAuthResponse projectUserAuthResponse = RpcAskUtils.processAskException(DSSSenderServiceFactory.getOrCreateServiceInstance()
+                    .getProjectServerSender().ask(new ProjectUserAuthRequest(dssProject.getId(), accessUser)), ProjectUserAuthResponse.class, ProjectUserAuthRequest.class);
+
+            if (CollectionUtils.isEmpty(projectUserAuthResponse.getPrivList())) {
+                projectUserAuthResponse.setPrivList(new ArrayList<>());
+            }
+
+            if (projectUserAuthResponse.getPrivList().contains(ProjectUserPrivEnum.PRIV_EDIT.getRank()) ||
+                    projectUserAuthResponse.getPrivList().contains(ProjectUserPrivEnum.PRIV_RELEASE.getRank()) ||
+                    projectUserAuthResponse.getPrivList().contains(ProjectUserPrivEnum.PRIV_ACCESS.getRank()) ||
+                    projectUserAuthResponse.getProjectOwner().equals(accessUser)
+            ) {
+                LOGGER.info("{} 用户已拥有 {} 项目查看权限", accessUser, dssProject.getName());
+                return;
+            }
+
+            LOGGER.info("{} 用户没有 {} 项目查看权限,添加用户为查看权限", accessUser, dssProject.getName());
+            LOGGER.info("{} project add  access permission before info is ", dssProject);
+
+            ProjectUserAuthModifyRequest projectUserAuthModifyRequest = new ProjectUserAuthModifyRequest();
+            projectUserAuthModifyRequest.setAccessUser(accessUser);
+            projectUserAuthModifyRequest.setProjectName(dssProject.getName());
+            projectUserAuthModifyRequest.setProjectId(dssProject.getId());
+            projectUserAuthModifyRequest.setUsername(username);
+            projectUserAuthModifyRequest.setWorkspaceId(workspaceId);
+            projectUserAuthModifyRequest.setWorkspaceName(dssProject.getWorkspaceName());
+
+
+            DSSProject responseProject = RpcAskUtils.processAskException(DSSSenderServiceFactory.getOrCreateServiceInstance()
+                    .getProjectServerSender().ask(projectUserAuthModifyRequest), DSSProject.class, ProjectUserAuthModifyRequest.class);
+
+            LOGGER.info("{} project add access permission after project info is ", responseProject);
+
+
+        } catch (Exception e) {
+
+            LOGGER.error("add {} user to {} project access permission fail", accessUser, dssProject.getName(), e);
+        }
+
 
     }
 
 
-    public void addAccessUserToProject(DSSProject dssProject,String accessUser,String username,Long workspaceId){
+    public DSSEncryptOrchestratorCopyInfo getDSSEncryptOrchestratorCopyInfo(String copyInfoId) {
 
-        ProjectUserAuthResponse projectUserAuthResponse = RpcAskUtils.processAskException(DSSSenderServiceFactory.getOrCreateServiceInstance()
-                .getProjectServerSender().ask(new ProjectUserAuthRequest(dssProject.getId(), accessUser)), ProjectUserAuthResponse.class, ProjectUserAuthRequest.class);
+        DSSOrchestratorCopyInfo dssOrchestratorCopyInfo = getOrchestratorCopyInfoById(copyInfoId);
+        DSSEncryptOrchestratorCopyInfo dssEncryptOrchestratorCopyInfo = new DSSEncryptOrchestratorCopyInfo();
 
-        if (CollectionUtils.isEmpty(projectUserAuthResponse.getPrivList())) {
-            projectUserAuthResponse.setPrivList(new ArrayList<>());
+        if (dssOrchestratorCopyInfo == null) {
+            return  dssEncryptOrchestratorCopyInfo;
         }
 
-        if ( projectUserAuthResponse.getPrivList().contains(ProjectUserPrivEnum.PRIV_EDIT.getRank()) ||
-                projectUserAuthResponse.getPrivList().contains(ProjectUserPrivEnum.PRIV_RELEASE.getRank()) ||
-                projectUserAuthResponse.getPrivList().contains(ProjectUserPrivEnum.PRIV_ACCESS.getRank()) ||
-                projectUserAuthResponse.getProjectOwner().equals(accessUser)
-        ){
-            LOGGER.info("{} 用户已拥有 {} 项目查看权限",accessUser,dssProject.getName());
-            return;
+        BeanUtils.copyProperties(dssOrchestratorCopyInfo, dssEncryptOrchestratorCopyInfo);
+
+        if (dssOrchestratorCopyInfo.getStatus() == 1) {
+
+            List<String> projects = Collections.singletonList(dssOrchestratorCopyInfo.getTargetProjectName());
+            ProjectInfoListRequest request = new ProjectInfoListRequest();
+            request.setProjectNames(projects);
+
+            ProjectInfoListResponse response = RpcAskUtils.processAskException(DSSSenderServiceFactory.getOrCreateServiceInstance()
+                    .getProjectServerSender().ask(request), ProjectInfoListResponse.class, ProjectInfoListRequest.class);
+
+            DSSProject dssProject = CollectionUtils.isEmpty(response.getDssProjects()) ? null : response.getDssProjects().get(0);
+
+            if (dssProject != null) {
+                List<DSSOrchestratorInfo> dssOrchestratorList = orchestratorMapper.getByNameAndProjectId(dssProject.getId(), dssOrchestratorCopyInfo.getTargetOrchestratorName());
+                if (CollectionUtils.isNotEmpty(dssOrchestratorList)) {
+
+                    dssEncryptOrchestratorCopyInfo.setTargetOrchestratorId(dssOrchestratorList.get(0).getId());
+                    dssEncryptOrchestratorCopyInfo.setTargetProjectId(dssProject.getId());
+                }
+            }
+
         }
 
-        LOGGER.info("{} 用户没有 {} 项目查看权限,添加用户为查看权限",accessUser,dssProject.getName());
-
-        ProjectUserAuthModifyRequest projectUserAuthModifyRequest = new ProjectUserAuthModifyRequest();
-        projectUserAuthModifyRequest.setAccessUser(accessUser);
-        projectUserAuthModifyRequest.setProjectName(dssProject.getName());
-        projectUserAuthModifyRequest.setProjectId(dssProject.getId());
-        projectUserAuthModifyRequest.setUsername(username);
-        projectUserAuthModifyRequest.setWorkspaceId(workspaceId);
-        projectUserAuthModifyRequest.setWorkspaceName(dssProject.getWorkspaceName());
-
-
-        DSSProject responseProject =  RpcAskUtils.processAskException(DSSSenderServiceFactory.getOrCreateServiceInstance()
-                .getProjectServerSender().ask(projectUserAuthModifyRequest),DSSProject.class,ProjectUserAuthModifyRequest.class);
-
-
+        return dssEncryptOrchestratorCopyInfo;
 
     }
+
 
 }

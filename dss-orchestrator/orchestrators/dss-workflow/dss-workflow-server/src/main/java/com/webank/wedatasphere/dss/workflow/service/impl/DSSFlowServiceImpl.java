@@ -957,7 +957,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     public DSSFlow copyRootFlow(Long rootFlowId, String userName, Workspace workspace,
                                 String projectName, String version, String contextIdStr,
                                 String description, List<DSSLabel> dssLabels, String nodeSuffix,
-                                String newFlowName, Long newProjectId) throws DSSErrorException, IOException {
+                                String newFlowName, Long newProjectId,List<String> enableNodeList) throws DSSErrorException, IOException {
         DSSFlow dssFlow = flowMapper.selectFlowByID(rootFlowId);
         Sender orcSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getOrcSender(dssLabels);
         OrchestratorVo orchestratorVo = RpcAskUtils.processAskException(orcSender.ask(new RequestQuertByAppIdOrchestrator(dssFlow.getId())),
@@ -966,7 +966,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         deleteFlowMetaData(orchestratorId);
         DSSFlow rootFlowWithSubFlows = copyFlowAndSetSubFlowInDB(dssFlow, userName, description, nodeSuffix, newFlowName, newProjectId);
         updateFlowJson(userName, projectName, rootFlowWithSubFlows, version, null,
-                contextIdStr, workspace, dssLabels, nodeSuffix, orchestratorId);
+                contextIdStr, workspace, dssLabels, nodeSuffix, orchestratorId,enableNodeList);
         DSSFlow copyFlow = flowMapper.selectFlowByID(rootFlowWithSubFlows.getId());
         copyFlow.setFlowIdParamConfTemplateIdTuples(rootFlowWithSubFlows.getFlowIdParamConfTemplateIdTuples());
         return copyFlow;
@@ -1081,7 +1081,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     private void updateFlowJson(String userName, String projectName, DSSFlow rootFlow,
                                 String version, Long parentFlowId, String contextIdStr,
                                 Workspace workspace, List<DSSLabel> dssLabels, String nodeSuffix,
-                                Long orchestratorId) throws DSSErrorException, IOException {
+                                Long orchestratorId,List<String> enableNodeList) throws DSSErrorException, IOException {
         String flowJson = bmlService.readTextFromBML(userName, rootFlow.getResourceId(), rootFlow.getBmlVersion());
         //如果包含subflow,需要一同导入subflow内容，并更新parrentflow的json内容
         // TODO: 2020/7/31 优化update方法里面的saveContent
@@ -1092,7 +1092,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         }
         String updateFlowJson = updateFlowContextIdAndVersion(flowJson, contextIdStr, version);
         if (StringUtils.isNotBlank(nodeSuffix)) {
-            updateFlowJson = addFLowNodeSuffix(updateFlowJson, nodeSuffix);
+            updateFlowJson = addFLowNodeSuffix(updateFlowJson, nodeSuffix,enableNodeList);
         }
         //重新上传工作流资源
         updateFlowJson = uploadFlowResourceToBml(userName, updateFlowJson, projectName, rootFlow);
@@ -1106,7 +1106,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         if (subFlows != null) {
             for (DSSFlow subflow : subFlows) {
                 updateFlowJson(userName, projectName, subflow, version, rootFlow.getId(),
-                        contextIdStr, workspace, dssLabels, nodeSuffix, orchestratorId);
+                        contextIdStr, workspace, dssLabels, nodeSuffix, orchestratorId,enableNodeList);
                 templateIds.addAll(subflow.getFlowIdParamConfTemplateIdTuples());
             }
         }
@@ -1123,7 +1123,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         contextService.checkAndSaveContext(updateFlowJson, String.valueOf(parentFlowId));
     }
 
-    private String addFLowNodeSuffix(String flowJson, String nodeSuffix) throws IOException {
+    private String addFLowNodeSuffix(String flowJson, String nodeSuffix,List<String> enableNodeList) throws IOException {
         List<String> nodeJsonList = workFlowParser.getWorkFlowNodesJson(flowJson);
         List<DSSEdge> edgeList = workFlowParser.getWorkFlowEdges(flowJson);
         if (CollectionUtils.isEmpty(nodeJsonList)) {
@@ -1161,6 +1161,37 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                         }
                     });
                 }
+
+                Map<String,Object> params = (Map) nodeJsonMap.get("params");
+
+                // enableNodeList 不为空,且不包含节点Id，则添加禁用节点 auto.disable=true
+                if(CollectionUtils.isNotEmpty(enableNodeList) && !enableNodeList.contains(oldKey)){
+
+                    if(params == null){
+                        params = new HashMap<>();
+                    }
+
+                    Map<String,Object> configuration = (Map) params.get("configuration");
+                    if(configuration == null){
+                        configuration = new HashMap<>();
+                    }
+
+                    Map<String,Object> special = (Map) configuration.get("special");
+
+                    if(special == null){
+                        special = new HashMap<>();
+                    }
+                    // auto.disable = true
+                    special.put("auto.disable","true");
+
+                    configuration.put("special",special);
+
+                    params.put("configuration",configuration);
+
+                    nodeJsonMap.put("params", params);
+
+                }
+
             }
             nodeList.add(nodeJsonMap);
         }

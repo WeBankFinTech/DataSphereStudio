@@ -71,6 +71,7 @@ import org.apache.linkis.server.security.SecurityFilter;
 import org.checkerframework.checker.units.qual.A;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 
@@ -227,7 +228,7 @@ public class DSSFrameworkOrchestratorRestful {
             return Message.error("当前工作流正在被复制，不允许再次复制");
         }
 
-        String copyJobId = orchestratorFrameworkService.copyOrchestrator(username, orchestratorCopyRequest, workspace);
+        String copyJobId = orchestratorFrameworkService.copyOrchestrator(username, orchestratorCopyRequest, workspace,null);
         AuditLogUtils.printLog(username, workspace.getWorkspaceId(), workspace.getWorkspaceName(), TargetTypeEnum.ORCHESTRATOR,
                 orchestratorCopyRequest.getSourceOrchestratorId(), orchestratorCopyRequest.getSourceOrchestratorName(), OperateTypeEnum.COPY, orchestratorCopyRequest);
 
@@ -785,7 +786,7 @@ public class DSSFrameworkOrchestratorRestful {
 
 
     @RequestMapping(value = "encryptCopyOrchestrator",method = RequestMethod.POST)
-    public Message encryptCopyOrchestrator(EncryptCopyOrchestratorRequest encryptCopyOrchestratorRequest) throws  Exception{
+    public Message encryptCopyOrchestrator(@RequestBody EncryptCopyOrchestratorRequest encryptCopyOrchestratorRequest) throws  Exception{
 
         String minutes = new SimpleDateFormat("MMddHHmm").format(new Date());
         if(StringUtils.isEmpty(encryptCopyOrchestratorRequest.getCopyFlowSuffix())){
@@ -819,8 +820,15 @@ public class DSSFrameworkOrchestratorRestful {
         AuditLogUtils.printLog("hadoop", encryptCopyOrchestratorRequest.getWorkspaceId(), workspaceName, TargetTypeEnum.ORCHESTRATOR,
                 dssOrchestratorCopyInfo.getSourceOrchestratorId(), dssOrchestratorCopyInfo.getSourceOrchestratorName(), OperateTypeEnum.COPY, encryptCopyOrchestratorRequest);
 
-        return Message.ok("复制工作流已经开始，正在后台复制中，复制状态可以从复制历史查看...").data("copyJobId", dssOrchestratorCopyInfo.getId());
+        return Message.ok("复制工作流已经开始，正在后台复制中，复制状态可以从复制历史查看...").data("orchestratorCopyInfo", dssOrchestratorCopyInfo);
 
+    }
+
+
+    @RequestMapping(path = "/{id}/encryptCopyOrchestrator", method = RequestMethod.GET)
+    public Message getEncryptCopyOrchestratorStatus(@PathVariable("id") String copyInfoId) throws Exception {
+
+        return Message.ok("获取编排复制任务状态成功").data("encryptOrchestratorCopyInfo", orchestratorFrameworkService.getDSSEncryptOrchestratorCopyInfo(copyInfoId));
     }
 
 }

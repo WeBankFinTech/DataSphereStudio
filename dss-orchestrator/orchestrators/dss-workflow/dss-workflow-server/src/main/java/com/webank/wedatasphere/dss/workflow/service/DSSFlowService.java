@@ -76,7 +76,7 @@ public interface DSSFlowService {
     DSSFlow copyRootFlow(Long rootFlowId, String userName, Workspace workspace,
                          String projectName, String version, String contextIdStr,
                          String description, List<DSSLabel> dssLabels,String nodeSuffix,
-                         String newFlowName, Long newProjectId) throws DSSErrorException, IOException;
+                         String newFlowName, Long newProjectId,List<String> enableNodeList) throws DSSErrorException, IOException;
 
     Long getParentFlowID(Long id);
 

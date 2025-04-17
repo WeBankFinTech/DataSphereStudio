@@ -1164,7 +1164,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
                 Map<String,Object> params = (Map) nodeJsonMap.get("params");
 
-                // enableNodeList 不为空,且不包含节点Id，则添加禁用节点 auto.disable=true
+                // enableNodeList 不为空,且不包含节点Id，则添加禁用节点 auto.disabled=true
                 if(CollectionUtils.isNotEmpty(enableNodeList) && !enableNodeList.contains(oldKey)){
 
                     if(params == null){
@@ -1181,8 +1181,8 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                     if(special == null){
                         special = new HashMap<>();
                     }
-                    // auto.disable = true
-                    special.put("auto.disable","true");
+                    // auto.disabled = true
+                    special.put("auto.disabled","true");
 
                     configuration.put("special",special);
 

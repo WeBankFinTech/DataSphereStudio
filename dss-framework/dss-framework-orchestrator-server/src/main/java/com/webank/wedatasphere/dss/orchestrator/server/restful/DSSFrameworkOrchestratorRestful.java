@@ -825,7 +825,7 @@ public class DSSFrameworkOrchestratorRestful {
     }
 
 
-    @RequestMapping(path = "/{id}/encryptCopyOrchestrator", method = RequestMethod.GET)
+    @RequestMapping(path = "/{id}/encryptOrchestratorCopyInfo", method = RequestMethod.GET)
     public Message getEncryptCopyOrchestratorStatus(@PathVariable("id") String copyInfoId) throws Exception {
 
         return Message.ok("获取编排复制任务状态成功").data("encryptOrchestratorCopyInfo", orchestratorFrameworkService.getDSSEncryptOrchestratorCopyInfo(copyInfoId));

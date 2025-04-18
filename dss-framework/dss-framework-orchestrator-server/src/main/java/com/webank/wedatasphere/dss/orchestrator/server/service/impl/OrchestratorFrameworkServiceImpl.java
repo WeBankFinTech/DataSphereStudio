@@ -98,6 +98,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
+import javax.servlet.http.Cookie;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -999,7 +1000,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
     }
 
 
-    public DSSOrchestratorCopyInfo encryptCopyOrchestrator(EncryptCopyOrchestratorRequest request) throws Exception {
+    public DSSOrchestratorCopyInfo encryptCopyOrchestrator(EncryptCopyOrchestratorRequest request,Workspace workspace) throws Exception {
 
         Long projectId = request.getProjectId();
         Long workspaceId = request.getWorkspaceId();
@@ -1032,12 +1033,9 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         String targetOrchestratorName = String.format("%s_%s", dssOrchestratorInfo.getName(), request.getCopyFlowSuffix());
 
         //添加hadoop为查看权限
-        addAccessUserToProject(dssProject, request.getAccessUser(), username, workspaceId);
+        addAccessUserToProject(dssProject, request.getAccessUser(), username, workspaceId,workspace);
 
         // 复制工作流
-        Workspace workspace = new Workspace();
-        workspace.setWorkspaceName(dssProject.getWorkspaceName());
-        workspace.setWorkspaceId(Long.valueOf(dssProject.getWorkspaceId()));
         OrchestratorCopyRequest orchestratorCopyRequest = new OrchestratorCopyRequest();
         orchestratorCopyRequest.setSourceOrchestratorId(dssOrchestratorInfo.getId());
         orchestratorCopyRequest.setSourceOrchestratorName(dssOrchestratorInfo.getName());
@@ -1065,7 +1063,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
     }
 
 
-    public void addAccessUserToProject(DSSProject dssProject, String accessUser, String username, Long workspaceId) {
+    public void addAccessUserToProject(DSSProject dssProject, String accessUser, String username, Long workspaceId, Workspace workspace) {
 
         try {
 
@@ -1095,7 +1093,8 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
             projectUserAuthModifyRequest.setUsername(username);
             projectUserAuthModifyRequest.setWorkspaceId(workspaceId);
             projectUserAuthModifyRequest.setWorkspaceName(dssProject.getWorkspaceName());
-
+            projectUserAuthModifyRequest.setCookies(workspace.getCookies());
+            projectUserAuthModifyRequest.setDssUrl(workspace.getDssUrl());
 
             DSSProject responseProject = RpcAskUtils.processAskException(DSSSenderServiceFactory.getOrCreateServiceInstance()
                     .getProjectServerSender().ask(projectUserAuthModifyRequest), DSSProject.class, ProjectUserAuthModifyRequest.class);
@@ -1123,7 +1122,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
 
         BeanUtils.copyProperties(dssOrchestratorCopyInfo, dssEncryptOrchestratorCopyInfo);
 
-        if (dssOrchestratorCopyInfo.getStatus() == 1) {
+        if (dssOrchestratorCopyInfo.getStatus()!= null && dssOrchestratorCopyInfo.getStatus() == 1) {
 
             List<String> projects = Collections.singletonList(dssOrchestratorCopyInfo.getTargetProjectName());
             ProjectInfoListRequest request = new ProjectInfoListRequest();

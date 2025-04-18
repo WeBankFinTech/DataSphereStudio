@@ -1,5 +1,11 @@
 package com.webank.wedatasphere.dss.common.protocol.project;
 
+import com.webank.wedatasphere.dss.common.entity.DSSWorkspace;
+
+import javax.servlet.http.Cookie;
+import java.util.HashMap;
+import java.util.Map;
+
 public class ProjectUserAuthModifyRequest {
 
     private Long projectId;
@@ -14,6 +20,8 @@ public class ProjectUserAuthModifyRequest {
 
     private String username;
 
+    private Map<String, String> cookies = new HashMap<>();
+    private String dssUrl;
 
     public Long getProjectId() {
         return projectId;
@@ -64,6 +72,21 @@ public class ProjectUserAuthModifyRequest {
         this.projectName = projectName;
     }
 
+    public Map<String, String> getCookies() {
+        return cookies;
+    }
+
+    public void setCookies(Map<String, String> cookies) {
+        this.cookies = cookies;
+    }
+
+    public String getDssUrl() {
+        return dssUrl;
+    }
+
+    public void setDssUrl(String dssUrl) {
+        this.dssUrl = dssUrl;
+    }
 
     @Override
     public String toString() {
@@ -76,4 +99,6 @@ public class ProjectUserAuthModifyRequest {
                 ", username='" + username + '\'' +
                 '}';
     }
+
 }
+

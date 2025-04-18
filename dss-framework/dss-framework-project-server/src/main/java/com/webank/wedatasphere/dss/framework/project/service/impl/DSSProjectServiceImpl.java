@@ -911,6 +911,8 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
         Workspace workspace = new Workspace();
         workspace.setWorkspaceName(projectUserAuthModifyRequest.getWorkspaceName());
         workspace.setWorkspaceId(workspaceId);
+        workspace.setCookies(projectUserAuthModifyRequest.getCookies());
+        workspace.setDssUrl(projectUserAuthModifyRequest.getDssUrl());
 
         ProjectModifyRequest projectModifyRequest = new ProjectModifyRequest();
         projectModifyRequest.setReleaseUsers(project.getReleaseUsers());

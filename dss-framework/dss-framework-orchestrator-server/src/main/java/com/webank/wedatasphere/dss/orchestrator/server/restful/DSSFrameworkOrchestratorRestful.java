@@ -799,8 +799,12 @@ public class DSSFrameworkOrchestratorRestful {
         }
 
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
+        Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         encryptCopyOrchestratorRequest.setUsername(username);
         encryptCopyOrchestratorRequest.setAccessUser("hadoop");
+        encryptCopyOrchestratorRequest.setWorkspaceId(workspace.getWorkspaceId());
+
+
 
         LOGGER.info("request encryptCopyOrchestrator body is {}",encryptCopyOrchestratorRequest);
 
@@ -815,7 +819,7 @@ public class DSSFrameworkOrchestratorRestful {
         }
 
 
-        DSSOrchestratorCopyInfo  dssOrchestratorCopyInfo = orchestratorFrameworkService.encryptCopyOrchestrator(encryptCopyOrchestratorRequest);
+        DSSOrchestratorCopyInfo  dssOrchestratorCopyInfo = orchestratorFrameworkService.encryptCopyOrchestrator(encryptCopyOrchestratorRequest,workspace);
 
         AuditLogUtils.printLog("hadoop", encryptCopyOrchestratorRequest.getWorkspaceId(), workspaceName, TargetTypeEnum.ORCHESTRATOR,
                 dssOrchestratorCopyInfo.getSourceOrchestratorId(), dssOrchestratorCopyInfo.getSourceOrchestratorName(), OperateTypeEnum.COPY, encryptCopyOrchestratorRequest);

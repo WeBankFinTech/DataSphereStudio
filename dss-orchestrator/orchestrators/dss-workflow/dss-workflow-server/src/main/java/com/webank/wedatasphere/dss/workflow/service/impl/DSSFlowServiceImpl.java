@@ -1134,6 +1134,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             Map<String, Object> nodeJsonMap = BDPJettyServerHelper.jacksonJson().readValue(nodeJson, Map.class);
             nodeJsonMap.replace(TITLE_KEY, nodeJsonMap.get(TITLE_KEY) + "_" + nodeSuffix);
             List<Resource> resourceList = nodeParser.getNodeResource(nodeJson);
+            String oldId = (String) nodeJsonMap.get("id");
             if (CollectionUtils.isNotEmpty(resourceList)) {
                 String oldKey = (String) nodeJsonMap.get("key");
                 final String newKey = UUID.randomUUID().toString();
@@ -1161,38 +1162,41 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                         }
                     });
                 }
+            }
 
-                Map<String,Object> params = (Map) nodeJsonMap.get("params");
+            Map<String,Object> params = (Map) nodeJsonMap.get("params");
 
-                // enableNodeList 不为空,且不包含节点Id，则添加禁用节点 auto.disabled=true
-                if(CollectionUtils.isNotEmpty(enableNodeList) && !enableNodeList.contains(oldKey)){
+            // enableNodeList 不为空,且不包含节点Id，则添加禁用节点 auto.disabled=true
+            if(CollectionUtils.isNotEmpty(enableNodeList) && !enableNodeList.contains(oldId)){
 
-                    if(params == null){
-                        params = new HashMap<>();
-                    }
-
-                    Map<String,Object> configuration = (Map) params.get("configuration");
-                    if(configuration == null){
-                        configuration = new HashMap<>();
-                    }
-
-                    Map<String,Object> special = (Map) configuration.get("special");
-
-                    if(special == null){
-                        special = new HashMap<>();
-                    }
-                    // auto.disabled = true
-                    special.put("auto.disabled","true");
-
-                    configuration.put("special",special);
-
-                    params.put("configuration",configuration);
-
-                    nodeJsonMap.put("params", params);
-
+                if(params == null){
+                    params = new HashMap<>();
                 }
 
+                Map<String,Object> configuration = (Map) params.get("configuration");
+                if(configuration == null){
+                    configuration = new HashMap<>();
+                    configuration.put("special",new HashMap<>());
+                    configuration.put("runtime",new HashMap<>());
+                    configuration.put("startup",new HashMap<>());
+                }
+
+                Map<String,Object> special = (Map) configuration.get("special");
+
+                if(special == null){
+                    special = new HashMap<>();
+                }
+                // auto.disabled = true
+                special.put("auto.disabled","true");
+
+                configuration.put("special",special);
+
+                params.put("configuration",configuration);
+
+                nodeJsonMap.put("params", params);
+
             }
+
             nodeList.add(nodeJsonMap);
         }
         flowJson = workFlowParser.updateFlowJsonWithKey(flowJson, "edges", edgeList);

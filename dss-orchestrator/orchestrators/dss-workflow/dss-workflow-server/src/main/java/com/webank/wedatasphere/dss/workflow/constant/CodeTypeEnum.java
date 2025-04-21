@@ -81,7 +81,7 @@ public enum CodeTypeEnum {
     }
 
     public static boolean isMatchDataOrSignalNode(String engineType){
-        return isMatchDataNode(engineType) || isMatchDataNode(engineType);
+        return isMatchDataNode(engineType) || isMatchSignalNode(engineType);
 
     }
 

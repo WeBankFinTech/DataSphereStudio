@@ -16,4 +16,10 @@ public interface ScriptisProxyUserMapper extends BaseMapper<ScriptisProxyUser> {
 
     void deleteProxyUser(@Param("userName") String userName, @Param("proxyUserNames") String[] proxyUserNames);
 
+
+    ScriptisProxyUser selectProxyUserByUser(@Param("userName") String userName,@Param("proxyUserName") String proxyUserName);
+
+
+    int updateById(ScriptisProxyUser user);
+
 }

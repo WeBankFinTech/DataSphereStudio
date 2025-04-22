@@ -2776,6 +2776,10 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         String nodeContent = editNodeContentRequest.getNodeContent();
         Map<String,Object> nodeMetadata = editNodeContentRequest.getNodeMetadata();
 
+        if(StringUtils.isEmpty(nodeContent) && MapUtils.isEmpty(nodeMetadata)){
+            DSSExceptionUtils.dealErrorException(90003, String.format("节点内容和节点配置信息都为空,%s节点不做更新",nodeName), DSSErrorException.class);
+        }
+
         // 鉴权
        DSSProject  dssProject = validateOperation(editNodeContentRequest.getProjectId(),username);
 

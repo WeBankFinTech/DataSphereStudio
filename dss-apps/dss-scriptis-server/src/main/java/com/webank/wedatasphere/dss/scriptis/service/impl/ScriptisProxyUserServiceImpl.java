@@ -41,11 +41,11 @@ public class ScriptisProxyUserServiceImpl implements DssProxyUserService, Script
         // 查看用户是否有相同的代理用户
         ScriptisProxyUser scriptisProxyUser= dssProxyUserMapper.selectProxyUserByUser(dssProxyUser.getUserName(),dssProxyUser.getProxyUserName());
 
-        if(scriptisProxyUser != null){
+        if(StringUtils.isEmpty(dssProxyUser.getExpireTime())){
+            dssProxyUser.setExpireTime("2099-12-31 23:59:59");
+        }
 
-            if(StringUtils.isEmpty(dssProxyUser.getExpireTime())){
-                throw new DSSErrorException(90001,String.format("%s用户的%s代理用户传入的过期时间(expireTime)不能为空",dssProxyUser.getUserName(),dssProxyUser.getProxyUserName()));
-            }
+        if(scriptisProxyUser != null){
 
             scriptisProxyUser.setExpireTime(dssProxyUser.getExpireTime());
             // 修改过期时间

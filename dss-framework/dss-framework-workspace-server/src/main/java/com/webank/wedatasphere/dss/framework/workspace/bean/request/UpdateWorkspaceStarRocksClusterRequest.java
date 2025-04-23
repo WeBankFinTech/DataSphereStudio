@@ -14,16 +14,16 @@ public class UpdateWorkspaceStarRocksClusterRequest implements Serializable {
 
     private String clusterIp;
 
-    private Integer httpPort;
+    private String httpPort;
 
-    private Integer tcpPort;
+    private String tcpPort;
 
     private Boolean isDefaultCluster;
 
     public UpdateWorkspaceStarRocksClusterRequest() {
     }
 
-    public UpdateWorkspaceStarRocksClusterRequest(Long workspaceId, String workspaceName, String username, String clusterName, String clusterIp, Integer httpPort, Integer tcpPort, Boolean isDefaultCluster) {
+    public UpdateWorkspaceStarRocksClusterRequest(Long workspaceId, String workspaceName, String username, String clusterName, String clusterIp, String httpPort, String tcpPort, Boolean isDefaultCluster) {
         this.workspaceId = workspaceId;
         this.workspaceName = workspaceName;
         this.username = username;
@@ -74,19 +74,19 @@ public class UpdateWorkspaceStarRocksClusterRequest implements Serializable {
         this.clusterIp = clusterIp;
     }
 
-    public Integer getHttpPort() {
+    public String getHttpPort() {
         return httpPort;
     }
 
-    public void setHttpPort(Integer httpPort) {
+    public void setHttpPort(String httpPort) {
         this.httpPort = httpPort;
     }
 
-    public Integer getTcpPort() {
+    public String getTcpPort() {
         return tcpPort;
     }
 
-    public void setTcpPort(Integer tcpPort) {
+    public void setTcpPort(String tcpPort) {
         this.tcpPort = tcpPort;
     }
 

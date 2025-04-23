@@ -892,7 +892,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
                 throw new DSSErrorException(90054, String.format("StarRocks cluster %s length cannot exceed 128 in workspace %s", r.getClusterName(), r.getWorkspaceName()));
             }
 
-            if (r.getHttpPort() < 0 || r.getHttpPort() > 65535 || r.getTcpPort() < 0 || r.getTcpPort() > 65535) {
+            if (Integer.parseInt(r.getHttpPort()) < 0 || Integer.parseInt(r.getHttpPort()) > 65535 || Integer.parseInt(r.getTcpPort()) < 0 || Integer.parseInt(r.getTcpPort()) > 65535) {
                 LOGGER.warn("工作空间{}StarRocks集群端口必须在0-65535之间", r.getWorkspaceName());
                 throw new DSSErrorException(90054, String.format("%s workspace StarRocks cluster port must be between 0 and 65535", r.getWorkspaceName()));
             }

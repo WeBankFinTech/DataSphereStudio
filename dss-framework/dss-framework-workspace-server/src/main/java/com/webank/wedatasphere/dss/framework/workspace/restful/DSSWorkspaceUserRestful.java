@@ -218,7 +218,7 @@ public class DSSWorkspaceUserRestful {
     /**
      * 判断username是否离职
      *
-     * @param usernames
+     * @param body
      * @return 离职返回true，未离职false
      */
     @RequestMapping(path = "isDismissed", method = RequestMethod.POST)
@@ -381,6 +381,10 @@ public class DSSWorkspaceUserRestful {
             if (StringUtils.isEmpty(workspaceName)) {
                 LOGGER.error("updateUserDefaultWorkspace workspaceId is {} , workspaceName is {}",r.getWorkspaceId(), workspaceName);
                 throw new DSSErrorException(90054, String.format("%s workspace not exists!", workspaceName) );
+            }
+
+            if (!dssWorkspaceService.checkAdminByWorkspace(username, r.getWorkspaceId().intValue())) {
+                throw new DSSErrorException(90054, String.format("%s 用户不是当前工作空间管理员,无权限进行该操作!",username));
             }
             r.setWorkspaceName(workspaceName);
             r.setUsername(username);

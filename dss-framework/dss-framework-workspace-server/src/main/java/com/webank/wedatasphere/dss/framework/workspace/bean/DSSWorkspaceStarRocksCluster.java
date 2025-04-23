@@ -14,9 +14,9 @@ public class DSSWorkspaceStarRocksCluster {
 
     private String clusterIp;
 
-    private Integer httpPort;
+    private String httpPort;
 
-    private Integer tcpPort;
+    private String tcpPort;
 
     private Boolean isDefaultCluster;
 
@@ -31,7 +31,7 @@ public class DSSWorkspaceStarRocksCluster {
     public DSSWorkspaceStarRocksCluster() {
     }
 
-    public DSSWorkspaceStarRocksCluster(Integer id, Long workspaceId, String workspaceName, String clusterName, String clusterIp, Integer httpPort, Integer tcpPort, Boolean isDefaultCluster, String createUser, String updateUser, Date createTime, Date updateTime) {
+    public DSSWorkspaceStarRocksCluster(Integer id, Long workspaceId, String workspaceName, String clusterName, String clusterIp, String httpPort, String tcpPort, Boolean isDefaultCluster, String createUser, String updateUser, Date createTime, Date updateTime) {
         this.id = id;
         this.workspaceId = workspaceId;
         this.workspaceName = workspaceName;
@@ -86,19 +86,19 @@ public class DSSWorkspaceStarRocksCluster {
         this.clusterIp = clusterIp;
     }
 
-    public Integer getHttpPort() {
+    public String getHttpPort() {
         return httpPort;
     }
 
-    public void setHttpPort(Integer httpPort) {
+    public void setHttpPort(String httpPort) {
         this.httpPort = httpPort;
     }
 
-    public Integer getTcpPort() {
+    public String getTcpPort() {
         return tcpPort;
     }
 
-    public void setTcpPort(Integer tcpPort) {
+    public void setTcpPort(String tcpPort) {
         this.tcpPort = tcpPort;
     }
 

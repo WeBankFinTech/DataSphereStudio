@@ -5,6 +5,7 @@ import com.webank.wedatasphere.dss.workflow.dto.NodeContentDO;
 import com.webank.wedatasphere.dss.workflow.entity.DSSFlowNodeInfo;
 import com.webank.wedatasphere.dss.workflow.entity.DSSFlowNodeInfoOfFlow;
 import com.webank.wedatasphere.dss.workflow.entity.DSSFlowNodeTemplate;
+import com.webank.wedatasphere.dss.workflow.entity.StarRocksNodeInfo;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.mapstruct.Mapper;
@@ -63,4 +64,12 @@ public interface NodeContentMapper {
     DSSFlowNodeInfoOfFlow getNodeInfoOfFLow(@Param("projectId") Long projectId,
                                                             @Param("orchestratorName")String orchestratorName,
                                                             @Param("nodeName")String nodeName);
+
+    @Select(
+        "SELECT t3.workspace_id, t3.project_id, t3.id, t2.id, t1.node_ui_key, t1.node_ui_value, t1.node_type FROM dss_workflow_node_content_to_ui t1\n" +
+                "LEFT JOIN dss_workflow_node_content t2 ON t1.content_id = t2.id\n" +
+                "LEFT JOIN dss_orchestrator_info t3 ON t2.orchestrator_id = t3.id\n" +
+                "WHERE t1.node_type = 'linkis.jdbc.starrocks' AND workspace_id = 224 AND node_ui_key = 'executeCluster' "
+    )
+    List<StarRocksNodeInfo> queryStarRocksNodeInfo(Long workspaceId);
 }

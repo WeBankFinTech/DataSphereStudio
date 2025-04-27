@@ -23,6 +23,7 @@ import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.entity.DSSFlowName;
 import com.webank.wedatasphere.dss.workflow.entity.NodeInfo;
+import com.webank.wedatasphere.dss.workflow.entity.StarRocksNodeInfo;
 import com.webank.wedatasphere.dss.workflow.entity.request.*;
 import com.webank.wedatasphere.dss.workflow.entity.response.*;
 import com.webank.wedatasphere.dss.workflow.entity.vo.ExtraToolBarsVO;
@@ -93,6 +94,8 @@ public interface DSSFlowService {
     String getFlowJson(String userName, String projectName, DSSFlow dssFlow);
 
     DataDevelopNodeResponse queryDataDevelopNodeList(String username, Workspace workspace, DataDevelopNodeRequest request);
+
+    List<StarRocksNodeInfo> queryStarRocksNodeList(Long workspaceId);
 
     Map<String,Object> getDataDevelopNodeContent(String nodeId, Long contentId) throws DSSErrorException;
 

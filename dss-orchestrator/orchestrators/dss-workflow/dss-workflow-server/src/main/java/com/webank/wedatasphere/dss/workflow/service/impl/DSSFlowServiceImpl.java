@@ -1616,6 +1616,10 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
     }
 
+    @Override
+    public List<StarRocksNodeInfo> queryStarRocksNodeList(Long workspaceId) {
+        return nodeContentMapper.queryStarRocksNodeInfo(workspaceId);
+    }
 
     @Override
     public DataViewNodeResponse queryDataViewNode(String username, Workspace workspace, DataViewNodeRequest request) {

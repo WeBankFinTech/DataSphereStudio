@@ -49,6 +49,8 @@ import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperation;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
+import com.webank.wedatasphere.dss.workflow.entity.StarRocksNodeInfo;
+import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.ArrayUtils;
@@ -106,6 +108,8 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
 
     @Autowired
     private DSSWorkspaceStarRocksClusterMapper dssWorkspaceStarRocksClusterMapper;
+    @Autowired
+    private DSSFlowService dssFlowService;
     //创建工作空间
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -905,7 +909,6 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
                 throw new DSSErrorException(90054, String.format("%s workspace StarRocks cluster ip is illegal", r.getWorkspaceName()));
             }
 
-
             if (r.getDefaultCluster()) {
                 count++;
             }
@@ -922,6 +925,8 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
                 seenKeys.put(key, r);
             }
         }
+        List<StarRocksNodeInfo> starRocksNodeInfos = dssFlowService.queryStarRocksNodeList(workspaceId);
+        Set<String> executeClusterSet = starRocksNodeInfos.stream().map(StarRocksNodeInfo::getNodeUiValue).collect(Collectors.toSet());
 
         List<DSSWorkspaceStarRocksCluster> itemsByWorkspaceId = dssWorkspaceStarRocksClusterMapper.getItemsByWorkspaceId(workspaceId);
         if (CollectionUtils.isNotEmpty(itemsByWorkspaceId)) {
@@ -937,7 +942,11 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
                     starRocksClusters.add(item);
                     seenKeys.remove(key);
                 } else {
-                    dssWorkspaceStarRocksClusterMapper.deleteItemById(item.getId());
+                    if (executeClusterSet.contains(item.getClusterName())) {
+                        throw new DSSErrorException(90054, String.format("集群 %s 在工作流节点中被引用，不允许删除", item.getClusterName()) );
+                    } else {
+                        dssWorkspaceStarRocksClusterMapper.deleteItemById(item.getId());
+                    }
                 }
             }
         }

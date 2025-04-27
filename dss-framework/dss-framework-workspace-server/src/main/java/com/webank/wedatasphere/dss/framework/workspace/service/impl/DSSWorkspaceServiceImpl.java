@@ -880,8 +880,11 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         List<DSSWorkspaceStarRocksCluster> starRocksClusters = new ArrayList<>();
         HashMap<String, UpdateWorkspaceStarRocksClusterRequest> seenKeys = new HashMap<>();
         int count = 0;
+        Set<String> clusterNames = new HashSet<>();
         for (UpdateWorkspaceStarRocksClusterRequest r : request) {
-
+            if (!clusterNames.add(r.getClusterName())) {
+                throw new DSSErrorException(90054, String.format("Two identical names %s are not allowed in workspace %s", r.getClusterName(), r.getWorkspaceName()));
+            }
             if (StringUtils.isEmpty(r.getClusterName()) || StringUtils.isEmpty(r.getClusterIp())) {
                 LOGGER.warn("工作空间{} StarRocks集群名和ip不能为空", r.getWorkspaceName());
                 throw new DSSErrorException(90054, String.format("%s workspace StarRocks cluster name and ip cannot be empty.", r.getWorkspaceName()));

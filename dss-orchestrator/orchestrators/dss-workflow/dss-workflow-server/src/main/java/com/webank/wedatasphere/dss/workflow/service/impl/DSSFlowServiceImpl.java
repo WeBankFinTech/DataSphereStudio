@@ -2928,12 +2928,6 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
         logger.info("update script node info is {}",dssNodeDefault.toString());
 
-        // 判断节点类型(spark、pyspark、hive) 三种类型可以更改内容
-        if(!CodeTypeEnum.isMatchDataNode(dssNodeDefault.getJobType())){
-            logger.warn("{} node job type is {}, not update script",dssNodeDefault.getTitle(),dssNodeDefault.getJobType());
-            DSSExceptionUtils.dealErrorException(90003, String.format("%s 所属节点类型不是【spark、pyspark、hive】,不能进行内容修改",dssNodeDefault.getTitle()), DSSErrorException.class);
-        }
-
         // 节点是否在脚本信息
         if(dssNodeDefault.getJobContent() == null || !dssNodeDefault.getJobContent().containsKey("script") ){
             logger.error("{} node jobContent not contains script key ", dssNodeDefault.getTitle());
@@ -3027,14 +3021,6 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
 
         logger.info("node info is {}, input meta data is {}",dssNodeDefault.toString(),DSSCommonUtils.COMMON_GSON.toJson(nodeMetaData));
-
-        // 判断节点类型(spark、pyspark、hive) + 信号节点 可以更改配置
-        if(!CodeTypeEnum.isMatchDataOrSignalNode(dssNodeDefault.getJobType())){
-            logger.error("{} node job type is {}, not update metadata",dssNodeDefault.getTitle(),dssNodeDefault.getJobType());
-            DSSExceptionUtils.dealErrorException(90003,
-                    String.format("%s 所属节点类型不是【spark、pyspark、hive、SignalNode】,不能进行配置修改",
-                            dssNodeDefault.getTitle()), DSSErrorException.class);
-        }
 
         JsonObject jsonObject = new JsonParser().parse(dssFlow.getFlowJson()).getAsJsonObject();
         JsonArray nodeJsonArray = jsonObject.getAsJsonArray("nodes");

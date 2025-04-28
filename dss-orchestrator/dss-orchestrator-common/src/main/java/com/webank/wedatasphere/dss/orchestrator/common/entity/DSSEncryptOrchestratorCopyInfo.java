@@ -7,6 +7,8 @@ public class DSSEncryptOrchestratorCopyInfo extends DSSOrchestratorCopyInfo {
 
     private Long targetProjectId;
 
+    private Long targetOrchestratorVersionId;
+
 
     public Long getTargetOrchestratorId() {
         return targetOrchestratorId;
@@ -22,5 +24,14 @@ public class DSSEncryptOrchestratorCopyInfo extends DSSOrchestratorCopyInfo {
 
     public void setTargetProjectId(Long targetProjectId) {
         this.targetProjectId = targetProjectId;
+    }
+
+
+    public Long getTargetOrchestratorVersionId() {
+        return targetOrchestratorVersionId;
+    }
+
+    public void setTargetOrchestratorVersionId(Long targetOrchestratorVersionId) {
+        this.targetOrchestratorVersionId = targetOrchestratorVersionId;
     }
 }

@@ -1137,8 +1137,13 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
                 List<DSSOrchestratorInfo> dssOrchestratorList = orchestratorMapper.getByNameAndProjectId(dssProject.getId(), dssOrchestratorCopyInfo.getTargetOrchestratorName());
                 if (CollectionUtils.isNotEmpty(dssOrchestratorList)) {
 
-                    dssEncryptOrchestratorCopyInfo.setTargetOrchestratorId(dssOrchestratorList.get(0).getId());
+                    Long orchestratorId = dssOrchestratorList.get(0).getId();
+                    DSSOrchestratorVersion  dssOrchestratorVersion = getLatestOrchestratorVersion(orchestratorId);
+
+                    dssEncryptOrchestratorCopyInfo.setTargetOrchestratorId(orchestratorId);
                     dssEncryptOrchestratorCopyInfo.setTargetProjectId(dssProject.getId());
+                    dssEncryptOrchestratorCopyInfo.setTargetOrchestratorVersionId(dssOrchestratorVersion.getId());
+
                 }
             }
 

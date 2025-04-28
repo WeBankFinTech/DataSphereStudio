@@ -35,6 +35,7 @@ import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceDBHelper;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.common.exception.AppStandardWarnException;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
+import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.linkis.server.Message;
@@ -46,6 +47,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -371,7 +373,9 @@ public class DSSWorkspaceUserRestful {
 
         List<UpdateWorkspaceStarRocksClusterRequest> request = requestWrapper.getStarRocksUpdateRequest();
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
-
+        String ticketId = Arrays.stream(httpServletRequest.getCookies()).filter(cookie -> DSSWorkFlowConstant.BDP_USER_TICKET_ID.equals(cookie.getName()))
+                .findFirst().map(Cookie::getValue).get();
+        Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         if (CollectionUtils.isEmpty(request)) {
             Long workspaceId = SSOHelper.getWorkspace(httpServletRequest).getWorkspaceId();
             dssWorkspaceService.deleteStarRocksClusterByWorkspaceId(workspaceId);
@@ -392,7 +396,7 @@ public class DSSWorkspaceUserRestful {
             r.setUsername(username);
         });
 
-        List<DSSWorkspaceStarRocksCluster> dssWorkspaceStarRocksCluster = dssWorkspaceService.updateStarRocksCluster(request);
+        List<DSSWorkspaceStarRocksCluster> dssWorkspaceStarRocksCluster = dssWorkspaceService.updateStarRocksCluster(request, ticketId, workspace, username);
 
         AuditLogUtils.printLog(username, request.get(0).getWorkspaceId(), request.get(0).getWorkspaceName(), TargetTypeEnum.WORKSPACE, request.get(0).getWorkspaceId(), request.get(0).getWorkspaceName(),
                 OperateTypeEnum.UPDATE, request);

@@ -37,4 +37,6 @@ public interface DSSWorkspaceStarRocksClusterMapper {
 
     void deleteItemByWorkspaceId(@Param("workspaceId") Long workspaceId);
 
+    DSSWorkspaceStarRocksCluster getOneByClusterName(@Param("clusterName") String clusterName);
+
 }

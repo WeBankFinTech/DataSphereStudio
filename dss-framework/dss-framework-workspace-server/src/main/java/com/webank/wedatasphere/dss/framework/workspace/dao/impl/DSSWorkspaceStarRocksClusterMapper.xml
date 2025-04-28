@@ -42,4 +42,9 @@
         SELECT * FROM dss_workspace_starrocks_cluster where workspace_id = #{workspaceId}
     </select>
 
+    <select id="getOneByClusterName"
+            resultType="com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceStarRocksCluster">
+        SELECT * FROM dss_workspace_starrocks_cluster where cluster_name = #{clusterName}
+    </select>
+
 </mapper>

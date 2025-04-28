@@ -16,6 +16,9 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.github.pagehelper.page.PageMethod;
@@ -50,6 +53,8 @@ import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperati
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import com.webank.wedatasphere.dss.workflow.entity.StarRocksNodeInfo;
+import com.webank.wedatasphere.dss.workflow.entity.request.BatchEditFlowRequest;
+import com.webank.wedatasphere.dss.workflow.entity.request.EditFlowRequest;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -878,17 +883,18 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     }
 
     @Override
-    public List<DSSWorkspaceStarRocksCluster> updateStarRocksCluster(List<UpdateWorkspaceStarRocksClusterRequest> request) {
+    public List<DSSWorkspaceStarRocksCluster> updateStarRocksCluster(List<UpdateWorkspaceStarRocksClusterRequest> request, String ticketId, Workspace workspace, String userName) {
 
         Long workspaceId = request.get(0).getWorkspaceId();
         List<DSSWorkspaceStarRocksCluster> starRocksClusters = new ArrayList<>();
-        HashMap<String, UpdateWorkspaceStarRocksClusterRequest> seenKeys = new HashMap<>();
-        int count = 0;
         Set<String> clusterNames = new HashSet<>();
+        int count = 0;
         for (UpdateWorkspaceStarRocksClusterRequest r : request) {
+
             if (!clusterNames.add(r.getClusterName())) {
                 throw new DSSErrorException(90054, String.format("Two identical names %s are not allowed in workspace %s", r.getClusterName(), r.getWorkspaceName()));
             }
+
             if (StringUtils.isEmpty(r.getClusterName()) || StringUtils.isEmpty(r.getClusterIp())) {
                 LOGGER.warn("工作空间{} StarRocks集群名和ip不能为空", r.getWorkspaceName());
                 throw new DSSErrorException(90054, String.format("%s workspace StarRocks cluster name and ip cannot be empty.", r.getWorkspaceName()));
@@ -916,56 +922,67 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
                 LOGGER.warn("工作空间{}不允许设置两个默认集群", r.getWorkspaceName());
                 throw new DSSErrorException(90054, String.format("%s workspace cannot set multiple default StarRocks cluster!", r.getWorkspaceName()) );
             }
-
-            String key = r.getClusterIp() + "|" + r.getHttpPort() + "|" + r.getTcpPort();
-            if (seenKeys.containsKey(key)) {
-                LOGGER.warn("存在相同的集群配置，ip为{}，http端口为{}，tcp端口为{}", r.getClusterIp(), r.getHttpPort(), r.getTcpPort());
-                throw new DSSErrorException(90054, String.format("%s workspace cannot exist same ip and port!", r.getWorkspaceName()) );
-            } else {
-                seenKeys.put(key, r);
-            }
         }
+
         List<StarRocksNodeInfo> starRocksNodeInfos = dssFlowService.queryStarRocksNodeList(workspaceId);
         Set<String> executeClusterSet = starRocksNodeInfos.stream().map(StarRocksNodeInfo::getNodeUiValue).collect(Collectors.toSet());
 
         List<DSSWorkspaceStarRocksCluster> itemsByWorkspaceId = dssWorkspaceStarRocksClusterMapper.getItemsByWorkspaceId(workspaceId);
-        if (CollectionUtils.isNotEmpty(itemsByWorkspaceId)) {
-            for (DSSWorkspaceStarRocksCluster item : itemsByWorkspaceId) {
-                String key = item.getClusterIp() + "|" + item.getHttpPort() + "|" + item.getTcpPort();
-                if (seenKeys.containsKey(key)) {
-                    UpdateWorkspaceStarRocksClusterRequest requestItem = seenKeys.get(key);
-                    item.setClusterName(requestItem.getClusterName());
-                    item.setDefaultCluster(requestItem.getDefaultCluster());
-                    item.setUpdateUser(requestItem.getUsername());
-                    item.setUpdateTime(new Date());
-                    dssWorkspaceStarRocksClusterMapper.updateStarRocksCluster(item);
-                    starRocksClusters.add(item);
-                    seenKeys.remove(key);
+
+        Map<String, DSSWorkspaceStarRocksCluster> existsClusters = itemsByWorkspaceId.stream()
+                .collect(Collectors.toMap(DSSWorkspaceStarRocksCluster::getClusterName, cluster -> cluster));
+
+        Map<String, UpdateWorkspaceStarRocksClusterRequest> requestCluster = request.stream().
+                collect(Collectors.toMap(UpdateWorkspaceStarRocksClusterRequest::getClusterName, r -> r));
+
+        for (DSSWorkspaceStarRocksCluster item : itemsByWorkspaceId) {
+            UpdateWorkspaceStarRocksClusterRequest requestOne = requestCluster.get(item.getClusterName());
+            if (requestOne == null) {
+                //请求中没有该集群，删除前需要校验有没有被引用，没有引用才允许删除
+                if (executeClusterSet.contains(item.getClusterName())) {
+                    throw new DSSErrorException(90054, String.format("集群 %s 在工作流节点中被引用，不允许删除", item.getClusterName()) );
                 } else {
-                    if (executeClusterSet.contains(item.getClusterName())) {
-                        throw new DSSErrorException(90054, String.format("集群 %s 在工作流节点中被引用，不允许删除", item.getClusterName()) );
-                    } else {
-                        dssWorkspaceStarRocksClusterMapper.deleteItemById(item.getId());
+                    dssWorkspaceStarRocksClusterMapper.deleteItemById(item.getId());
+                }
+            } else {
+                //如果属性有更新且该集群有被引用那么就需要更新引用该集群的starrocks节点属性信息
+                if ( executeClusterSet.contains(requestOne.getClusterName()) &&
+                        (!Objects.equals(item.getClusterIp(), requestOne.getClusterIp())
+                                || !Objects.equals(item.getHttpPort(), requestOne.getHttpPort())
+                                || !Objects.equals(item.getTcpPort(), requestOne.getTcpPort())) ) {
+                    List<String> nodeKeys = starRocksNodeInfos.stream().filter(s -> s.getNodeUiValue().equals(requestOne.getClusterName())).map(StarRocksNodeInfo::getNodeKey).collect(Collectors.toList());
+                    List<StarRocksNodeInfo> updateNodes = starRocksNodeInfos.stream().filter(s -> nodeKeys.contains(s.getNodeKey())).collect(Collectors.toList());
+                    DSSWorkspaceStarRocksCluster oneByClusterName = dssWorkspaceStarRocksClusterMapper.getOneByClusterName(requestOne.getClusterName());
+                    try {
+                        BatchEditFlowRequest editFlowRequest = getEditFlowRequest(updateNodes, oneByClusterName);
+                        dssFlowService.batchEditFlow(editFlowRequest, ticketId, workspace, userName);
+                    } catch (Exception e) {
+                        LOGGER.error("集群{}有被工作流中starrocks的节点引用，在批量修改starrocks节点使用的集群信息失败，不允许修改集群信息", requestOne.getClusterName());
+                        throw new DSSErrorException(90054, String.format("集群 %s 有被工作流中starrocks的节点引用，在批量修改starrocks节点使用的集群信息失败，不允许修改集群信息", requestOne.getClusterName()) );
                     }
                 }
+                BeanUtils.copyProperties(item, requestOne);
+                item.setUpdateUser(requestOne.getUsername());
+                item.setUpdateTime(new Date());
+                dssWorkspaceStarRocksClusterMapper.updateStarRocksCluster(item);
+                starRocksClusters.add(item);
             }
         }
 
-        //新增的写入
-        if (!seenKeys.isEmpty()) {
-            for (Map.Entry<String, UpdateWorkspaceStarRocksClusterRequest> entry : seenKeys.entrySet()) {
-                UpdateWorkspaceStarRocksClusterRequest value = entry.getValue();
+        for (UpdateWorkspaceStarRocksClusterRequest r : request) {
+            DSSWorkspaceStarRocksCluster existsOne = existsClusters.get(r.getClusterName());
+            //如果数据库不存在，就需要添加进去
+            if (existsOne == null) {
                 DSSWorkspaceStarRocksCluster dssWorkspaceStarRocksCluster = new DSSWorkspaceStarRocksCluster();
-                BeanUtils.copyProperties(value, dssWorkspaceStarRocksCluster);
-                dssWorkspaceStarRocksCluster.setCreateUser(value.getUsername());
-                dssWorkspaceStarRocksCluster.setUpdateUser(value.getUsername());
+                BeanUtils.copyProperties(r, dssWorkspaceStarRocksCluster);
+                dssWorkspaceStarRocksCluster.setCreateUser(r.getUsername());
+                dssWorkspaceStarRocksCluster.setUpdateUser(r.getUsername());
                 dssWorkspaceStarRocksCluster.setCreateTime(new Date());
                 dssWorkspaceStarRocksCluster.setUpdateTime(new Date());
                 dssWorkspaceStarRocksClusterMapper.insertStarRocksCluster(dssWorkspaceStarRocksCluster);
                 starRocksClusters.add(dssWorkspaceStarRocksCluster);
             }
         }
-
         return starRocksClusters;
     }
 
@@ -976,6 +993,86 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
 
     @Override
     public void deleteStarRocksClusterByWorkspaceId(Long workspaceId) {
-        dssWorkspaceStarRocksClusterMapper.deleteItemByWorkspaceId(workspaceId);
+        List<StarRocksNodeInfo> starRocksNodeInfos = dssFlowService.queryStarRocksNodeList(workspaceId);
+        Set<String> executeClusterSet = starRocksNodeInfos.stream().map(StarRocksNodeInfo::getNodeUiValue).collect(Collectors.toSet());
+        List<DSSWorkspaceStarRocksCluster> itemsByWorkspaceId = dssWorkspaceStarRocksClusterMapper.getItemsByWorkspaceId(workspaceId);
+        for (DSSWorkspaceStarRocksCluster item : itemsByWorkspaceId) {
+            if (executeClusterSet.contains(item.getClusterName())) {
+                throw new DSSErrorException(90054, String.format("集群 %s 在工作流节点中被引用，不允许删除", item.getClusterName()) );
+            } else {
+                dssWorkspaceStarRocksClusterMapper.deleteItemByWorkspaceId(workspaceId);
+            }
+        }
+    }
+
+    private BatchEditFlowRequest getEditFlowRequest(List<StarRocksNodeInfo> updateNodes, DSSWorkspaceStarRocksCluster oneByClusterName) throws JsonProcessingException {
+        Map<String, Map<String, String>> nodeKeyToUiMap = new HashMap<>();
+        for (StarRocksNodeInfo updateNode : updateNodes) {
+            String nodeKey = updateNode.getNodeKey() + "&" + updateNode.getNodeContentId() + "&" + updateNode.getOrchestratorId();
+            String nodeUiKey = updateNode.getNodeUiKey();
+            String nodeUiValue = updateNode.getNodeUiValue();
+            nodeKeyToUiMap.computeIfAbsent(nodeKey, k -> new HashMap<>())
+                    .put(nodeUiKey, nodeUiValue);
+        }
+        List<EditFlowRequest> editFlowRequestList = new ArrayList<>();
+        for (Map.Entry<String, Map<String, String>> outerEntry : nodeKeyToUiMap.entrySet()) {
+            String nodeKey = outerEntry.getKey();
+            Map<String, String> innerMap = outerEntry.getValue();
+            EditFlowRequest editFlowRequest = new EditFlowRequest();
+            String[] split = nodeKey.split("&");
+            editFlowRequest.setNodeKey(split[0]);
+            editFlowRequest.setId(Long.parseLong(split[1]));
+            editFlowRequest.setOrchestratorId(Long.parseLong(split[2]));
+            String reuseEngine = innerMap.getOrDefault("ReuseEngine", null);
+            String autoDisabled = innerMap.getOrDefault("auto.disable", null);
+            String params = constructParams(reuseEngine, autoDisabled, oneByClusterName.getClusterName(),
+                    oneByClusterName.getClusterIp(), oneByClusterName.getTcpPort());
+            editFlowRequest.setParams(params);
+            editFlowRequestList.add(editFlowRequest);
+        }
+
+        BatchEditFlowRequest batchEditFlowRequest = new BatchEditFlowRequest();
+        batchEditFlowRequest.setEditNodeList(editFlowRequestList);
+
+
+        return batchEditFlowRequest;
+    }
+
+    private String constructParams(String reuseEngine, String autoDisabled, String executeCluster, String host, String port) throws JsonProcessingException {
+        // 使用 Jackson 构造 JSON
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode configuration = mapper.createObjectNode();
+
+        // special
+        ObjectNode special = mapper.createObjectNode();
+        if (autoDisabled != null) {
+            special.put("auto.disabled", autoDisabled);
+        } else {
+            special.putNull("auto.disabled");
+        }
+
+        // runtime
+        ObjectNode runtime = mapper.createObjectNode();
+        if (executeCluster != null) {
+            runtime.put("executeCluster", executeCluster);
+        } else {
+            runtime.putNull("executeCluster");
+        }
+        runtime.put("linkis.datasource.type", "starrocks");
+        runtime.put("linkis.datasource.params.host", host);
+        runtime.put("linkis.datasource.params.port", port);
+
+        // startup
+        ObjectNode startup = mapper.createObjectNode();
+        startup.put("ReuseEngine", reuseEngine);
+
+        // 总的configuration
+        configuration.set("special", special);
+        configuration.set("runtime", runtime);
+        configuration.set("startup", startup);
+
+        // 转成String
+        return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(configuration);
+
     }
 }

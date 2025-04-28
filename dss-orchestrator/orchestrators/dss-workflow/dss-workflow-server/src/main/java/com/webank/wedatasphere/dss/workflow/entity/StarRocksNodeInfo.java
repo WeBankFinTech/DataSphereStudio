@@ -7,6 +7,7 @@ public class StarRocksNodeInfo {
     private Long projectId;
     private Long orchestratorId;
     private Long nodeContentId;
+    private String nodeKey;
     private String nodeUiKey;
     private String nodeUiValue;
     private String nodeType;
@@ -65,5 +66,13 @@ public class StarRocksNodeInfo {
 
     public void setNodeType(String nodeType) {
         this.nodeType = nodeType;
+    }
+
+    public String getNodeKey() {
+        return nodeKey;
+    }
+
+    public void setNodeKey(String nodeKey) {
+        this.nodeKey = nodeKey;
     }
 }

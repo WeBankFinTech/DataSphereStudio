@@ -124,7 +124,7 @@ public interface DSSWorkspaceService {
 
     void updateWorkspaceInfo(DSSWorkspace dssWorkspace);
 
-    List<DSSWorkspaceStarRocksCluster> updateStarRocksCluster(List<UpdateWorkspaceStarRocksClusterRequest> request);
+    List<DSSWorkspaceStarRocksCluster> updateStarRocksCluster(List<UpdateWorkspaceStarRocksClusterRequest> request, String ticketId, Workspace workspace, String userName);
     List<DSSWorkspaceStarRocksCluster> getStarRocksCluster(Long workspaceId);
     void deleteStarRocksClusterByWorkspaceId(Long workspaceId);
 }

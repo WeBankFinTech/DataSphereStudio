@@ -66,10 +66,10 @@ public interface NodeContentMapper {
                                                             @Param("nodeName")String nodeName);
 
     @Select(
-        "SELECT t3.workspace_id, t3.project_id, t3.id, t2.id, t1.node_ui_key, t1.node_ui_value, t1.node_type FROM dss_workflow_node_content_to_ui t1\n" +
+        "SELECT t3.workspace_id, t3.project_id, t3.id AS orchestrator_id, t2.id AS node_content_id, t2.node_key, t1.node_ui_key, t1.node_ui_value, t1.node_type FROM dss_workflow_node_content_to_ui t1\n" +
                 "LEFT JOIN dss_workflow_node_content t2 ON t1.content_id = t2.id\n" +
                 "LEFT JOIN dss_orchestrator_info t3 ON t2.orchestrator_id = t3.id\n" +
-                "WHERE t1.node_type = 'linkis.jdbc.starrocks' AND workspace_id = 224 AND node_ui_key = 'executeCluster' "
+                "WHERE t1.node_type = 'linkis.jdbc.starrocks' AND workspace_id = 224 AND node_ui_key in ('executeCluster','ReuseEngine', 'auto.disabled') "
     )
     List<StarRocksNodeInfo> queryStarRocksNodeInfo(Long workspaceId);
 }

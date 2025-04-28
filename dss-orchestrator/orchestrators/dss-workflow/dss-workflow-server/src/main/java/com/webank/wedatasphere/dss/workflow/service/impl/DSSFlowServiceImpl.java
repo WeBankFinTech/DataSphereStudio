@@ -1968,6 +1968,11 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             editFlowRequestMap.put(orchestratorId, editFlowRequests);
         }
 
+        // 校验节点是否可进行编辑
+        List<Long> contentIdList = editFlowRequestList.stream().map(EditFlowRequest::getId).collect(Collectors.toList());
+        validNodeDisableEdit(contentIdList);
+
+
         Set<Long> orchestratorIdList = editFlowRequestList.stream().map(EditFlowRequest::getOrchestratorId).collect(Collectors.toSet());
         // 批量获取编辑锁
         Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getOrcSender();
@@ -2035,6 +2040,35 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                 workFlowManager.unlockWorkflow(userName, flowId, true, workspace);
             }
         }
+
+    }
+
+
+    private void validNodeDisableEdit(List<Long> contentIdList){
+
+        List<String> disableEditNodeList = new ArrayList<>();
+        if(CollectionUtils.isNotEmpty(contentIdList)){
+
+            Map<Long, List<NodeContentUIDO>>  nodeContentUIGroup = getNodeContentUIGroup(contentIdList);
+            for(Long contentId: nodeContentUIGroup.keySet() ){
+
+                List<NodeContentUIDO> nodeUIList = nodeContentUIGroup.get(contentId);
+
+                List<String> nodeUIKeys = nodeUIList.stream().map(NodeContentUIDO::getNodeUIKey).collect(Collectors.toList());
+                List<String> nodeUIValues = nodeUIList.stream().map(NodeContentUIDO::getNodeUIValue).collect(Collectors.toList());
+                Map<String, String> nodeMap = CollUtil.zip(nodeUIKeys, nodeUIValues);
+                // 节点disableEdit属性为true,则不允许编辑
+                if(nodeMap.containsKey("disableEdit") && Boolean.parseBoolean(nodeMap.get("disableEdit"))){
+                    disableEditNodeList.add(nodeMap.get("title"));
+                }
+            }
+        }
+
+        if(CollectionUtils.isNotEmpty(disableEditNodeList)){
+            String nodeNames = String.join(",",disableEditNodeList);
+            throw new DSSErrorException(80001, String.format("%s 节点禁止编辑!!",nodeNames));
+        }
+
 
     }
 
@@ -3012,7 +3046,28 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             if(title.equals(dssNodeDefault.getTitle())){
                 // 修改配置
                 if(!MapUtils.isEmpty(nodeMetaData)){
-                    json.add("params", new Gson().toJsonTree(nodeMetaData));
+                    JsonObject params = new Gson().toJsonTree(nodeMetaData).getAsJsonObject();
+                    JsonObject configuration = new JsonObject();
+
+                    if(!params.has("configuration")){
+                        params.add("configuration",configuration);
+                    }
+
+                    configuration = params.get("configuration").getAsJsonObject();
+
+                    if(!configuration.has("special")){
+                        configuration.add("special",new JsonObject());
+                    }
+
+                    if(!configuration.has("runtime")){
+                        configuration.add("runtime",new JsonObject());
+                    }
+
+                    if(!configuration.has("startup")){
+                        configuration.add("startup",new JsonObject());
+                    }
+
+                    json.add("params", params);
                 } else{
                     logger.warn("input meta data is empty , node is {}", dssNodeDefault.getTitle());
                 }

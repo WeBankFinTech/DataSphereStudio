@@ -35,4 +35,6 @@ public interface DSSWorkspaceStarRocksClusterMapper {
 
     void deleteItemById(@Param("id") Integer id);
 
+    void deleteItemByWorkspaceId(@Param("workspaceId") Long workspaceId);
+
 }

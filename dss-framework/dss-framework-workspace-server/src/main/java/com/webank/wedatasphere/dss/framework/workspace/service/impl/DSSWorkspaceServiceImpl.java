@@ -894,9 +894,9 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
                 throw new DSSErrorException(90054, String.format("%s workspace StarRocks cluster name and ip cannot be empty.", r.getWorkspaceName()));
             }
 
-            if (StringUtils.length(r.getClusterName()) > 128) {
+            if (StringUtils.length(r.getClusterName()) > 256) {
                 LOGGER.warn("工作空间{}StarRocks集群名称{}超过128字符", r.getWorkspaceName(), r.getClusterName());
-                throw new DSSErrorException(90054, String.format("StarRocks cluster %s length cannot exceed 128 in workspace %s", r.getClusterName(), r.getWorkspaceName()));
+                throw new DSSErrorException(90054, String.format("StarRocks cluster %s length cannot exceed 256 in workspace %s", r.getClusterName(), r.getWorkspaceName()));
             }
 
             if (Integer.parseInt(r.getHttpPort()) < 0 || Integer.parseInt(r.getHttpPort()) > 65535 || Integer.parseInt(r.getTcpPort()) < 0 || Integer.parseInt(r.getTcpPort()) > 65535) {
@@ -972,5 +972,10 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     @Override
     public List<DSSWorkspaceStarRocksCluster> getStarRocksCluster(Long workspaceId) {
         return dssWorkspaceStarRocksClusterMapper.getItemsByWorkspaceId(workspaceId);
+    }
+
+    @Override
+    public void deleteStarRocksClusterByWorkspaceId(Long workspaceId) {
+        dssWorkspaceStarRocksClusterMapper.deleteItemByWorkspaceId(workspaceId);
     }
 }

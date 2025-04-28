@@ -33,6 +33,10 @@
         DELETE FROM dss_workspace_starrocks_cluster where id = #{id}
     </delete>
 
+    <delete id="deleteItemByWorkspaceId">
+        DELETE FROM dss_workspace_starrocks_cluster where workspace_id = #{workspaceId}
+    </delete>
+
     <select id="getItemsByWorkspaceId"
             resultType="com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceStarRocksCluster">
         SELECT * FROM dss_workspace_starrocks_cluster where workspace_id = #{workspaceId}

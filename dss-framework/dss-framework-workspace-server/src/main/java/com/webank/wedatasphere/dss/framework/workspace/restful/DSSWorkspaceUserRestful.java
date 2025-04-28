@@ -373,6 +373,8 @@ public class DSSWorkspaceUserRestful {
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
 
         if (CollectionUtils.isEmpty(request)) {
+            Long workspaceId = SSOHelper.getWorkspace(httpServletRequest).getWorkspaceId();
+            dssWorkspaceService.deleteStarRocksClusterByWorkspaceId(workspaceId);
             return Message.ok().data("dssWorkspaceStarRocksCluster", Lists.newArrayList());
         }
 

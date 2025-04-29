@@ -25,7 +25,7 @@
 
     <update id="updateStarRocksCluster">
         UPDATE dss_workspace_starrocks_cluster
-        SET cluster_name=#{clusterName}, is_default_cluster=#{isDefaultCluster}, update_user=#{updateUser}, update_time=#{updateTime}
+        SET cluster_name=#{clusterName}, http_port=#{httpPort}, tcp_port=#{tcpPort}, is_default_cluster=#{isDefaultCluster}, update_user=#{updateUser}, update_time=#{updateTime}
         WHERE id = #{id}
     </update>
 

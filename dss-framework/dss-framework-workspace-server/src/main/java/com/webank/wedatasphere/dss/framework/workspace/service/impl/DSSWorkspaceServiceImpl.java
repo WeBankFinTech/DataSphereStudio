@@ -952,6 +952,8 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
                     List<String> nodeKeys = starRocksNodeInfos.stream().filter(s -> s.getNodeUiValue().equals(requestOne.getClusterName())).map(StarRocksNodeInfo::getNodeKey).collect(Collectors.toList());
                     List<StarRocksNodeInfo> updateNodes = starRocksNodeInfos.stream().filter(s -> nodeKeys.contains(s.getNodeKey())).collect(Collectors.toList());
                     DSSWorkspaceStarRocksCluster oneByClusterName = dssWorkspaceStarRocksClusterMapper.getOneByClusterName(requestOne.getClusterName());
+                    oneByClusterName.setClusterIp(requestOne.getClusterIp());
+                    oneByClusterName.setTcpPort(requestOne.getTcpPort());
                     try {
                         BatchEditFlowRequest editFlowRequest = getEditFlowRequest(updateNodes, oneByClusterName);
                         dssFlowService.batchEditFlow(editFlowRequest, ticketId, workspace, userName);

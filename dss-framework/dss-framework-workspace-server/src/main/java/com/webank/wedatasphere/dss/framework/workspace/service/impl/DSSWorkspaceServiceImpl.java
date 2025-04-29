@@ -946,25 +946,27 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
                 }
             } else {
                 //如果属性有更新且该集群有被引用那么就需要更新引用该集群的starrocks节点属性信息
-                if ( (!Objects.equals(item.getClusterIp(), requestOne.getClusterIp())
-                                || !Objects.equals(item.getHttpPort(), requestOne.getHttpPort())
+                if ( executeClusterSet.contains(requestOne.getClusterName()) && (!Objects.equals(item.getClusterIp(), requestOne.getClusterIp())
                                 || !Objects.equals(item.getTcpPort(), requestOne.getTcpPort())) ) {
-                    if (executeClusterSet.contains(requestOne.getClusterName())) {
-                        List<String> nodeKeys = starRocksNodeInfos.stream().filter(s -> s.getNodeUiValue().equals(requestOne.getClusterName())).map(StarRocksNodeInfo::getNodeKey).collect(Collectors.toList());
-                        List<StarRocksNodeInfo> updateNodes = starRocksNodeInfos.stream().filter(s -> nodeKeys.contains(s.getNodeKey())).collect(Collectors.toList());
-                        DSSWorkspaceStarRocksCluster oneByClusterName = dssWorkspaceStarRocksClusterMapper.getOneByClusterName(requestOne.getClusterName());
-                        try {
-                            BatchEditFlowRequest editFlowRequest = getEditFlowRequest(updateNodes, oneByClusterName);
-                            dssFlowService.batchEditFlow(editFlowRequest, ticketId, workspace, userName);
-                        } catch (Exception e) {
-                            LOGGER.error("集群{}有被工作流中starrocks的节点引用，在批量修改starrocks节点使用的集群信息失败，不允许修改集群信息", requestOne.getClusterName());
-                            throw new DSSErrorException(90054, String.format("集群 %s 有被工作流中starrocks的节点引用，在批量修改starrocks节点使用的集群信息失败，不允许修改集群信息", requestOne.getClusterName()) );
-                        }
+                    LOGGER.info("集群{}的ip或者tcp端口信息有变更，需要修改使用该集群的节点信息", requestOne.getClusterName());
+                    List<String> nodeKeys = starRocksNodeInfos.stream().filter(s -> s.getNodeUiValue().equals(requestOne.getClusterName())).map(StarRocksNodeInfo::getNodeKey).collect(Collectors.toList());
+                    List<StarRocksNodeInfo> updateNodes = starRocksNodeInfos.stream().filter(s -> nodeKeys.contains(s.getNodeKey())).collect(Collectors.toList());
+                    DSSWorkspaceStarRocksCluster oneByClusterName = dssWorkspaceStarRocksClusterMapper.getOneByClusterName(requestOne.getClusterName());
+                    try {
+                        BatchEditFlowRequest editFlowRequest = getEditFlowRequest(updateNodes, oneByClusterName);
+                        dssFlowService.batchEditFlow(editFlowRequest, ticketId, workspace, userName);
+                    } catch (Exception e) {
+                        LOGGER.error("集群{}有被工作流中starrocks的节点引用，在批量修改starrocks节点使用的集群信息失败，不允许修改集群信息", requestOne.getClusterName());
+                        throw new DSSErrorException(90054, String.format("集群 %s 有被工作流中starrocks的节点引用，在批量修改starrocks节点使用的集群信息失败，不允许修改集群信息", requestOne.getClusterName()) );
                     }
                 }
-                BeanUtils.copyProperties(item, requestOne);
+                item.setClusterIp(requestOne.getClusterIp());
+                item.setHttpPort(requestOne.getHttpPort());
+                item.setTcpPort(requestOne.getTcpPort());
+                item.setDefaultCluster(requestOne.getDefaultCluster());
                 item.setUpdateUser(requestOne.getUsername());
                 item.setUpdateTime(new Date());
+                LOGGER.info("更新集群{}的信息为{}", item.getClusterName(), item);
                 dssWorkspaceStarRocksClusterMapper.updateStarRocksCluster(item);
                 starRocksClusters.add(item);
             }
@@ -974,12 +976,10 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
             DSSWorkspaceStarRocksCluster existsOne = existsClusters.get(r.getClusterName());
             //如果数据库不存在，就需要添加进去
             if (existsOne == null) {
-                DSSWorkspaceStarRocksCluster dssWorkspaceStarRocksCluster = new DSSWorkspaceStarRocksCluster();
-                BeanUtils.copyProperties(r, dssWorkspaceStarRocksCluster);
-                dssWorkspaceStarRocksCluster.setCreateUser(r.getUsername());
-                dssWorkspaceStarRocksCluster.setUpdateUser(r.getUsername());
-                dssWorkspaceStarRocksCluster.setCreateTime(new Date());
-                dssWorkspaceStarRocksCluster.setUpdateTime(new Date());
+                LOGGER.info("新增集群{}", r.getClusterName());
+                DSSWorkspaceStarRocksCluster dssWorkspaceStarRocksCluster = new DSSWorkspaceStarRocksCluster(r.getWorkspaceId(),
+                        workspace.getWorkspaceName(), r.getClusterName(), r.getClusterIp(), r.getHttpPort(), r.getTcpPort(),
+                        r.getDefaultCluster(), r.getUsername(), r.getUsername(), new Date(), new Date());
                 dssWorkspaceStarRocksClusterMapper.insertStarRocksCluster(dssWorkspaceStarRocksCluster);
                 starRocksClusters.add(dssWorkspaceStarRocksCluster);
             }

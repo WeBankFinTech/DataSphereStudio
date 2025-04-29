@@ -49,8 +49,7 @@ public class ScriptisProxyUserServiceImpl implements DssProxyUserService, Script
 
             scriptisProxyUser.setExpireTime(dssProxyUser.getExpireTime());
             // 修改过期时间
-            dssProxyUserMapper.updateById(scriptisProxyUser);
-            return scriptisProxyUser.getId().intValue();
+            return dssProxyUserMapper.updateByUser(scriptisProxyUser);
         }
 
 

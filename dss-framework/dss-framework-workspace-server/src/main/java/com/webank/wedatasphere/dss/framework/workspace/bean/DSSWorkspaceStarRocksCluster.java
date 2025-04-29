@@ -28,6 +28,20 @@ public class DSSWorkspaceStarRocksCluster {
 
     private Date updateTime;
 
+    public DSSWorkspaceStarRocksCluster(Long workspaceId, String workspaceName, String clusterName, String clusterIp, String httpPort, String tcpPort, Boolean isDefaultCluster, String createUser, String updateUser, Date createTime, Date updateTime) {
+        this.workspaceId = workspaceId;
+        this.workspaceName = workspaceName;
+        this.clusterName = clusterName;
+        this.clusterIp = clusterIp;
+        this.httpPort = httpPort;
+        this.tcpPort = tcpPort;
+        this.isDefaultCluster = isDefaultCluster;
+        this.createUser = createUser;
+        this.updateUser = updateUser;
+        this.createTime = createTime;
+        this.updateTime = updateTime;
+    }
+
     public DSSWorkspaceStarRocksCluster() {
     }
 

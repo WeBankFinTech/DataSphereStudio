@@ -59,7 +59,7 @@
     </select>
 
     <update id="updateById" parameterType="com.webank.wedatasphere.dss.scriptis.pojo.entity.ScriptisProxyUser">
-        update dss_proxy_user set expire_time=#{expireTime}  where id=#{id}
+        update dss_proxy_user set expire_time=#{expireTime},update_time=now()  where id=#{id}
     </update>
 
 </mapper>

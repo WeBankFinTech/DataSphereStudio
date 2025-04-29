@@ -946,19 +946,20 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
                 }
             } else {
                 //如果属性有更新且该集群有被引用那么就需要更新引用该集群的starrocks节点属性信息
-                if ( executeClusterSet.contains(requestOne.getClusterName()) &&
-                        (!Objects.equals(item.getClusterIp(), requestOne.getClusterIp())
+                if ( (!Objects.equals(item.getClusterIp(), requestOne.getClusterIp())
                                 || !Objects.equals(item.getHttpPort(), requestOne.getHttpPort())
                                 || !Objects.equals(item.getTcpPort(), requestOne.getTcpPort())) ) {
-                    List<String> nodeKeys = starRocksNodeInfos.stream().filter(s -> s.getNodeUiValue().equals(requestOne.getClusterName())).map(StarRocksNodeInfo::getNodeKey).collect(Collectors.toList());
-                    List<StarRocksNodeInfo> updateNodes = starRocksNodeInfos.stream().filter(s -> nodeKeys.contains(s.getNodeKey())).collect(Collectors.toList());
-                    DSSWorkspaceStarRocksCluster oneByClusterName = dssWorkspaceStarRocksClusterMapper.getOneByClusterName(requestOne.getClusterName());
-                    try {
-                        BatchEditFlowRequest editFlowRequest = getEditFlowRequest(updateNodes, oneByClusterName);
-                        dssFlowService.batchEditFlow(editFlowRequest, ticketId, workspace, userName);
-                    } catch (Exception e) {
-                        LOGGER.error("集群{}有被工作流中starrocks的节点引用，在批量修改starrocks节点使用的集群信息失败，不允许修改集群信息", requestOne.getClusterName());
-                        throw new DSSErrorException(90054, String.format("集群 %s 有被工作流中starrocks的节点引用，在批量修改starrocks节点使用的集群信息失败，不允许修改集群信息", requestOne.getClusterName()) );
+                    if (executeClusterSet.contains(requestOne.getClusterName())) {
+                        List<String> nodeKeys = starRocksNodeInfos.stream().filter(s -> s.getNodeUiValue().equals(requestOne.getClusterName())).map(StarRocksNodeInfo::getNodeKey).collect(Collectors.toList());
+                        List<StarRocksNodeInfo> updateNodes = starRocksNodeInfos.stream().filter(s -> nodeKeys.contains(s.getNodeKey())).collect(Collectors.toList());
+                        DSSWorkspaceStarRocksCluster oneByClusterName = dssWorkspaceStarRocksClusterMapper.getOneByClusterName(requestOne.getClusterName());
+                        try {
+                            BatchEditFlowRequest editFlowRequest = getEditFlowRequest(updateNodes, oneByClusterName);
+                            dssFlowService.batchEditFlow(editFlowRequest, ticketId, workspace, userName);
+                        } catch (Exception e) {
+                            LOGGER.error("集群{}有被工作流中starrocks的节点引用，在批量修改starrocks节点使用的集群信息失败，不允许修改集群信息", requestOne.getClusterName());
+                            throw new DSSErrorException(90054, String.format("集群 %s 有被工作流中starrocks的节点引用，在批量修改starrocks节点使用的集群信息失败，不允许修改集群信息", requestOne.getClusterName()) );
+                        }
                     }
                 }
                 BeanUtils.copyProperties(item, requestOne);

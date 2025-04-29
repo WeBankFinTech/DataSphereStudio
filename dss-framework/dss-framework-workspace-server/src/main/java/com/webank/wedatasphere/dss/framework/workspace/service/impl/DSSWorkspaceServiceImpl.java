@@ -1073,9 +1073,11 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         configuration.set("special", special);
         configuration.set("runtime", runtime);
         configuration.set("startup", startup);
+        ObjectNode rootNode = mapper.createObjectNode();
+        rootNode.set("configuration", configuration);
 
         // 转成String
-        return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(configuration);
+        return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(rootNode);
 
     }
 }

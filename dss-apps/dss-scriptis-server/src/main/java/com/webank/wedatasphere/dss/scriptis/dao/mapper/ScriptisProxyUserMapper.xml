@@ -58,8 +58,9 @@
         and   u.proxy_user_name  = #{proxyUserName} limit 1
     </select>
 
-    <update id="updateById" parameterType="com.webank.wedatasphere.dss.scriptis.pojo.entity.ScriptisProxyUser">
-        update dss_proxy_user set expire_time=#{expireTime},update_time=now()  where id=#{id}
+    <update id="updateByUser" parameterType="com.webank.wedatasphere.dss.scriptis.pojo.entity.ScriptisProxyUser">
+        update dss_proxy_user set expire_time=#{expireTime},update_time=now()  where username = #{userName}
+        and proxy_user_name = #{proxyUserName}
     </update>
 
 </mapper>

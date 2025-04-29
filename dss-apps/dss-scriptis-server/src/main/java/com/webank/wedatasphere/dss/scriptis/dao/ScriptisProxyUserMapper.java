@@ -20,6 +20,6 @@ public interface ScriptisProxyUserMapper extends BaseMapper<ScriptisProxyUser> {
     ScriptisProxyUser selectProxyUserByUser(@Param("userName") String userName,@Param("proxyUserName") String proxyUserName);
 
 
-    int updateById(ScriptisProxyUser user);
+    int updateByUser(ScriptisProxyUser user);
 
 }

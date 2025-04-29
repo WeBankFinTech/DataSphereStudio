@@ -995,7 +995,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     @Override
     public void deleteStarRocksClusterByWorkspaceId(Long workspaceId) {
         List<StarRocksNodeInfo> starRocksNodeInfos = dssFlowService.queryStarRocksNodeList(workspaceId);
-        Set<String> executeClusterSet = starRocksNodeInfos.stream().map(StarRocksNodeInfo::getNodeUiValue).collect(Collectors.toSet());
+        Set<String> executeClusterSet = starRocksNodeInfos.stream().filter(s -> "executeCluster".equals(s.getNodeUiKey())).map(StarRocksNodeInfo::getNodeUiValue).collect(Collectors.toSet());
         List<DSSWorkspaceStarRocksCluster> itemsByWorkspaceId = dssWorkspaceStarRocksClusterMapper.getItemsByWorkspaceId(workspaceId);
         for (DSSWorkspaceStarRocksCluster item : itemsByWorkspaceId) {
             if (executeClusterSet.contains(item.getClusterName())) {

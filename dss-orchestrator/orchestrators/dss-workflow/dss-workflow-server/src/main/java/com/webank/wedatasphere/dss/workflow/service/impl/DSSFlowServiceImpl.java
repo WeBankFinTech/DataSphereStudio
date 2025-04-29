@@ -3035,21 +3035,21 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                     JsonObject params = new Gson().toJsonTree(nodeMetaData).getAsJsonObject();
                     JsonObject configuration = new JsonObject();
 
-                    if(!params.has("configuration")){
+                    if(!params.has("configuration") || params.get("configuration") == null){
                         params.add("configuration",configuration);
                     }
 
                     configuration = params.get("configuration").getAsJsonObject();
 
-                    if(!configuration.has("special")){
+                    if(!configuration.has("special") || configuration.get("special") == null){
                         configuration.add("special",new JsonObject());
                     }
 
-                    if(!configuration.has("runtime")){
+                    if(!configuration.has("runtime") || configuration.get("runtime") == null){
                         configuration.add("runtime",new JsonObject());
                     }
 
-                    if(!configuration.has("startup")){
+                    if(!configuration.has("startup") || configuration.get("startup") == null){
                         configuration.add("startup",new JsonObject());
                     }
 

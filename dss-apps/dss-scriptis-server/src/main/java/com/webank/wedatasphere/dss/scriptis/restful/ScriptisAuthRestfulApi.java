@@ -45,17 +45,17 @@ public class ScriptisAuthRestfulApi {
     public Message globalLimits(HttpServletRequest req) {
         String username = SecurityFilter.getLoginUsername(req);
         Map<String,Object> globalLimits = scriptisAuthService.getGlobalLimits(username);
-        boolean enabled = DSSCommonConf.LINKIE_USERNAME_SUFFIX_ENABLE.value();
-        String suffix = DSSCommonConf.DSS_USER_NAME_SUFFIX.value();
-        logger.info("linkis.username.suffix.enable is {}, wds.dss.username.suffix.name is {}, username is {}",enabled,suffix,username);
-        Map<String, Object> resMap = new HashMap<>(globalLimits);
+//        boolean enabled = DSSCommonConf.LINKIE_USERNAME_SUFFIX_ENABLE.value();
+//        String suffix = DSSCommonConf.DSS_USER_NAME_SUFFIX.value();
+//        logger.info("linkis.username.suffix.enable is {}, wds.dss.username.suffix.name is {}, username is {}",enabled,suffix,username);
+//        Map<String, Object> resMap = new HashMap<>(globalLimits);
 
 //        if(enabled && username.endsWith(suffix)){
 //            List<String> authList = Lists.newArrayList("exportResEnable", "downloadResEnable", "resCopyEnable");
 //            authList.forEach(auth -> resMap.put(auth, true));
 //        }
 
-        return Message.ok().data("globalLimits", resMap);
+        return Message.ok().data("globalLimits", globalLimits);
     }
 
     @RequestMapping(value = "/globalLimits/{globalLimitName}",method = RequestMethod.GET)

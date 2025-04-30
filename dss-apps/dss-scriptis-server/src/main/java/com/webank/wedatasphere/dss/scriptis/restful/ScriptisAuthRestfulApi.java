@@ -50,10 +50,10 @@ public class ScriptisAuthRestfulApi {
         logger.info("linkis.username.suffix.enable is {}, wds.dss.username.suffix.name is {}, username is {}",enabled,suffix,username);
         Map<String, Object> resMap = new HashMap<>(globalLimits);
 
-        if(enabled && username.endsWith(suffix)){
-            List<String> authList = Lists.newArrayList("exportResEnable", "downloadResEnable", "resCopyEnable");
-            authList.forEach(auth -> resMap.put(auth, true));
-        }
+//        if(enabled && username.endsWith(suffix)){
+//            List<String> authList = Lists.newArrayList("exportResEnable", "downloadResEnable", "resCopyEnable");
+//            authList.forEach(auth -> resMap.put(auth, true));
+//        }
 
         return Message.ok().data("globalLimits", resMap);
     }

@@ -1,5 +1,6 @@
 package com.webank.wedatasphere.dss.scriptis.restful;
 
+import com.google.common.collect.Lists;
 import com.webank.wedatasphere.dss.common.conf.DSSCommonConf;
 import com.webank.wedatasphere.dss.common.utils.GlobalLimitsUtils;
 import com.webank.wedatasphere.dss.scriptis.config.DSSScriptisConfiguration;
@@ -7,12 +8,15 @@ import com.webank.wedatasphere.dss.scriptis.service.ScriptisAuthService;
 import org.apache.linkis.common.conf.BDPConfiguration;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.webank.wedatasphere.dss.scriptis.config.DSSScriptisConfiguration.GLOBAL_LIMITS_PREFIX;
@@ -27,6 +31,7 @@ import static com.webank.wedatasphere.dss.scriptis.config.DSSScriptisConfigurati
 @RestController
 public class ScriptisAuthRestfulApi {
 
+    private final Logger logger = LoggerFactory.getLogger(ScriptisAuthRestfulApi.class);
     @Autowired
     private ScriptisAuthService scriptisAuthService;
 
@@ -40,7 +45,17 @@ public class ScriptisAuthRestfulApi {
     public Message globalLimits(HttpServletRequest req) {
         String username = SecurityFilter.getLoginUsername(req);
         Map<String,Object> globalLimits = scriptisAuthService.getGlobalLimits(username);
-        return Message.ok().data("globalLimits", globalLimits);
+        boolean enabled = DSSCommonConf.LINKIE_USERNAME_SUFFIX_ENABLE.value();
+        String suffix = DSSCommonConf.DSS_USER_NAME_SUFFIX.value();
+        logger.info("linkis.username.suffix.enable is {}, wds.dss.username.suffix.name is {}, username is {}",enabled,suffix,username);
+        Map<String, Object> resMap = new HashMap<>(globalLimits);
+
+        if(enabled && username.endsWith(suffix)){
+            List<String> authList = Lists.newArrayList("exportResEnable", "downloadResEnable", "resCopyEnable");
+            authList.forEach(auth -> resMap.put(auth, true));
+        }
+
+        return Message.ok().data("globalLimits", resMap);
     }
 
     @RequestMapping(value = "/globalLimits/{globalLimitName}",method = RequestMethod.GET)

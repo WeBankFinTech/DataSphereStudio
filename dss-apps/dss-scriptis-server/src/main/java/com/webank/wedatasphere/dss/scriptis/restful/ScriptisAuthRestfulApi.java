@@ -55,7 +55,7 @@ public class ScriptisAuthRestfulApi {
             authList.forEach(auth -> resMap.put(auth, true));
         }
 
-        return Message.ok().data("globalLimits", globalLimits);
+        return Message.ok().data("globalLimits", resMap);
     }
 
     @RequestMapping(value = "/globalLimits/{globalLimitName}",method = RequestMethod.GET)

@@ -2883,7 +2883,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
         }
 
-        if(!CollectionUtils.isNotEmpty(dssFlow.getChildren())){
+        if(CollectionUtils.isNotEmpty(dssFlow.getChildren())){
 
             for(DSSFlow flow: dssFlow.getChildren()){
 

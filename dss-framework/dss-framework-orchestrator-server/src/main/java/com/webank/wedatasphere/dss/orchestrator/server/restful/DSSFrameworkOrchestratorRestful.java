@@ -114,6 +114,8 @@ public class DSSFrameworkOrchestratorRestful {
     @Autowired
     private DSSWorkspaceService dssWorkspaceService;
 
+    private final  String encryptCopyWorkflowSuffix = "copy_cib";
+
 
     /**
      * 创建编排模式
@@ -790,7 +792,7 @@ public class DSSFrameworkOrchestratorRestful {
 
         String minutes = new SimpleDateFormat("MMddHHmm").format(new Date());
         if(StringUtils.isEmpty(encryptCopyOrchestratorRequest.getCopyFlowSuffix())){
-            encryptCopyOrchestratorRequest.setCopyFlowSuffix("copy_cib"  + minutes);
+            encryptCopyOrchestratorRequest.setCopyFlowSuffix(encryptCopyWorkflowSuffix  + minutes);
         }
 
         if(StringUtils.isEmpty(encryptCopyOrchestratorRequest.getCopyNodeSuffix())){
@@ -833,6 +835,46 @@ public class DSSFrameworkOrchestratorRestful {
     public Message getEncryptCopyOrchestratorStatus(@PathVariable("id") String copyInfoId) throws Exception {
 
         return Message.ok("获取编排复制任务状态成功").data("encryptOrchestratorCopyInfo", orchestratorFrameworkService.getDSSEncryptOrchestratorCopyInfo(copyInfoId));
+    }
+
+
+    @RequestMapping(path = "deleteEncryptOrchestrator", method = RequestMethod.POST)
+    public Message deleteEncryptOrchestrator(@RequestBody OrchestratorDeleteRequest deleteRequest) throws Exception {
+
+        OrchestratorVo orchestrator =  orchestratorService.getOrchestratorVoById(deleteRequest.getId());
+
+        if(orchestrator.getDssOrchestratorInfo() == null  || StringUtils.isEmpty(orchestrator.getDssOrchestratorInfo().getName())){
+            DSSExceptionUtils.dealErrorException(63335, "未找到工作流信息,不能进行删除", DSSErrorException.class);
+        }
+
+        String orchestratorName = orchestrator.getDssOrchestratorInfo().getName();
+        // 编排名称 必须符合 copy_cibxxxxxxxx格式才允许删除
+        // \\S*copy_cib\\d{8}
+        String regex = String.format("\\S*%s\\d{8}",encryptCopyWorkflowSuffix);
+
+        if(!Pattern.matches(regex, orchestratorName)){
+            DSSExceptionUtils.dealErrorException(63335, String.format("%s 工作流不是企业明文工作流,不能进行删除",orchestratorName),
+                    DSSErrorException.class);
+        }
+
+        String username = SecurityFilter.getLoginUsername(httpServletRequest);
+        Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
+        if (orchestratorFrameworkService.getOrchestratorCopyStatus(deleteRequest.getId())) {
+            return Message.error("当前工作流正在被复制，不允许删除");
+        }
+        ProjectInfoRequest projectInfoRequest = new ProjectInfoRequest();
+        projectInfoRequest.setProjectId(deleteRequest.getProjectId());
+        DSSProject dssProject = (DSSProject) DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender().ask(projectInfoRequest);
+        if (dssProject.getWorkspaceId() != workspace.getWorkspaceId()) {
+            DSSExceptionUtils.dealErrorException(63335, "工作流所在工作空间和cookie中不一致，请刷新页面后，再次发布！", DSSErrorException.class);
+        }
+
+        CommonOrchestratorVo orchestratorVo = orchestratorFrameworkService.deleteOrchestrator(username, deleteRequest, workspace);
+
+        AuditLogUtils.printLog("hadoop", workspace.getWorkspaceId(), workspace.getWorkspaceName(), TargetTypeEnum.ORCHESTRATOR,
+                orchestratorVo.getOrchestratorId(), orchestratorVo.getOrchestratorName(), OperateTypeEnum.DELETE, deleteRequest);
+
+        return Message.ok("删除工作流编排模式成功");
     }
 
 }

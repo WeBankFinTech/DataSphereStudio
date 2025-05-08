@@ -581,7 +581,7 @@ public class DataCheckerDao {
             Response response = HttpUtils.httpClientHandleBase(maskUrl, requestBody, dataMap);
             handleResponse(response, resultMap, log);
         } catch (IOException e) {
-            log.error("fetch data from BDP MASK failed ");
+            log.error("fetch data from BDP MASK failed ",e);
             resultMap.put("maskStatus", "noPrepare");
         } catch (MaskCheckNotExistException e) {
             String errorMessage = "fetch data from BDP MASK failed" +

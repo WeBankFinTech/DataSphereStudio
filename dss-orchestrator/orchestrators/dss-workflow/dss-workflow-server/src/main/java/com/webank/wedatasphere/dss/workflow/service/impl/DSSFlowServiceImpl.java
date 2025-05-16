@@ -436,7 +436,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             contextService.checkAndSaveContext(jsonFlow, String.valueOf(parentFlowID));
         } catch (DSSErrorException e) {
             logger.error("Failed to saveContext: ", e);
-            throw new DSSRuntimeException(e.getErrCode(), "保存ContextId失败，您可以尝试重新发布工作流！原因：" + ExceptionUtils.getRootCauseMessage(e), e);
+            throw new DSSRuntimeException(e.getErrCode(), "保存ContextId失败，您可以尝试重新发布工作流！flowID："+flowID+"原因：" + ExceptionUtils.getRootCauseMessage(e), e);
         }
         saveFlowHook.afterSave(jsonFlow, dssFlow, parentFlowID);
         String version = bmlReturnMap.get("version").toString();

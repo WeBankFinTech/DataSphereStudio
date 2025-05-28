@@ -23,6 +23,31 @@ public class DataDevelopNodeInfo  extends NodeBaseInfo{
 
     private String script;
 
+    // spark.executor.memory
+    private String  sparkExecutorMemory;
+
+    // spark.driver.memory
+    private String  sparkDriverMemory;
+
+    // spark.conf
+    private String  sparkConf;
+
+    // spark.executor.core
+    private String  sparkExecutorCore;
+
+    // spark.executor.instances
+    private String sparkExecutorInstances;
+
+
+    private String executeCluster;
+
+    public String getExecuteCluster() {
+        return executeCluster;
+    }
+
+    public void setExecuteCluster(String executeCluster) {
+        this.executeCluster = executeCluster;
+    }
     public Boolean getRefTemplate() {
         return isRefTemplate;
     }
@@ -70,5 +95,46 @@ public class DataDevelopNodeInfo  extends NodeBaseInfo{
 
     public void setScript(String script) {
         this.script = script;
+    }
+
+
+    public String getSparkExecutorMemory() {
+        return sparkExecutorMemory;
+    }
+
+    public void setSparkExecutorMemory(String sparkExecutorMemory) {
+        this.sparkExecutorMemory = sparkExecutorMemory;
+    }
+
+    public String getSparkDriverMemory() {
+        return sparkDriverMemory;
+    }
+
+    public void setSparkDriverMemory(String sparkDriverMemory) {
+        this.sparkDriverMemory = sparkDriverMemory;
+    }
+
+    public String getSparkConf() {
+        return sparkConf;
+    }
+
+    public void setSparkConf(String sparkConf) {
+        this.sparkConf = sparkConf;
+    }
+
+    public String getSparkExecutorCore() {
+        return sparkExecutorCore;
+    }
+
+    public void setSparkExecutorCore(String sparkExecutorCore) {
+        this.sparkExecutorCore = sparkExecutorCore;
+    }
+
+    public String getSparkExecutorInstances() {
+        return sparkExecutorInstances;
+    }
+
+    public void setSparkExecutorInstances(String sparkExecutorInstances) {
+        this.sparkExecutorInstances = sparkExecutorInstances;
     }
 }

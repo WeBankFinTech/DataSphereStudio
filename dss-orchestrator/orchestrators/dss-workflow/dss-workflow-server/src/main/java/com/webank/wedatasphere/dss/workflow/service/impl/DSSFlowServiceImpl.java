@@ -1482,8 +1482,6 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         // 查询节点信息
         List<DSSFlowNodeInfo> flowNodeInfoList = nodeContentMapper.queryFlowNodeInfo(projectIdList, nodeTypeList);
 
-//        Map<String, List<NodeUIInfo>> nodeInfoGroup = nodeUIInfoGroupByNodeType(nodeTypeList);
-
         if (CollectionUtils.isEmpty(flowNodeInfoList)) {
             logger.error("queryDataDevelopNodeList find node info is empty, example project id is {}", projectIdList.get(0));
             return dataDevelopNodeResponse;
@@ -1500,11 +1498,6 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         }
 
 
-
-        // 查询模板信息
-        //  List<Long> orchestratorIdList = flowNodeInfoList.stream().map(DSSFlowNodeInfo::getOrchestratorId).collect(Collectors.toList());
-        //  Map<String, String> templateMap = getTemplateMap(orchestratorIdList);
-
         List<DataDevelopNodeInfo> dataDevelopNodeInfoList = new ArrayList<>();
 
         for (Long contentId : nodeContentUIGroup.keySet()) {
@@ -1514,8 +1507,6 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                 DSSFlowNodeInfo dssFlowNodeInfo = dssFlowNodeInfoMap.get(contentId);
                 List<NodeContentUIDO> nodeUIList = nodeContentUIGroup.get(contentId);
                 DSSProject dssProject = dssProjectMap.get(dssFlowNodeInfo.getProjectId());
-
-//                Map<String, String> nodeDefaultValue = getNodeDefaultValue(nodeInfoGroup, dssFlowNodeInfo.getJobType());
 
                 List<String> nodeUIKeys = nodeUIList.stream().map(NodeContentUIDO::getNodeUIKey).collect(Collectors.toList());
                 List<String> nodeUIValues = nodeUIList.stream().map(NodeContentUIDO::getNodeUIValue).collect(Collectors.toList());
@@ -1550,10 +1541,41 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                     dataDevelopNodeInfo.setScript(nodeMap.get("script"));
                 }
 
+
+                // 未引用资源模板时, 获取属性
+                if(!dataDevelopNodeInfo.getRefTemplate()){
+
+                    if(nodeMap.containsKey("spark.driver.memory") && StringUtils.isNotEmpty(nodeMap.get("spark.driver.memory"))){
+                        dataDevelopNodeInfo.setSparkDriverMemory(nodeMap.get("spark.driver.memory"));
+                    }
+
+                    if(nodeMap.containsKey("spark.executor.memory") && StringUtils.isNotEmpty(nodeMap.get("spark.executor.memory"))){
+                        dataDevelopNodeInfo.setSparkExecutorMemory(nodeMap.get("spark.executor.memory"));
+                    }
+
+                    if(nodeMap.containsKey("spark.executor.cores") && StringUtils.isNotEmpty(nodeMap.get("spark.executor.cores"))){
+                        dataDevelopNodeInfo.setSparkExecutorCore(nodeMap.get("spark.executor.cores"));
+                    }
+
+                    if(nodeMap.containsKey("spark.conf") && StringUtils.isNotEmpty(nodeMap.get("spark.conf"))){
+                        dataDevelopNodeInfo.setSparkConf(nodeMap.get("spark.conf"));
+                    }
+
+                    if(nodeMap.containsKey("spark.executor.instances") && StringUtils.isNotEmpty(nodeMap.get("spark.executor.instances"))){
+                        dataDevelopNodeInfo.setSparkExecutorInstances(nodeMap.get("spark.executor.instances"));
+                    }
+
+                }
+
+                // 获取 executeCluster
+                if (nodeMap.containsKey("executeCluster") && StringUtils.isNotEmpty(nodeMap.get("executeCluster"))) {
+                    dataDevelopNodeInfo.setExecuteCluster(nodeMap.get("executeCluster"));
+                }
+
                 dataDevelopNodeInfoList.add(dataDevelopNodeInfo);
-            } catch (Exception exception) {
-                logger.error("queryDataDevelopNodeList error content id is {}", contentId);
-                logger.error(exception.getMessage());
+            } catch (Exception e) {
+                logger.error("queryDataDevelopNodeList error content id is {}, error message is {}", contentId,e.getMessage(),e);
+
             }
         }
 
@@ -1824,6 +1846,32 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                 flag = request.getProjectNameList().contains(dataDevelopNodeInfo.getProjectName());
             }
 
+            // 新增 Spark 相关属性筛选
+            if (!StringUtils.isBlank(request.getSparkDriverMemory()) && flag) {
+                flag = request.getSparkDriverMemory().equals(dataDevelopNodeInfo.getSparkDriverMemory());
+            }
+
+            if (!StringUtils.isBlank(request.getSparkExecutorMemory()) && flag) {
+                flag = request.getSparkExecutorMemory().equals(dataDevelopNodeInfo.getSparkExecutorMemory());
+            }
+
+            if (!StringUtils.isBlank(request.getSparkExecutorCore()) && flag) {
+                flag = request.getSparkExecutorCore().equals(dataDevelopNodeInfo.getSparkExecutorCore());
+            }
+
+            if (!StringUtils.isBlank(request.getSparkConf()) && flag) {
+                flag = request.getSparkConf().equals(dataDevelopNodeInfo.getSparkConf());
+            }
+
+            if (!StringUtils.isBlank(request.getSparkExecutorInstances()) && flag) {
+                flag = request.getSparkExecutorInstances().equals(dataDevelopNodeInfo.getSparkExecutorInstances());
+            }
+
+            // 新增 executeCluster 筛选
+            if (!StringUtils.isBlank(request.getExecuteCluster()) && flag) {
+                flag = request.getExecuteCluster().equals(dataDevelopNodeInfo.getExecuteCluster());
+            }
+
             return flag;
         }).collect(Collectors.toList());
 
@@ -2008,6 +2056,9 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                             editFlowRequestTOFlowIDMap.get(targetFlowId) : new ArrayList<>();
                     editFlowRequestsList.add(editFlowRequest);
                     editFlowRequestTOFlowIDMap.put(targetFlowId, editFlowRequestsList);
+
+
+
                 }
             }
         }

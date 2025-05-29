@@ -17,6 +17,7 @@
 package com.webank.wedatasphere.dss.framework.workspace.service;
 
 import com.github.pagehelper.PageInfo;
+import com.webank.wedatasphere.dss.common.entity.workspace.DSSStarRocksCluster;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSUserRoleComponentPriv;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace;
@@ -127,4 +128,8 @@ public interface DSSWorkspaceService {
     List<DSSWorkspaceStarRocksCluster> updateStarRocksCluster(List<UpdateWorkspaceStarRocksClusterRequest> request, String ticketId, Workspace workspace, String userName);
     List<DSSWorkspaceStarRocksCluster> getStarRocksCluster(Long workspaceId);
     void deleteStarRocksClusterByWorkspaceId(Long workspaceId);
+
+
+    List<DSSStarRocksCluster> getDSSStarrocksCluster(Long workspaceId);
+
 }

@@ -27,6 +27,7 @@ import com.webank.wedatasphere.dss.appconn.core.ext.OnlySSOAppConn;
 import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
 import com.webank.wedatasphere.dss.appconn.manager.utils.AppInstanceConstants;
 import com.webank.wedatasphere.dss.common.StaffInfoGetter;
+import com.webank.wedatasphere.dss.common.entity.workspace.DSSStarRocksCluster;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
@@ -1006,6 +1007,22 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
                 dssWorkspaceStarRocksClusterMapper.deleteItemByWorkspaceId(workspaceId);
             }
         }
+    }
+
+    @Override
+    public List<DSSStarRocksCluster> getDSSStarrocksCluster(Long workspaceId) {
+        List<DSSStarRocksCluster> starrocksClusterList = new ArrayList<>();
+
+        List<DSSWorkspaceStarRocksCluster> dssWorkspaceStarRocksClusterList = getStarRocksCluster(workspaceId);
+
+        for(DSSWorkspaceStarRocksCluster dssWorkspaceStarRocksCluster: dssWorkspaceStarRocksClusterList){
+            DSSStarRocksCluster dssStarrocksCluster = new DSSStarRocksCluster();
+            BeanUtils.copyProperties(dssWorkspaceStarRocksCluster,dssStarrocksCluster);
+            starrocksClusterList.add(dssStarrocksCluster);
+
+        }
+
+        return starrocksClusterList;
     }
 
     private BatchEditFlowRequest getEditFlowRequest(List<StarRocksNodeInfo> updateNodes, DSSWorkspaceStarRocksCluster oneByClusterName) throws JsonProcessingException {

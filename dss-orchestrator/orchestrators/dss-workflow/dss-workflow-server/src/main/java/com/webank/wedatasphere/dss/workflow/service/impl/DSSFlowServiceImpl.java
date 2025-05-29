@@ -19,7 +19,6 @@ package com.webank.wedatasphere.dss.workflow.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.*;
-import com.webank.wedatasphere.dss.common.StaffInfo;
 import com.webank.wedatasphere.dss.common.StaffInfoGetter;
 import com.webank.wedatasphere.dss.common.constant.project.ProjectUserPrivEnum;
 import com.webank.wedatasphere.dss.common.entity.BmlResource;
@@ -29,11 +28,14 @@ import com.webank.wedatasphere.dss.common.entity.node.DSSNode;
 import com.webank.wedatasphere.dss.common.entity.node.DSSNodeDefault;
 import com.webank.wedatasphere.dss.common.entity.node.Node;
 import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
+import com.webank.wedatasphere.dss.common.entity.workspace.DSSStarRocksCluster;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
 import com.webank.wedatasphere.dss.common.protocol.project.*;
+import com.webank.wedatasphere.dss.common.protocol.workspace.StarRocksClusterListRequest;
+import com.webank.wedatasphere.dss.common.protocol.workspace.StarRocksClusterListResponse;
 import com.webank.wedatasphere.dss.common.utils.*;
 import com.webank.wedatasphere.dss.contextservice.service.ContextService;
 import com.webank.wedatasphere.dss.contextservice.service.impl.ContextServiceImpl;
@@ -49,7 +51,6 @@ import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlowRelation;
 import com.webank.wedatasphere.dss.workflow.common.parser.NodeParser;
 import com.webank.wedatasphere.dss.workflow.common.parser.WorkFlowParser;
-import com.webank.wedatasphere.dss.workflow.constant.CodeTypeEnum;
 import com.webank.wedatasphere.dss.workflow.constant.SignalNodeConstant;
 import com.webank.wedatasphere.dss.workflow.constant.WorkflowNodeGroupEnum;
 import com.webank.wedatasphere.dss.workflow.core.WorkflowFactory;
@@ -90,7 +91,6 @@ import org.apache.linkis.cs.client.utils.SerializeHelper;
 import org.apache.linkis.cs.common.utils.CSCommonUtils;
 import org.apache.linkis.rpc.Sender;
 import org.apache.linkis.server.BDPJettyServerHelper;
-import org.apache.linkis.server.Message;
 import org.apache.linkis.storage.script.*;
 import org.apache.linkis.storage.script.writer.StorageScriptFsWriter;
 import org.slf4j.Logger;
@@ -2035,6 +2035,16 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         Long modifyTime = System.currentTimeMillis();
         Map<Long, List<EditFlowRequest>> editFlowRequestTOFlowIDMap = new HashMap<>();
 
+        // 获取StarRocks集群配置信息
+        List<DSSStarRocksCluster> starRocksClusterList = getStarRocksCluster(workspace);
+
+        Map<String,DSSStarRocksCluster> starRocksClusterMap = new HashMap<>();
+
+        if(CollectionUtils.isNotEmpty(starRocksClusterList)){
+            starRocksClusterMap = starRocksClusterList.stream()
+                    .collect(Collectors.toMap(DSSStarRocksCluster::getClusterName, cluster -> cluster));
+        }
+
         for (OrchestratorVo orchestratorVo : orchestratorVoes) {
             DSSOrchestratorVersion dssOrchestratorVersion = orchestratorVo.getDssOrchestratorVersion();
             if (dssOrchestratorVersion != null) {
@@ -2054,11 +2064,14 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                     Long targetFlowId = nodeContentByContentId.getFlowId();
                     List<EditFlowRequest> editFlowRequestsList = editFlowRequestTOFlowIDMap.containsKey(targetFlowId) ?
                             editFlowRequestTOFlowIDMap.get(targetFlowId) : new ArrayList<>();
+
+                    //  处理starrocks节点
+                    if("linkis.jdbc.starrocks".equals(nodeContentByContentId.getJobType())){
+                        starRocksNodeParamsHandle(editFlowRequest,starRocksClusterMap);
+                    }
+
                     editFlowRequestsList.add(editFlowRequest);
                     editFlowRequestTOFlowIDMap.put(targetFlowId, editFlowRequestsList);
-
-
-
                 }
             }
         }
@@ -3084,26 +3097,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                 // 修改配置
                 if(!MapUtils.isEmpty(nodeMetaData)){
                     JsonObject params = new Gson().toJsonTree(nodeMetaData).getAsJsonObject();
-                    JsonObject configuration = new JsonObject();
-
-                    if(!params.has("configuration") || params.get("configuration") == null){
-                        params.add("configuration",configuration);
-                    }
-
-                    configuration = params.get("configuration").getAsJsonObject();
-
-                    if(!configuration.has("special") || configuration.get("special") == null){
-                        configuration.add("special",new JsonObject());
-                    }
-
-                    if(!configuration.has("runtime") || configuration.get("runtime") == null){
-                        configuration.add("runtime",new JsonObject());
-                    }
-
-                    if(!configuration.has("startup") || configuration.get("startup") == null){
-                        configuration.add("startup",new JsonObject());
-                    }
-
+                    handleFlowJsonParams(params);
                     json.add("params", params);
                 } else{
                     logger.warn("input meta data is empty , node is {}", dssNodeDefault.getTitle());
@@ -3179,6 +3173,108 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                     projectUserAuthResponse.getPrivList().contains(ProjectUserPrivEnum.PRIV_RELEASE.getRank());
         }
         return hasEditPriv || projectUserAuthResponse.getProjectOwner().equals(username);
+    }
+
+
+    private void starRocksNodeParamsHandle(EditFlowRequest editFlowRequest,Map<String,DSSStarRocksCluster> starRocksClusterMap){
+
+        try {
+            logger.info(" {} starrocks node params is {}",editFlowRequest.getTitle(),editFlowRequest.getParams());
+
+            if(StringUtils.isEmpty(editFlowRequest.getParams())){
+                logger.warn("{} starrocks node params is empty",editFlowRequest.getTitle());
+                return;
+            }
+
+            JsonObject params = JsonParser.parseString(editFlowRequest.getParams()).getAsJsonObject();
+
+            handleFlowJsonParams(params);
+
+            JsonObject configuration = params.get("configuration").getAsJsonObject();
+
+            JsonObject runtime= configuration.get("runtime").getAsJsonObject();
+
+            JsonElement executeCluster = runtime.get("executeCluster");
+
+
+            if(executeCluster == null || executeCluster.isJsonNull()){
+                logger.warn("{} starrocks node , executeCluster value is empty",editFlowRequest.getTitle());
+                return;
+            }
+
+            String clusterName = executeCluster.getAsString();
+
+            DSSStarRocksCluster dssStarRocksCluster = starRocksClusterMap.get(clusterName);
+
+            if(dssStarRocksCluster == null){
+                logger.warn("{} starrocks node , executeCluster value is {}, not find cluster info",
+                        editFlowRequest.getTitle(),clusterName);
+                return;
+            }
+
+            JsonElement dataSourceHost = runtime.get("linkis.datasource.params.host");
+            JsonElement dataSourcePort = runtime.get("linkis.datasource.params.port");
+
+            if(dataSourceHost == null || dataSourceHost.isJsonNull()
+                    || dataSourcePort == null || dataSourcePort.isJsonNull()){
+
+                runtime.addProperty("linkis.datasource.params.host", dssStarRocksCluster.getClusterIp());
+                runtime.addProperty("linkis.datasource.params.port", dssStarRocksCluster.getTcpPort());
+                runtime.addProperty("linkis.datasource.type", "starrocks");
+                logger.info("{} starrocks node params is {}",editFlowRequest.getTitle(),params.toString());
+                editFlowRequest.setParams(params.toString());
+            }
+
+            logger.info("{} starrocks node, handle after params is {}",editFlowRequest.getTitle(), editFlowRequest.getParams());
+
+        }catch (Exception e){
+            logger.error("{} starrocks node update  params fail, error message is [{}]",
+                    editFlowRequest.getTitle(),e.getMessage(),e);
+        }
+
+    }
+
+    private List<DSSStarRocksCluster> getStarRocksCluster(Workspace workspace){
+
+       try {
+
+           StarRocksClusterListResponse response = RpcAskUtils.processAskException(DSSSenderServiceFactory.getOrCreateServiceInstance()
+                           .getProjectServerSender().ask(new StarRocksClusterListRequest(workspace.getWorkspaceId())),
+                   StarRocksClusterListResponse.class, StarRocksClusterListRequest.class);
+
+           return response.getList();
+
+       }catch (Exception e){
+
+           logger.error("workspace id is {}, name is {},getStarRocksCluster fail, error message is {}",
+                   workspace.getWorkspaceId(),workspace.getWorkspaceName(),e.getMessage(),e);
+       }
+
+       return new ArrayList<>();
+
+    }
+
+
+    private void handleFlowJsonParams(JsonObject params){
+
+        if(!params.has("configuration") || params.get("configuration").isJsonNull()){
+            params.add("configuration",new JsonObject());
+        }
+
+        JsonObject  configuration = params.get("configuration").getAsJsonObject();
+
+        if(!configuration.has("runtime") || configuration.get("runtime").isJsonNull()){
+            configuration.add("runtime",new JsonObject());
+        }
+
+        if(!configuration.has("special") || configuration.get("special").isJsonNull()){
+            configuration.add("special",new JsonObject());
+        }
+
+        if(!configuration.has("startup") || configuration.get("startup").isJsonNull()){
+            configuration.add("startup",new JsonObject());
+        }
+
     }
 
 }

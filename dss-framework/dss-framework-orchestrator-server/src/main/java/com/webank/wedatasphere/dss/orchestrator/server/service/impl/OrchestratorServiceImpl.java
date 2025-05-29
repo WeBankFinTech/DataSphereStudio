@@ -167,6 +167,10 @@ public class OrchestratorServiceImpl implements OrchestratorService {
                     return ((RefCreationOperation) developmentOperation).createRef(requestRef);
                 }, "create");
 
+
+        // 添加前 需判断是否存在相同的编排名称,防止短时间内两个相同名称的工作流添加
+        isExistSameNameBeforeCreate(workspace.getWorkspaceId(), projectId, dssOrchestratorInfo.getName());
+
         //2.往数据库插入一条DSS编排模式
         orchestratorMapper.addOrchestrator(dssOrchestratorInfo);
 

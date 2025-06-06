@@ -371,17 +371,20 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         orchestratorVo.setOrchestratorName(orchestratorInfo.getName());
         orchestratorVo.setOrchestratorId(orchestratorInfoId);
 
-        // 同步更新flowJson
-        List<NodeContentDO> contentDOS = nodeContentMapper.getContentListByOrchestratorIdAndFlowId(orchestratorInfoId, versionById.getAppId());
-        if (CollectionUtils.isEmpty(contentDOS)) {
-            return orchestratorVo;
+        if(versionById != null){
+            // 同步更新flowJson
+            List<NodeContentDO> contentDOS = nodeContentMapper.getContentListByOrchestratorIdAndFlowId(orchestratorInfoId, versionById.getAppId());
+            if (CollectionUtils.isEmpty(contentDOS)) {
+                return orchestratorVo;
+            }
+            List<Long> contentIdList = contentDOS.stream().map(NodeContentDO::getId).collect(Collectors.toList());
+            nodeContentMapper.deleteNodeContentByOrchestratorIdAndFlowId(orchestratorInfoId, versionById.getAppId());
+            if (CollectionUtils.isNotEmpty(contentIdList)) {
+                nodeContentUIMapper.deleteNodeContentUIByContentList(contentIdList);
+            }
+            nodeMetaMapper.deleteNodeMetaByOrchestratorId(orchestratorInfoId);
         }
-        List<Long> contentIdList = contentDOS.stream().map(NodeContentDO::getId).collect(Collectors.toList());
-        nodeContentMapper.deleteNodeContentByOrchestratorIdAndFlowId(orchestratorInfoId, versionById.getAppId());
-        if (CollectionUtils.isNotEmpty(contentIdList)) {
-            nodeContentUIMapper.deleteNodeContentUIByContentList(contentIdList);
-        }
-        nodeMetaMapper.deleteNodeMetaByOrchestratorId(orchestratorInfoId);
+
         return orchestratorVo;
     }
 

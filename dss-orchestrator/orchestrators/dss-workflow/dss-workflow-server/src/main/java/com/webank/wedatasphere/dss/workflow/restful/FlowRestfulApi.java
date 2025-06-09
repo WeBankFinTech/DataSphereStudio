@@ -24,6 +24,7 @@ import com.webank.wedatasphere.dss.common.StaffInfo;
 import com.webank.wedatasphere.dss.common.StaffInfoGetter;
 import com.webank.wedatasphere.dss.common.auditlog.OperateTypeEnum;
 import com.webank.wedatasphere.dss.common.auditlog.TargetTypeEnum;
+import com.webank.wedatasphere.dss.common.entity.node.DSSNodeDefault;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
@@ -429,6 +430,44 @@ public class FlowRestfulApi {
             return Message.error(String.format("%s 节点编辑失败，原因为：%s",nodeName , e.getMessage()));
         }
         return Message.ok(String.format("%s 节点编辑成功",nodeName));
+    }
+
+
+    @RequestMapping(value = "/batchEditNodeContent",method = RequestMethod.POST)
+    public Message batchEditNodeContent(@RequestBody BatchEditNodeContentRequest batchEditNodeContentRequest){
+
+        String userName = SecurityFilter.getLoginUsername(httpServletRequest);
+
+        try {
+
+            Cookie[] cookies = httpServletRequest.getCookies();
+            String ticketId = Arrays.stream(cookies).filter(cookie -> DSSWorkFlowConstant.BDP_USER_TICKET_ID.equals(cookie.getName())).findFirst().map(Cookie::getValue).get();
+
+
+
+        }catch (Exception e){
+            LOGGER.error("批量编辑节点失败", e);
+            return Message.error(String.format("批量编辑节点失败，原因为：%s" , e.getMessage()));
+        }
+
+        return  Message.ok("批量编辑节点成功");
+    }
+
+
+    @RequestMapping(value = "/getNodeInfoByName",method = RequestMethod.POST)
+    public Message getNodeInfoByName(@RequestBody QueryNodeInfoByNameRequest queryNodeInfoByNameRequest){
+
+        List<DSSNodeDefault> dssNodeDefaultList = new ArrayList<>();
+        try {
+
+            dssNodeDefaultList = flowService.getNodeInfoByName(queryNodeInfoByNameRequest);
+
+        }catch (Exception e){
+            LOGGER.error("获取节点信息失败", e);
+            return Message.error(String.format("获取节点信息失败，原因为：%s" , e.getMessage()));
+        }
+
+        return Message.ok("获取节点信息成功").data("data",dssNodeDefaultList);
     }
 
 }

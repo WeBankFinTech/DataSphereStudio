@@ -16,6 +16,7 @@
 
 package com.webank.wedatasphere.dss.workflow.service;
 
+import com.webank.wedatasphere.dss.common.entity.node.DSSNodeDefault;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
@@ -126,5 +127,10 @@ public interface DSSFlowService {
     void getRootFlowProxy(DSSFlow dssFlow);
 
     void editNodeContent(EditNodeContentRequest editNodeContentRequest,String ticketId) throws Exception;
+
+    void batchEditNodeContent(BatchEditNodeContentRequest batchEditNodeContentRequest,String ticketId,String username) throws Exception;
+
+
+    List<DSSNodeDefault> getNodeInfoByName(QueryNodeInfoByNameRequest queryNodeInfoByNameRequest);
 
 }

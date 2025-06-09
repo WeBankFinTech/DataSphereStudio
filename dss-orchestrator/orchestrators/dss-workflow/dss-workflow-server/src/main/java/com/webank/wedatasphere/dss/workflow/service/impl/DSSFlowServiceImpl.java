@@ -39,6 +39,7 @@ import com.webank.wedatasphere.dss.common.protocol.workspace.StarRocksClusterLis
 import com.webank.wedatasphere.dss.common.utils.*;
 import com.webank.wedatasphere.dss.contextservice.service.ContextService;
 import com.webank.wedatasphere.dss.contextservice.service.impl.ContextServiceImpl;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.*;
@@ -2933,6 +2934,14 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                 dssProject.getWorkspaceName(),dssProject.getName(),null);
     }
 
+
+    public void batchEditNodeContent(BatchEditNodeContentRequest batchEditNodeContentRequest,String ticketId,String username) throws Exception {
+
+        
+
+
+    }
+
     public DSSFlow getFLowByNode(DSSFlow dssFlow,String nodeName){
 
         List<DSSNodeDefault> nodeList = DSSCommonUtils.getWorkFlowNodes(dssFlow.getFlowJson());
@@ -3274,6 +3283,63 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         if(!configuration.has("startup") || configuration.get("startup").isJsonNull()){
             configuration.add("startup",new JsonObject());
         }
+
+    }
+
+
+    @Override
+    public List<DSSNodeDefault> getNodeInfoByName(QueryNodeInfoByNameRequest queryNodeInfoByNameRequest){
+
+        Long orchestratorId = queryNodeInfoByNameRequest.getOrchestratorId();
+        List<String> nodeNameList = queryNodeInfoByNameRequest.getNodeNameList();
+        if(CollectionUtils.isEmpty(nodeNameList)){
+            DSSExceptionUtils.dealErrorException(90003, "查找的节点列表为空", DSSErrorException.class);
+        }
+
+        List<DSSNodeDefault> dssNodeDefaultList = new ArrayList<>();
+        RequestQueryByIdOrchestrator RequestQueryByIdOrchestrator =  new  RequestQueryByIdOrchestrator();
+        RequestQueryByIdOrchestrator.setOrchestratorId(orchestratorId);
+
+        OrchestratorVo orchestratorVo = RpcAskUtils.processAskException(getOrchestratorSender().ask(RequestQueryByIdOrchestrator),
+                OrchestratorVo.class, RequestQueryByIdOrchestrator.class);
+
+        if(orchestratorVo == null || orchestratorVo.getDssOrchestratorInfo() == null || orchestratorVo.getDssOrchestratorVersion() == null){
+
+            DSSExceptionUtils.dealErrorException(90003, "工作流不存在", DSSErrorException.class);
+        }
+
+        DSSOrchestratorVersion dssOrchestratorVersion = orchestratorVo.getDssOrchestratorVersion();
+        DSSOrchestratorInfo dssOrchestratorInfo = orchestratorVo.getDssOrchestratorInfo();
+
+        // 获取主工作流下的节点和所有子工作流
+        DSSFlow rootFlow = genDSSFlowTree(dssOrchestratorVersion.getAppId());
+        for(String nodeName: nodeNameList){
+
+            // 获取节点所属工作流
+            DSSFlow flow = getFLowByNode(rootFlow,nodeName);
+
+            if(flow == null){
+                logger.error("dssOrchestratorInfo is [{},{}],not find flow info by {} node ",dssOrchestratorInfo.getName(),
+                        dssOrchestratorInfo.getId(),nodeName);
+                DSSExceptionUtils.dealErrorException(90003, String.format("%s 工作流中未找到%s节点信息",
+                        dssOrchestratorInfo.getName(),nodeName), DSSErrorException.class);
+            }
+
+            DSSNodeDefault dssNodeDefault = getNode(flow,nodeName);
+
+            if(dssNodeDefault == null){
+                logger.error("dssOrchestratorInfo is [{},{}], not find {} node, flow is [{},{}] ",dssOrchestratorInfo.getName(),
+                        dssOrchestratorInfo.getId(),nodeName,flow.getName(),flow.getId());
+                DSSExceptionUtils.dealErrorException(90003,
+                        String.format("%s 工作流下未找到 %s 节点",dssOrchestratorInfo.getName(),nodeName), DSSErrorException.class);
+            }
+
+            dssNodeDefaultList.add(dssNodeDefault);
+
+        }
+
+
+        return dssNodeDefaultList;
 
     }
 

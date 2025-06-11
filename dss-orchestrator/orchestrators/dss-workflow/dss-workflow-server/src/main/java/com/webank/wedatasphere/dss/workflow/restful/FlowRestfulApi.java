@@ -442,7 +442,7 @@ public class FlowRestfulApi {
         try {
 
             if(batchEditNodeContentRequest  == null){
-                return Message.error(String.format("批量编辑节点失败,输入参数为空"));
+                return Message.error("批量编辑节点失败,输入参数为空");
             }
 
             Cookie[] cookies = httpServletRequest.getCookies();
@@ -452,7 +452,7 @@ public class FlowRestfulApi {
             BatchEditNodeContentResponse batchEditNodeContentResponse = flowService.batchEditNodeContent(batchEditNodeContentRequest,ticketId);
 
             if(batchEditNodeContentResponse !=null && !CollectionUtils.isNotEmpty(batchEditNodeContentResponse.getFailNodeName())){
-                return Message.error(String.format("批量编辑节点失败")).data("data",batchEditNodeContentResponse);
+                return Message.error("批量编辑节点失败").data("data",batchEditNodeContentResponse);
             }
 
             return  Message.ok("批量编辑节点完成").data("data",batchEditNodeContentResponse);

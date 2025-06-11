@@ -128,7 +128,7 @@ public interface DSSFlowService {
 
     void editNodeContent(EditNodeContentRequest editNodeContentRequest,String ticketId) throws Exception;
 
-    void batchEditNodeContent(BatchEditNodeContentRequest batchEditNodeContentRequest,String ticketId,String username) throws Exception;
+    void batchEditNodeContent(BatchEditNodeContentRequest batchEditNodeContentRequest,String ticketId) throws Exception;
 
 
     List<DSSNodeDefault> getNodeInfoByName(QueryNodeInfoByNameRequest queryNodeInfoByNameRequest);

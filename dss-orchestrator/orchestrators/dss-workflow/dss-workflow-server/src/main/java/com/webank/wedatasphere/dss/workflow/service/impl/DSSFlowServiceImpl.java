@@ -92,6 +92,7 @@ import org.apache.linkis.cs.client.utils.SerializeHelper;
 import org.apache.linkis.cs.common.utils.CSCommonUtils;
 import org.apache.linkis.rpc.Sender;
 import org.apache.linkis.server.BDPJettyServerHelper;
+import org.apache.linkis.server.Message;
 import org.apache.linkis.storage.script.*;
 import org.apache.linkis.storage.script.writer.StorageScriptFsWriter;
 import org.slf4j.Logger;
@@ -2924,21 +2925,129 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
             updateNodeContent(flow,nodeName,nodeContent,nodeMetadata,dssProject.getName(),username);
 
+            saveFlow(flow.getId(),flow.getFlowJson(),flow.getDescription(),flow.getCreator(),
+                    dssProject.getWorkspaceName(),dssProject.getName(),null);
+
+        }catch (Exception e){
+            logger.error("保存工作流失败", e);
+            throw new DSSErrorException(80001,"保存失败，原因为：" + e.getMessage());
         } finally {
             // 解锁工作流
             workFlowManager.unlockWorkflow(username,dssOrchestratorVersion.getAppId(),true,workspace);
         }
 
 
-        saveFlow(flow.getId(),flow.getFlowJson(),flow.getDescription(),flow.getCreator(),
-                dssProject.getWorkspaceName(),dssProject.getName(),null);
     }
 
 
-    public void batchEditNodeContent(BatchEditNodeContentRequest batchEditNodeContentRequest,String ticketId,String username) throws Exception {
+    @Override
+    public void batchEditNodeContent(BatchEditNodeContentRequest batchEditNodeContentRequest,String ticketId) throws Exception {
 
-        
+        String username = batchEditNodeContentRequest.getUsername();
+        Long projectId = batchEditNodeContentRequest.getProjectId();
+        Long workspaceId = batchEditNodeContentRequest.getWorkspaceId();
+        Long orchestratorId = batchEditNodeContentRequest.getOrchestratorId();
+        List<BatchEditNodeContentRequest.NodeContent> nodeContentList = batchEditNodeContentRequest.getNodeContentList();
 
+        // 鉴权
+        DSSProject  dssProject = validateOperation(projectId,username);
+
+        if(!workspaceId.equals(Long.valueOf(dssProject.getWorkspaceId()))){
+            DSSExceptionUtils.dealErrorException(90003, "传入的工作空间与项目所属工作空间不一致", DSSErrorException.class);
+        }
+
+        // 判断是否有传入更新的节点信息
+        if(CollectionUtils.isEmpty(nodeContentList)){
+            DSSExceptionUtils.dealErrorException(90003, "未输入需要更新的节点信息", DSSErrorException.class);
+        }
+
+
+        RequestQueryByIdOrchestrator RequestQueryByIdOrchestrator =  new  RequestQueryByIdOrchestrator();
+        RequestQueryByIdOrchestrator.setOrchestratorId(orchestratorId);
+
+        OrchestratorVo orchestratorVo = RpcAskUtils.processAskException(getOrchestratorSender().ask(RequestQueryByIdOrchestrator),
+                OrchestratorVo.class, RequestQueryByIdOrchestrator.class);
+
+        if(orchestratorVo == null || orchestratorVo.getDssOrchestratorInfo() == null
+                || orchestratorVo.getDssOrchestratorVersion() == null){
+
+            DSSExceptionUtils.dealErrorException(90003, "工作流不存在", DSSErrorException.class);
+        }
+
+        Workspace workspace = new Workspace();
+        workspace.setWorkspaceId(workspaceId);
+        workspace.setWorkspaceName(dssProject.getWorkspaceName());
+
+        DSSOrchestratorVersion dssOrchestratorVersion = orchestratorVo.getDssOrchestratorVersion();
+        DSSOrchestratorInfo dssOrchestratorInfo = orchestratorVo.getDssOrchestratorInfo();
+
+
+
+        // 获取主工作流下的节点和所有子工作流
+        DSSFlow rootFlow = genDSSFlowTree(dssOrchestratorVersion.getAppId());
+
+        // 校验工作流是否锁定
+        DSSFlowEditLock flowEditLock = lockMapper.getFlowEditLockByID(dssOrchestratorVersion.getAppId());
+        if (flowEditLock != null && !flowEditLock.getOwner().equals(ticketId)) {
+            throw new DSSErrorException(80001, "当前工作流" + rootFlow.getName() +"被用户" + flowEditLock.getUsername() + "已锁定编辑，您编辑的内容不能再被保存。如有疑问，请与" + flowEditLock.getUsername() + "确认");
+        }
+
+        try {
+
+            Map<Long,DSSFlow> flowMap = new HashMap<>();
+            Set<String> nodeNameSet = new HashSet<>();
+            // 查找出节点所属的工作流 并分组
+            for(BatchEditNodeContentRequest.NodeContent nodeContent: nodeContentList){
+
+                if(StringUtils.isEmpty(nodeContent.getNodeContent()) && MapUtils.isEmpty(nodeContent.getNodeMetadata())){
+                    DSSExceptionUtils.dealErrorException(90003,
+                            String.format("节点内容和节点配置信息都为空,%s节点不做更新",nodeContent.getNodeName()), DSSErrorException.class);
+                }
+
+
+                if(nodeNameSet.contains(nodeContent.getNodeName())){
+                    DSSExceptionUtils.dealErrorException(90003,
+                            String.format("%s节点信息重复,检查节点信息后重新编辑",nodeContent.getNodeName()), DSSErrorException.class);
+                }
+
+                nodeNameSet.add(nodeContent.getNodeName());
+
+                DSSFlow flow = getFLowByNode(rootFlow,nodeContent.getNodeName());
+
+                if(flow == null){
+                    DSSExceptionUtils.dealErrorException(90003,
+                            String.format("%s工作流下未找到%s节点",dssOrchestratorInfo.getName(),nodeContent.getNodeName()), DSSErrorException.class);
+                }
+
+                if(flowMap.containsKey(flow.getId())){
+                    flow = flowMap.get(flow.getId());
+                }
+
+                updateNodeContent(flow,nodeContent.getNodeName(),nodeContent.getNodeContent(),nodeContent.getNodeMetadata(),
+                        dssProject.getName(),username);
+
+                flowMap.put(flow.getId(),flow);
+
+            }
+
+            // 保存工作流
+            for(Long flowId: flowMap.keySet()){
+
+                DSSFlow dssFlow = flowMap.get(flowId);
+                logger.info("orchestrator is [{},{}],flow is [{},{}],update dssFlow json is {}",
+                        dssOrchestratorInfo.getName(),dssOrchestratorInfo.getId(),
+                        flowId,dssFlow.getName(),
+                        dssFlow.getFlowJson());
+                saveFlow(flowId,dssFlow.getFlowJson(),username,dssFlow.getDescription(),
+                        dssProject.getWorkspaceName(),dssProject.getName(),null);
+            }
+
+        }catch (Exception e){
+            logger.error("保存工作流失败", e);
+            throw new DSSErrorException(80001,"保存失败，原因为：" + e.getMessage());
+        }finally {
+            workFlowManager.unlockWorkflow(username,dssOrchestratorVersion.getAppId(),true,workspace);
+        }
 
     }
 

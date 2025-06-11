@@ -2961,41 +2961,32 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             DSSExceptionUtils.dealErrorException(90003, "未输入需要更新的节点信息", DSSErrorException.class);
         }
 
+        // 查看是否有重复的节点信息
+        checkDuplicateNodeNames(nodeContentList);
 
-        RequestQueryByIdOrchestrator RequestQueryByIdOrchestrator =  new  RequestQueryByIdOrchestrator();
-        RequestQueryByIdOrchestrator.setOrchestratorId(orchestratorId);
+        // 获取工作流信息
+        OrchestratorVo orchestratorVo = getOrchestratorVo(orchestratorId);
+        validateOrchestratorVo(orchestratorVo);
 
-        OrchestratorVo orchestratorVo = RpcAskUtils.processAskException(getOrchestratorSender().ask(RequestQueryByIdOrchestrator),
-                OrchestratorVo.class, RequestQueryByIdOrchestrator.class);
-
-        if(orchestratorVo == null || orchestratorVo.getDssOrchestratorInfo() == null
-                || orchestratorVo.getDssOrchestratorVersion() == null){
-
-            DSSExceptionUtils.dealErrorException(90003, "工作流不存在", DSSErrorException.class);
-        }
+        DSSOrchestratorVersion dssOrchestratorVersion = orchestratorVo.getDssOrchestratorVersion();
+        DSSOrchestratorInfo dssOrchestratorInfo = orchestratorVo.getDssOrchestratorInfo();
 
         Workspace workspace = new Workspace();
         workspace.setWorkspaceId(workspaceId);
         workspace.setWorkspaceName(dssProject.getWorkspaceName());
 
-        DSSOrchestratorVersion dssOrchestratorVersion = orchestratorVo.getDssOrchestratorVersion();
-        DSSOrchestratorInfo dssOrchestratorInfo = orchestratorVo.getDssOrchestratorInfo();
-
-
-
         // 获取主工作流下的节点和所有子工作流
         DSSFlow rootFlow = genDSSFlowTree(dssOrchestratorVersion.getAppId());
 
         // 校验工作流是否锁定
-        DSSFlowEditLock flowEditLock = lockMapper.getFlowEditLockByID(dssOrchestratorVersion.getAppId());
-        if (flowEditLock != null && !flowEditLock.getOwner().equals(ticketId)) {
-            throw new DSSErrorException(80001, "当前工作流" + rootFlow.getName() +"被用户" + flowEditLock.getUsername() + "已锁定编辑，您编辑的内容不能再被保存。如有疑问，请与" + flowEditLock.getUsername() + "确认");
-        }
+        validateFlowLock(rootFlow, ticketId);
+
+        // 锁定工作流
+        lockFlow(rootFlow, username, ticketId);
 
         try {
 
             Map<Long,DSSFlow> flowMap = new HashMap<>();
-            Set<String> nodeNameSet = new HashSet<>();
             // 查找出节点所属的工作流 并分组
             for(BatchEditNodeContentRequest.NodeContent nodeContent: nodeContentList){
 
@@ -3003,14 +2994,6 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                     DSSExceptionUtils.dealErrorException(90003,
                             String.format("节点内容和节点配置信息都为空,%s节点不做更新",nodeContent.getNodeName()), DSSErrorException.class);
                 }
-
-
-                if(nodeNameSet.contains(nodeContent.getNodeName())){
-                    DSSExceptionUtils.dealErrorException(90003,
-                            String.format("%s节点信息重复,检查节点信息后重新编辑",nodeContent.getNodeName()), DSSErrorException.class);
-                }
-
-                nodeNameSet.add(nodeContent.getNodeName());
 
                 DSSFlow flow = getFLowByNode(rootFlow,nodeContent.getNodeName());
 
@@ -3049,6 +3032,62 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             workFlowManager.unlockWorkflow(username,dssOrchestratorVersion.getAppId(),true,workspace);
         }
 
+    }
+
+    /**
+     * 校验工作流是否锁定
+     * @param rootFlow 根工作流对象
+     * @param ticketId 票据 ID
+     * @throws DSSErrorException 工作流被锁定时抛出异常
+     */
+    private void validateFlowLock(DSSFlow rootFlow, String ticketId) throws DSSErrorException {
+        DSSFlowEditLock flowEditLock = lockMapper.getFlowEditLockByID(rootFlow.getId());
+        if (flowEditLock != null && !flowEditLock.getOwner().equals(ticketId)) {
+            throw new DSSErrorException(80001, "当前工作流" + rootFlow.getName() + "被用户" + flowEditLock.getUsername() + "已锁定编辑，您编辑的内容不能再被保存。如有疑问，请与" + flowEditLock.getUsername() + "确认");
+        }
+    }
+
+
+    /**
+     * 检查节点名称是否重复
+     * @param nodeContentList 节点内容列表
+     * @throws DSSErrorException 存在重复节点名称时抛出异常
+     */
+    private void checkDuplicateNodeNames(List<BatchEditNodeContentRequest.NodeContent> nodeContentList) throws DSSErrorException {
+        Set<String> nodeNameSet = new HashSet<>();
+        for (BatchEditNodeContentRequest.NodeContent nodeContent : nodeContentList) {
+            if (nodeNameSet.contains(nodeContent.getNodeName())) {
+                DSSExceptionUtils.dealErrorException(90003,
+                        String.format("%s节点信息重复,检查节点信息后重新编辑", nodeContent.getNodeName()), DSSErrorException.class);
+            }
+            nodeNameSet.add(nodeContent.getNodeName());
+        }
+    }
+
+
+    /**
+     * 获取工作流信息
+     * @param orchestratorId 编排器 ID
+     * @return 工作流信息对象
+     * @throws DSSErrorException 获取失败时抛出异常
+     */
+    private OrchestratorVo getOrchestratorVo(Long orchestratorId) throws DSSErrorException {
+        RequestQueryByIdOrchestrator requestQueryByIdOrchestrator = new RequestQueryByIdOrchestrator();
+        requestQueryByIdOrchestrator.setOrchestratorId(orchestratorId);
+        return RpcAskUtils.processAskException(getOrchestratorSender().ask(requestQueryByIdOrchestrator),
+                OrchestratorVo.class, RequestQueryByIdOrchestrator.class);
+    }
+
+    /**
+     * 验证工作流信息是否有效
+     * @param orchestratorVo 工作流信息对象
+     * @throws DSSErrorException 验证失败时抛出异常
+     */
+    private void validateOrchestratorVo(OrchestratorVo orchestratorVo) throws DSSErrorException {
+        if (orchestratorVo == null || orchestratorVo.getDssOrchestratorInfo() == null
+                || orchestratorVo.getDssOrchestratorVersion() == null) {
+            DSSExceptionUtils.dealErrorException(90003, "工作流不存在", DSSErrorException.class);
+        }
     }
 
     public DSSFlow getFLowByNode(DSSFlow dssFlow,String nodeName){

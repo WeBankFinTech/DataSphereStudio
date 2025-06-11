@@ -24,4 +24,13 @@ public class QueryNodeInfoByNameRequest {
     public void setNodeNameList(List<String> nodeNameList) {
         this.nodeNameList = nodeNameList;
     }
+
+
+    @Override
+    public String toString() {
+        return "QueryNodeInfoByNameRequest{" +
+                "orchestratorId=" + orchestratorId +
+                ", nodeNameList=" + nodeNameList +
+                '}';
+    }
 }

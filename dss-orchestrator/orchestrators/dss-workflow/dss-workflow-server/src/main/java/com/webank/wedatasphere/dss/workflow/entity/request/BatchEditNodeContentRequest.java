@@ -93,4 +93,13 @@ public class BatchEditNodeContentRequest {
     }
 
 
+    @Override
+    public String toString() {
+        return "BatchEditNodeContentRequest{" +
+                "workspaceId=" + workspaceId +
+                ", projectId=" + projectId +
+                ", orchestratorId=" + orchestratorId +
+                ", username='" + username + '\'' +
+                '}';
+    }
 }

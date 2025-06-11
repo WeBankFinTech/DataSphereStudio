@@ -44,6 +44,7 @@ import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
 import com.webank.wedatasphere.dss.workflow.dao.LockMapper;
 import com.webank.wedatasphere.dss.workflow.entity.DSSFlowEditLock;
 import com.webank.wedatasphere.dss.workflow.entity.request.*;
+import com.webank.wedatasphere.dss.workflow.entity.response.BatchEditNodeContentResponse;
 import com.webank.wedatasphere.dss.workflow.entity.vo.ExtraToolBarsVO;
 import com.webank.wedatasphere.dss.workflow.lock.DSSFlowEditLockManager;
 import com.webank.wedatasphere.dss.common.service.BMLService;
@@ -448,14 +449,19 @@ public class FlowRestfulApi {
             String ticketId = Arrays.stream(cookies).filter(cookie -> DSSWorkFlowConstant.BDP_USER_TICKET_ID.equals(cookie.getName())).findFirst().map(Cookie::getValue).get();
             batchEditNodeContentRequest.setUsername(userName);
             LOGGER.info("batchEditNodeContent params is {}",batchEditNodeContentRequest);
-            flowService.batchEditNodeContent(batchEditNodeContentRequest,ticketId);
+            BatchEditNodeContentResponse batchEditNodeContentResponse = flowService.batchEditNodeContent(batchEditNodeContentRequest,ticketId);
 
+            if(batchEditNodeContentResponse !=null && !CollectionUtils.isNotEmpty(batchEditNodeContentResponse.getFailNodeName())){
+                return Message.error(String.format("批量编辑节点失败")).data("data",batchEditNodeContentResponse);
+            }
+
+            return  Message.ok("批量编辑节点完成").data("data",batchEditNodeContentResponse);
         }catch (Exception e){
             LOGGER.error("批量编辑节点失败", e);
             return Message.error(String.format("批量编辑节点失败，原因为：%s" , e.getMessage()));
         }
 
-        return  Message.ok("批量编辑节点成功");
+
     }
 
 

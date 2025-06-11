@@ -2941,7 +2941,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
 
     @Override
-    public void batchEditNodeContent(BatchEditNodeContentRequest batchEditNodeContentRequest,String ticketId) throws Exception {
+    public BatchEditNodeContentResponse batchEditNodeContent(BatchEditNodeContentRequest batchEditNodeContentRequest,String ticketId) throws Exception {
 
         String username = batchEditNodeContentRequest.getUsername();
         Long projectId = batchEditNodeContentRequest.getProjectId();
@@ -2981,12 +2981,18 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         // 校验工作流是否锁定
         validateFlowLock(rootFlow, ticketId);
 
+        BatchEditNodeContentResponse batchEditNodeContentResponse = new BatchEditNodeContentResponse();
+        batchEditNodeContentResponse.setOrchestratorId(dssOrchestratorInfo.getId());
+        batchEditNodeContentResponse.setOrchestratorName(dssOrchestratorInfo.getName());
+
         // 锁定工作流
         lockFlow(rootFlow, username, ticketId);
 
         try {
 
             Map<Long,DSSFlow> flowMap = new HashMap<>();
+
+            Map<Long,List<String>> flowNodeMap = new HashMap<>();
             // 查找出节点所属的工作流 并分组
             for(BatchEditNodeContentRequest.NodeContent nodeContent: nodeContentList){
 
@@ -3011,26 +3017,41 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
                 flowMap.put(flow.getId(),flow);
 
+                flowNodeMap.getOrDefault(flow.getId(), new ArrayList<>()).add(nodeContent.getNodeName());
+
             }
+
 
             // 保存工作流
             for(Long flowId: flowMap.keySet()){
 
-                DSSFlow dssFlow = flowMap.get(flowId);
-                logger.info("orchestrator is [{},{}],flow is [{},{}],update dssFlow json is {}",
-                        dssOrchestratorInfo.getName(),dssOrchestratorInfo.getId(),
-                        flowId,dssFlow.getName(),
-                        dssFlow.getFlowJson());
-                saveFlow(flowId,dssFlow.getFlowJson(),username,dssFlow.getDescription(),
-                        dssProject.getWorkspaceName(),dssProject.getName(),null);
+                try {
+                    DSSFlow dssFlow = flowMap.get(flowId);
+                    logger.info("orchestrator is [{},{}],flow is [{},{}],update dssFlow json is {}",
+                            dssOrchestratorInfo.getName(),dssOrchestratorInfo.getId(),
+                            flowId,dssFlow.getName(),
+                            dssFlow.getFlowJson());
+                    saveFlow(flowId,dssFlow.getFlowJson(),username,dssFlow.getDescription(),
+                            dssProject.getWorkspaceName(),dssProject.getName(),null);
+
+                    batchEditNodeContentResponse.setSuccessNodeName(flowNodeMap.get(flowId));
+                }catch (Exception e){
+                    batchEditNodeContentResponse.setFailNodeName(flowNodeMap.get(flowId));
+                    batchEditNodeContentResponse.setErrorMsg(e.getMessage());
+                    logger.error("保存工作流失败", e);
+                    break;
+                }
+
             }
 
         }catch (Exception e){
-            logger.error("保存工作流失败", e);
+            logger.error("保存编排失败", e);
             throw new DSSErrorException(80001,"保存失败，原因为：" + e.getMessage());
         }finally {
             workFlowManager.unlockWorkflow(username,dssOrchestratorVersion.getAppId(),true,workspace);
         }
+        
+        return batchEditNodeContentResponse;
 
     }
 

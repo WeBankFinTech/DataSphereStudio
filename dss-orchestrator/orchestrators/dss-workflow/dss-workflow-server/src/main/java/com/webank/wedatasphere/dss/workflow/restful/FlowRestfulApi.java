@@ -440,9 +440,14 @@ public class FlowRestfulApi {
 
         try {
 
+            if(batchEditNodeContentRequest  == null){
+                return Message.error(String.format("批量编辑节点失败,输入参数为空"));
+            }
+
             Cookie[] cookies = httpServletRequest.getCookies();
             String ticketId = Arrays.stream(cookies).filter(cookie -> DSSWorkFlowConstant.BDP_USER_TICKET_ID.equals(cookie.getName())).findFirst().map(Cookie::getValue).get();
             batchEditNodeContentRequest.setUsername(userName);
+            LOGGER.info("batchEditNodeContent params is {}",batchEditNodeContentRequest);
             flowService.batchEditNodeContent(batchEditNodeContentRequest,ticketId);
 
         }catch (Exception e){
@@ -459,7 +464,7 @@ public class FlowRestfulApi {
 
         List<DSSNodeDefault> dssNodeDefaultList = new ArrayList<>();
         try {
-
+            LOGGER.info("getNodeInfoByName params is {}",queryNodeInfoByNameRequest);
             dssNodeDefaultList = flowService.getNodeInfoByName(queryNodeInfoByNameRequest);
 
         }catch (Exception e){

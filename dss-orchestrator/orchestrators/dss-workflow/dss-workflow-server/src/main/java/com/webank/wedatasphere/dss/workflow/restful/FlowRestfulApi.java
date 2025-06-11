@@ -451,7 +451,7 @@ public class FlowRestfulApi {
             LOGGER.info("batchEditNodeContent params is {}",batchEditNodeContentRequest);
             BatchEditNodeContentResponse batchEditNodeContentResponse = flowService.batchEditNodeContent(batchEditNodeContentRequest,ticketId);
 
-            if(batchEditNodeContentResponse !=null && !CollectionUtils.isNotEmpty(batchEditNodeContentResponse.getFailNodeName())){
+            if(batchEditNodeContentResponse !=null && CollectionUtils.isNotEmpty(batchEditNodeContentResponse.getFailNodeName())){
                 return Message.error("批量编辑节点失败").data("data",batchEditNodeContentResponse);
             }
 

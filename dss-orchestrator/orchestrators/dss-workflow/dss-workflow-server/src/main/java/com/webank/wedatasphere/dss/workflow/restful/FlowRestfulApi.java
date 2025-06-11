@@ -442,8 +442,8 @@ public class FlowRestfulApi {
 
             Cookie[] cookies = httpServletRequest.getCookies();
             String ticketId = Arrays.stream(cookies).filter(cookie -> DSSWorkFlowConstant.BDP_USER_TICKET_ID.equals(cookie.getName())).findFirst().map(Cookie::getValue).get();
-
-
+            batchEditNodeContentRequest.setUsername(userName);
+            flowService.batchEditNodeContent(batchEditNodeContentRequest,ticketId);
 
         }catch (Exception e){
             LOGGER.error("批量编辑节点失败", e);

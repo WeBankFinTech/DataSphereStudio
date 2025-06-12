@@ -3017,7 +3017,10 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
                 flowMap.put(flow.getId(),flow);
 
-                flowNodeMap.getOrDefault(flow.getId(), new ArrayList<>()).add(nodeContent.getNodeName());
+                if(!flowNodeMap.containsKey(flow.getId())){
+                    flowNodeMap.put(flow.getId(),new ArrayList<>());
+                }
+                flowNodeMap.get(flow.getId()).add(nodeContent.getNodeName());
 
             }
 

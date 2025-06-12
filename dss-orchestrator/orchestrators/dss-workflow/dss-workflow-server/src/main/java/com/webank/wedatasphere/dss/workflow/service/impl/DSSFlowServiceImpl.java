@@ -1850,23 +1850,28 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
             // 新增 Spark 相关属性筛选
             if (!StringUtils.isBlank(request.getSparkDriverMemory()) && flag) {
-                flag = request.getSparkDriverMemory().contains(dataDevelopNodeInfo.getSparkDriverMemory());
+                flag = StringUtils.isNotEmpty(dataDevelopNodeInfo.getSparkDriverMemory())
+                        && dataDevelopNodeInfo.getSparkDriverMemory().contains(request.getSparkDriverMemory());
             }
 
             if (!StringUtils.isBlank(request.getSparkExecutorMemory()) && flag) {
-                flag = request.getSparkExecutorMemory().contains(dataDevelopNodeInfo.getSparkExecutorMemory());
+                flag = StringUtils.isNotEmpty(dataDevelopNodeInfo.getSparkExecutorMemory()) &&
+                        dataDevelopNodeInfo.getSparkExecutorMemory().contains(request.getSparkExecutorMemory());
             }
 
             if (!StringUtils.isBlank(request.getSparkExecutorCore()) && flag) {
-                flag = request.getSparkExecutorCore().contains(dataDevelopNodeInfo.getSparkExecutorCore());
+                flag = StringUtils.isNotEmpty(dataDevelopNodeInfo.getSparkExecutorCore()) &&
+                        dataDevelopNodeInfo.getSparkExecutorCore().contains(request.getSparkExecutorCore());
             }
 
             if (!StringUtils.isBlank(request.getSparkConf()) && flag) {
-                flag = request.getSparkConf().contains(dataDevelopNodeInfo.getSparkConf());
+                flag = StringUtils.isNotEmpty(dataDevelopNodeInfo.getSparkConf())
+                        && dataDevelopNodeInfo.getSparkConf().contains(request.getSparkConf());
             }
 
             if (!StringUtils.isBlank(request.getSparkExecutorInstances()) && flag) {
-                flag = request.getSparkExecutorInstances().contains(dataDevelopNodeInfo.getSparkExecutorInstances());
+                flag = StringUtils.isNotEmpty(dataDevelopNodeInfo.getSparkExecutorInstances()) &&
+                        dataDevelopNodeInfo.getSparkExecutorInstances().contains(request.getSparkExecutorInstances());
             }
 
             // 新增 executeCluster 筛选

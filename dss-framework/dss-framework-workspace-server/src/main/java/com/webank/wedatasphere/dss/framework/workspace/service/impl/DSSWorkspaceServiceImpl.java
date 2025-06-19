@@ -60,6 +60,7 @@ import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.linkis.common.exception.ErrorException;
 import org.slf4j.Logger;
@@ -890,6 +891,14 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         List<DSSWorkspaceStarRocksCluster> starRocksClusters = new ArrayList<>();
         Set<String> clusterNames = new HashSet<>();
         int count = 0;
+
+        List<DSSWorkspaceStarRocksCluster> itemsByWorkspaceId = dssWorkspaceStarRocksClusterMapper.getItemsByWorkspaceId(workspaceId);
+        Map<String, DSSWorkspaceStarRocksCluster> existsClusters = new HashMap<>();
+        if(CollectionUtils.isNotEmpty(itemsByWorkspaceId)){
+            existsClusters = itemsByWorkspaceId.stream()
+                    .collect(Collectors.toMap(DSSWorkspaceStarRocksCluster::getClusterName, cluster -> cluster));
+        }
+
         for (UpdateWorkspaceStarRocksClusterRequest r : request) {
 
             if (!clusterNames.add(r.getClusterName())) {
@@ -902,9 +911,30 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
             }
 
             if (StringUtils.length(r.getClusterName()) > 256) {
-                LOGGER.warn("工作空间{}StarRocks集群名称{}超过128字符", r.getWorkspaceName(), r.getClusterName());
+                LOGGER.warn("工作空间{}StarRocks集群名称{}超过256字符", r.getWorkspaceName(), r.getClusterName());
                 throw new DSSErrorException(90054, String.format("StarRocks cluster %s length cannot exceed 256 in workspace %s", r.getClusterName(), r.getWorkspaceName()));
             }
+
+            // 已经存在的集群 不允许更改IP 和端口
+            if(existsClusters.containsKey(r.getClusterName())){
+                DSSWorkspaceStarRocksCluster dssWorkspaceStarRocksCluster = existsClusters.get(r.getClusterName());
+
+                if(ObjectUtils.notEqual(dssWorkspaceStarRocksCluster.getClusterIp(),r.getClusterIp())){
+                    LOGGER.warn("{} workspace, {} StarRocks cluster ip cannot be updated, ip is [{},{}]",r.getWorkspaceName(),r.getClusterName(),
+                            r.getClusterIp(),dssWorkspaceStarRocksCluster.getClusterIp());
+                    throw new DSSErrorException(90054, String.format("%s workspace, %s StarRocks cluster ip cannot be updated", r.getWorkspaceName(),r.getClusterName()));
+                }
+
+                if(ObjectUtils.notEqual(dssWorkspaceStarRocksCluster.getHttpPort(),r.getHttpPort())
+                        || ObjectUtils.notEqual(dssWorkspaceStarRocksCluster.getTcpPort(),r.getTcpPort())
+                ){
+                    LOGGER.warn("{} workspace, {} StarRocks cluster port cannot be updated",r.getWorkspaceName(),r.getClusterName());
+                    LOGGER.warn("tcp port is [{},{}],http port is [{},{}]",r.getTcpPort(),dssWorkspaceStarRocksCluster.getTcpPort(),
+                            r.getHttpPort(),dssWorkspaceStarRocksCluster.getHttpPort());
+                    throw new DSSErrorException(90054, String.format("%s workspace, %s StarRocks cluster port cannot be updated", r.getWorkspaceName(),r.getClusterName()));
+                }
+            }
+
 
             if (Integer.parseInt(r.getHttpPort()) < 0 || Integer.parseInt(r.getHttpPort()) > 65535 || Integer.parseInt(r.getTcpPort()) < 0 || Integer.parseInt(r.getTcpPort()) > 65535) {
                 LOGGER.warn("工作空间{}StarRocks集群端口必须在0-65535之间", r.getWorkspaceName());
@@ -928,11 +958,6 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         List<StarRocksNodeInfo> starRocksNodeInfos = dssFlowService.queryStarRocksNodeList(workspaceId);
         Set<String> executeClusterSet = starRocksNodeInfos.stream().map(StarRocksNodeInfo::getNodeUiValue).collect(Collectors.toSet());
 
-        List<DSSWorkspaceStarRocksCluster> itemsByWorkspaceId = dssWorkspaceStarRocksClusterMapper.getItemsByWorkspaceId(workspaceId);
-
-        Map<String, DSSWorkspaceStarRocksCluster> existsClusters = itemsByWorkspaceId.stream()
-                .collect(Collectors.toMap(DSSWorkspaceStarRocksCluster::getClusterName, cluster -> cluster));
-
         Map<String, UpdateWorkspaceStarRocksClusterRequest> requestCluster = request.stream().
                 collect(Collectors.toMap(UpdateWorkspaceStarRocksClusterRequest::getClusterName, r -> r));
 
@@ -946,26 +971,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
                     dssWorkspaceStarRocksClusterMapper.deleteItemById(item.getId());
                 }
             } else {
-                //如果属性有更新且该集群有被引用那么就需要更新引用该集群的starrocks节点属性信息
-                if ( executeClusterSet.contains(requestOne.getClusterName()) && (!Objects.equals(item.getClusterIp(), requestOne.getClusterIp())
-                                || !Objects.equals(item.getTcpPort(), requestOne.getTcpPort())) ) {
-                    LOGGER.info("集群{}的ip或者tcp端口信息有变更，需要修改使用该集群的节点信息", requestOne.getClusterName());
-                    List<String> nodeKeys = starRocksNodeInfos.stream().filter(s -> s.getNodeUiValue().equals(requestOne.getClusterName())).map(StarRocksNodeInfo::getNodeKey).collect(Collectors.toList());
-                    List<StarRocksNodeInfo> updateNodes = starRocksNodeInfos.stream().filter(s -> nodeKeys.contains(s.getNodeKey())).collect(Collectors.toList());
-                    DSSWorkspaceStarRocksCluster oneByClusterName = dssWorkspaceStarRocksClusterMapper.getOneByClusterName(requestOne.getClusterName());
-                    oneByClusterName.setClusterIp(requestOne.getClusterIp());
-                    oneByClusterName.setTcpPort(requestOne.getTcpPort());
-                    try {
-                        BatchEditFlowRequest editFlowRequest = getEditFlowRequest(updateNodes, oneByClusterName);
-                        dssFlowService.batchEditFlow(editFlowRequest, ticketId, workspace, userName);
-                    } catch (Exception e) {
-                        LOGGER.error("集群{}有被工作流中starrocks的节点引用，在批量修改starrocks节点使用的集群信息失败，不允许修改集群信息", requestOne.getClusterName());
-                        throw new DSSErrorException(90054, String.format("集群 %s 有被工作流中starrocks的节点引用，在批量修改starrocks节点使用的集群信息失败，不允许修改集群信息", requestOne.getClusterName()) );
-                    }
-                }
-                item.setClusterIp(requestOne.getClusterIp());
-                item.setHttpPort(requestOne.getHttpPort());
-                item.setTcpPort(requestOne.getTcpPort());
+
                 item.setDefaultCluster(requestOne.getDefaultCluster());
                 item.setUpdateUser(requestOne.getUsername());
                 item.setUpdateTime(new Date());

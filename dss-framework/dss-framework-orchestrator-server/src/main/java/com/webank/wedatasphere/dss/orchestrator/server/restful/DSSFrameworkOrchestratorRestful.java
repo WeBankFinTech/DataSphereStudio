@@ -803,10 +803,12 @@ public class DSSFrameworkOrchestratorRestful {
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         encryptCopyOrchestratorRequest.setUsername(username);
-        encryptCopyOrchestratorRequest.setAccessUser("hadoop");
+
+        if(StringUtils.isEmpty(encryptCopyOrchestratorRequest.getAccessUser())){
+            encryptCopyOrchestratorRequest.setAccessUser("hadoop");
+        }
+
         encryptCopyOrchestratorRequest.setWorkspaceId(workspace.getWorkspaceId());
-
-
 
         LOGGER.info("request encryptCopyOrchestrator body is {}",encryptCopyOrchestratorRequest);
 

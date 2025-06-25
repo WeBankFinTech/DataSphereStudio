@@ -1222,12 +1222,10 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
             // 获取原工作流的代理用户
             String proxyUser = "";
-            if (CollectionUtils.isNotEmpty(props)) {
-                for (Map<String, Object> prop : props) {
-                    if (prop.containsKey("user.to.proxy") && prop.get("user.to.proxy") != null) {
-                        proxyUser = prop.get("user.to.proxy").toString();
-                        break;
-                    }
+            for (Map<String, Object> prop : props) {
+                if (prop.containsKey("user.to.proxy") && prop.get("user.to.proxy") != null) {
+                    proxyUser = prop.get("user.to.proxy").toString();
+                    break;
                 }
             }
 

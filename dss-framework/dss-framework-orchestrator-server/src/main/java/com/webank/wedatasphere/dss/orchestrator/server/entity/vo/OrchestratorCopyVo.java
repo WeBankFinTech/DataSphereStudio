@@ -26,6 +26,8 @@ public class OrchestratorCopyVo implements Serializable {
 
     private List<String> enableNodeIdList;
 
+    private String flowProxyUser;
+
     private OrchestratorCopyVo(Builder builder) {
         this.username = builder.username;
         this.sourceProjectId = builder.sourceProjectId;
@@ -40,6 +42,7 @@ public class OrchestratorCopyVo implements Serializable {
         this.copyTaskId = builder.copyTaskId;
         this.instanceName = builder.instanceName;
         this.enableNodeIdList = builder.enableNodeIdList;
+        this.flowProxyUser = builder.flowProxyUser;
     }
 
 
@@ -59,6 +62,8 @@ public class OrchestratorCopyVo implements Serializable {
         private final String instanceName;
 
         private List<String> enableNodeIdList;
+
+        private String flowProxyUser;
 
         public Builder(String username, Long sourceProjectId, String sourceProjectName, Long targetProjectId,
                        String targetProjectName, DSSOrchestratorInfo orchestrator, String targetOrchestratorName,
@@ -80,7 +85,7 @@ public class OrchestratorCopyVo implements Serializable {
         public Builder(String username, Long sourceProjectId, String sourceProjectName, Long targetProjectId,
                        String targetProjectName, DSSOrchestratorInfo orchestrator, String targetOrchestratorName,
                        String workflowNodeSuffix, DSSLabel dssLabel, Workspace workspace, String instanceName,
-                       List<String> enableNodeIdList) {
+                       List<String> enableNodeIdList,String flowProxyUser) {
 
             this.username = username;
             this.sourceProjectId = sourceProjectId;
@@ -94,6 +99,7 @@ public class OrchestratorCopyVo implements Serializable {
             this.workspace = workspace;
             this.instanceName = instanceName;
             this.enableNodeIdList = enableNodeIdList;
+            this.flowProxyUser = flowProxyUser;
         }
 
 
@@ -162,6 +168,14 @@ public class OrchestratorCopyVo implements Serializable {
 
     public void setEnableNodeIdList(List<String> enableNodeIdList) {
         this.enableNodeIdList = enableNodeIdList;
+    }
+
+    public String getFlowProxyUser() {
+        return flowProxyUser;
+    }
+
+    public void setFlowProxyUser(String flowProxyUser) {
+        this.flowProxyUser = flowProxyUser;
     }
 }
 

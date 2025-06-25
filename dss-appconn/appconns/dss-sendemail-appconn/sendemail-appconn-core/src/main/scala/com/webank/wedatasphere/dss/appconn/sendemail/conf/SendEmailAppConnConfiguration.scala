@@ -52,5 +52,6 @@ object SendEmailAppConnConfiguration {
   val EMAIL_ENTITY_CLASSES = CommonVars("wds.dss.appconn.email.hook.entity.classes",
     "com.webank.wedatasphere.dss.appconn.sendemail.hook.entity.newvisualis.NewVisualisEmailInfo," +
       "com.webank.wedatasphere.dss.appconn.sendemail.hook.entity.visualis.VisualisEmailInfo," +
-      "com.webank.wedatasphere.dss.appconn.sendemail.hook.entity.visualis.MetaBaseEmailInfo")
+      "com.webank.wedatasphere.dss.appconn.sendemail.hook.entity.visualis.MetaBaseEmailInfo," +
+      "com.webank.wedatasphere.dss.appconn.sendemail.hook.entity.mlss.MlssEmailInfo")
 }

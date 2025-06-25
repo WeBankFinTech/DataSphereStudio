@@ -77,7 +77,8 @@ public interface WorkFlowManager {
                                      String description,
                                      List<DSSLabel> dssLabels,String nodeSuffix,
                                      String newFlowName, Long newProjectId,
-                                     List<String> enableNodeList) throws DSSErrorException, IOException;
+                                     List<String> enableNodeList,
+                                     String flowProxyUser) throws DSSErrorException, IOException;
 
 
     DSSFlow queryWorkflow(String userName, Long rootFlowId) throws DSSErrorException;

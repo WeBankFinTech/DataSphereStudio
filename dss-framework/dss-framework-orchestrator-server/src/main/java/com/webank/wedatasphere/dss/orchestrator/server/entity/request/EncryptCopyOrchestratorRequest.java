@@ -23,6 +23,8 @@ public class EncryptCopyOrchestratorRequest {
     // 查看用户
     private String accessUser;
 
+    private String flowProxyUser;
+
     public Long getWorkspaceId() {
         return workspaceId;
     }
@@ -88,6 +90,13 @@ public class EncryptCopyOrchestratorRequest {
         this.accessUser = accessUser;
     }
 
+    public String getFlowProxyUser() {
+        return flowProxyUser;
+    }
+
+    public void setFlowProxyUser(String flowProxyUser) {
+        this.flowProxyUser = flowProxyUser;
+    }
 
     @Override
     public String toString() {
@@ -100,6 +109,7 @@ public class EncryptCopyOrchestratorRequest {
                 ", copyFlowSuffix='" + copyFlowSuffix + '\'' +
                 ", copyNodeSuffix='" + copyNodeSuffix + '\'' +
                 ", accessUser='" + accessUser + '\'' +
+                ", flowProxyUser='" + flowProxyUser + '\'' +
                 '}';
     }
 }

@@ -43,7 +43,7 @@ public interface OrchestratorFrameworkService {
 
     OrchestratorUnlockVo unlockOrchestrator(String username, Workspace workspace, OrchestratorUnlockRequest request) throws DSSErrorException;
 
-    String copyOrchestrator(String username, OrchestratorCopyRequest orchestratorCopyRequest, Workspace workspace,List<String> enableNodeIdList) throws Exception;
+    String copyOrchestrator(String username, OrchestratorCopyRequest orchestratorCopyRequest, Workspace workspace,List<String> enableNodeIdList,String flowProxyUser) throws Exception;
 
     Pair<Long, List<OrchestratorCopyHistory>> getOrchestratorCopyHistory(String username, Workspace workspace, Long orchestratorId, Integer currentPage, Integer pageSize) throws Exception;
 

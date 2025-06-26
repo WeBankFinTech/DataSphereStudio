@@ -164,10 +164,11 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
     public DSSFlow copyRootFlowWithSubFlows(String userName, Long rootFlowId, Workspace workspace,
                                             String projectName, String contextIdStr, String orcVersion,
                                             String description, List<DSSLabel> dssLabels, String nodeSuffix,
-                                            String newFlowName, Long newProjectId,List<String> enableNodeList) throws DSSErrorException, IOException {
+                                            String newFlowName, Long newProjectId,List<String> enableNodeList,
+                                            String flowProxyUser) throws DSSErrorException, IOException {
         return flowService.copyRootFlow(rootFlowId, userName, workspace, projectName,
                 orcVersion, contextIdStr, description, dssLabels, nodeSuffix, newFlowName, newProjectId,
-                enableNodeList);
+                enableNodeList,flowProxyUser);
     }
 
     @Override

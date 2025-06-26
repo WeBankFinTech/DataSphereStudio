@@ -47,6 +47,7 @@ public class WorkflowRefCopyOperation
         String contextIdStr = workflowCopyRequestRef.getContextId();
         String projectName = workflowCopyRequestRef.getProjectName();
         List<String> enableNodeList = (List<String>) workflowCopyRequestRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_ENABLE_NODE);
+        String flowProxyUser = (String) workflowCopyRequestRef.getRefJobContent().get(OrchestratorRefConstant.FLOW_PROXY_USER);
         //插入version
         String version = workflowCopyRequestRef.getNewVersion();
         String description = (String) workflowCopyRequestRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_DESCRIPTION);
@@ -57,7 +58,7 @@ public class WorkflowRefCopyOperation
                 workflowCopyRequestRef.getWorkspace(), appId, contextIdStr,
                 projectName, version, description, workflowCopyRequestRef.getDSSLabels(),
                 targetProjectId, (String) nodeSuffix.orElse(null), (String) newFlowName.orElse(null),
-                enableNodeList);
+                enableNodeList,flowProxyUser);
         List<DSSLabel> dssLabels = workflowCopyRequestRef.getDSSLabels();
         Sender tempSend = DSSSenderServiceFactory.getOrCreateServiceInstance().getWorkflowSender(dssLabels);
         ResponseCopyWorkflow responseCopyWorkflow = RpcAskUtils.processAskException(tempSend.ask(requestCopyWorkflow),

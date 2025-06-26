@@ -959,7 +959,8 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     public DSSFlow copyRootFlow(Long rootFlowId, String userName, Workspace workspace,
                                 String projectName, String version, String contextIdStr,
                                 String description, List<DSSLabel> dssLabels, String nodeSuffix,
-                                String newFlowName, Long newProjectId,List<String> enableNodeList) throws DSSErrorException, IOException {
+                                String newFlowName, Long newProjectId,List<String> enableNodeList,
+                                String flowProxyUser) throws DSSErrorException, IOException {
         DSSFlow dssFlow = flowMapper.selectFlowByID(rootFlowId);
         Sender orcSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getOrcSender(dssLabels);
         OrchestratorVo orchestratorVo = RpcAskUtils.processAskException(orcSender.ask(new RequestQuertByAppIdOrchestrator(dssFlow.getId())),
@@ -968,7 +969,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         deleteFlowMetaData(orchestratorId);
         DSSFlow rootFlowWithSubFlows = copyFlowAndSetSubFlowInDB(dssFlow, userName, description, nodeSuffix, newFlowName, newProjectId);
         updateFlowJson(userName, projectName, rootFlowWithSubFlows, version, null,
-                contextIdStr, workspace, dssLabels, nodeSuffix, orchestratorId,enableNodeList);
+                contextIdStr, workspace, dssLabels, nodeSuffix, orchestratorId,enableNodeList,flowProxyUser);
         DSSFlow copyFlow = flowMapper.selectFlowByID(rootFlowWithSubFlows.getId());
         copyFlow.setFlowIdParamConfTemplateIdTuples(rootFlowWithSubFlows.getFlowIdParamConfTemplateIdTuples());
         return copyFlow;
@@ -1083,7 +1084,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     private void updateFlowJson(String userName, String projectName, DSSFlow rootFlow,
                                 String version, Long parentFlowId, String contextIdStr,
                                 Workspace workspace, List<DSSLabel> dssLabels, String nodeSuffix,
-                                Long orchestratorId,List<String> enableNodeList) throws DSSErrorException, IOException {
+                                Long orchestratorId,List<String> enableNodeList,String flowProxyUser) throws DSSErrorException, IOException {
         String flowJson = bmlService.readTextFromBML(userName, rootFlow.getResourceId(), rootFlow.getBmlVersion());
         //如果包含subflow,需要一同导入subflow内容，并更新parrentflow的json内容
         // TODO: 2020/7/31 优化update方法里面的saveContent
@@ -1096,6 +1097,11 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         if (StringUtils.isNotBlank(nodeSuffix)) {
             updateFlowJson = addFLowNodeSuffix(updateFlowJson, nodeSuffix,enableNodeList);
         }
+
+        if(StringUtils.isNotBlank(flowProxyUser)){
+            updateFlowJson = updateFlowProxyUser(updateFlowJson,flowProxyUser,orchestratorId,rootFlow);
+        }
+
         //重新上传工作流资源
         updateFlowJson = uploadFlowResourceToBml(userName, updateFlowJson, projectName, rootFlow);
         //上传节点的资源或调用appconn的copyRef
@@ -1108,7 +1114,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         if (subFlows != null) {
             for (DSSFlow subflow : subFlows) {
                 updateFlowJson(userName, projectName, subflow, version, rootFlow.getId(),
-                        contextIdStr, workspace, dssLabels, nodeSuffix, orchestratorId,enableNodeList);
+                        contextIdStr, workspace, dssLabels, nodeSuffix, orchestratorId,enableNodeList,flowProxyUser);
                 templateIds.addAll(subflow.getFlowIdParamConfTemplateIdTuples());
             }
         }
@@ -1203,6 +1209,57 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         }
         flowJson = workFlowParser.updateFlowJsonWithKey(flowJson, "edges", edgeList);
         return workFlowParser.updateFlowJsonWithKey(flowJson, "nodes", nodeList);
+    }
+
+    private String updateFlowProxyUser(String flowJson,String flowProxyUser,Long orchestratorId,DSSFlow dssFlow) throws IOException{
+
+        List<Map<String, Object>> props = DSSCommonUtils.getFlowAttribute(flowJson, "props");
+
+        logger.info("start updateFlowProxyUser, origin orchestratorId is {}, origin flow is [{},{}], flowProxyUser is {} ",
+                orchestratorId,dssFlow.getId(),dssFlow.getName(),flowProxyUser);
+
+        if (CollectionUtils.isNotEmpty(props)) {
+
+            // 获取原工作流的代理用户
+            String proxyUser = "";
+            for (Map<String, Object> prop : props) {
+                if (prop.containsKey("user.to.proxy") && prop.get("user.to.proxy") != null) {
+                    proxyUser = prop.get("user.to.proxy").toString();
+                    break;
+                }
+            }
+
+            logger.info("origin orchestratorId is {},origin flow is [{},{}], origin proxy user is {}, flowProxyUser is {}",
+                    orchestratorId,dssFlow.getId(),dssFlow.getName(),proxyUser,flowProxyUser);
+
+            // 原工作流代理用户不为空,拷贝后的工作流 代理用户信息则进行替换
+            if(StringUtils.isNotEmpty(proxyUser)){
+
+                for (Map<String, Object> prop : props) {
+                    prop.put("user.to.proxy",flowProxyUser);
+                }
+
+                flowJson = workFlowParser.updateFlowJsonWithKey(flowJson, "props", props);
+
+                Map<String,Object> scheduleParams = new HashMap<>();
+                scheduleParams.put("proxyuser",flowProxyUser);
+                flowJson = workFlowParser.updateFlowJsonWithKey(flowJson, "scheduleParams", scheduleParams);
+
+                logger.info("origin orchestratorId is {},flow is [{},{}], update proxy user  flowJson is {}",
+                        orchestratorId,dssFlow.getId(),dssFlow.getName(),flowJson);
+
+            }
+
+        }
+
+        logger.info("end updateFlowProxyUser, origin orchestratorId is {},origin flow is [{},{}],flowProxyUser is {} ",
+                orchestratorId,dssFlow.getId(),dssFlow.getName(),flowProxyUser);
+
+        return flowJson;
+
+
+
+
     }
 
     //上传工作流资源

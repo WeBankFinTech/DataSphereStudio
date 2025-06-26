@@ -38,6 +38,8 @@ public class RequestCopyWorkflow {
 
    private List<String> enableNodeList;
 
+   private String flowProxyUser;
+
     public RequestCopyWorkflow(String userName,
                                Workspace workspace,
                                Long rootFlowId,
@@ -76,7 +78,8 @@ public class RequestCopyWorkflow {
                                Long targetProjectId,
                                String nodeSuffix,
                                String newFlowName,
-                               List<String> enableNodeList) {
+                               List<String> enableNodeList,
+                               String flowProxyUser) {
 
         this.userName = userName;
         this.workspace = workspace;
@@ -90,6 +93,7 @@ public class RequestCopyWorkflow {
         this.nodeSuffix = nodeSuffix;
         this.newFlowName = newFlowName;
         this.enableNodeList = enableNodeList;
+        this.flowProxyUser = flowProxyUser;
 
     }
 
@@ -187,5 +191,13 @@ public class RequestCopyWorkflow {
 
     public void setEnableNodeList(List<String> enableNodeList) {
         this.enableNodeList = enableNodeList;
+    }
+
+    public String getFlowProxyUser() {
+        return flowProxyUser;
+    }
+
+    public void setFlowProxyUser(String flowProxyUser) {
+        this.flowProxyUser = flowProxyUser;
     }
 }

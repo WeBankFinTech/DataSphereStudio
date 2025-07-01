@@ -1224,7 +1224,9 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             String proxyUser = "";
             for (Map<String, Object> prop : props) {
                 if (prop.containsKey("user.to.proxy") && prop.get("user.to.proxy") != null) {
+                    // 代理用户不为空,替换代理用户
                     proxyUser = prop.get("user.to.proxy").toString();
+                    prop.put("user.to.proxy",flowProxyUser);
                     break;
                 }
             }
@@ -1234,10 +1236,6 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
             // 原工作流代理用户不为空,拷贝后的工作流 代理用户信息则进行替换
             if(StringUtils.isNotEmpty(proxyUser)){
-
-                for (Map<String, Object> prop : props) {
-                    prop.put("user.to.proxy",flowProxyUser);
-                }
 
                 flowJson = workFlowParser.updateFlowJsonWithKey(flowJson, "props", props);
 

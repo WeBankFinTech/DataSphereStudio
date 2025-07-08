@@ -22,10 +22,12 @@ import com.webank.wedatasphere.dss.linkis.node.execution.exception.LinkisJobExec
 import com.webank.wedatasphere.dss.linkis.node.execution.job.Job;
 import com.webank.wedatasphere.dss.linkis.node.execution.job.LinkisJob;
 import com.webank.wedatasphere.dss.linkis.node.execution.service.BuildJobAction;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.linkis.common.conf.CommonVars;
 import org.apache.linkis.manager.label.constant.LabelKeyConstant;
+import org.apache.linkis.manager.label.entity.engine.EngineType;
 import org.apache.linkis.manager.label.entity.engine.EngineTypeLabel;
 import org.apache.linkis.manager.label.utils.EngineTypeLabelCreator;
 import org.apache.linkis.protocol.constants.TaskConstant;
@@ -142,7 +144,31 @@ public class BuildJobActionImpl implements BuildJobAction {
             engineTypeLabel.setVersion(NEBULA_ENGINE_VERSION.getValue());
         }
 
-        labels.put(LabelKeyConstant.ENGINE_TYPE_KEY, engineTypeLabel.getStringValue());
+        String stringValue = engineTypeLabel.getStringValue();
+        // spark3开关开启,并且引擎是Spark
+        if(WORKFLOW_SPARK3_SWITCH.getValue() && EngineType.SPARK().toString().equalsIgnoreCase(engineTypeLabel.getEngineType())){
+
+            Map<String,Object> variableMap = TaskUtils.getVariableMap(job.getParams());
+
+            // 判断sparkVersion参数为3,则使用spark3的引擎版本,否则使用spark默认引擎版本
+            if(MapUtils.isNotEmpty(variableMap)
+                    && variableMap.get("sparkVersion")!=null
+                    && StringUtils.startsWithIgnoreCase(variableMap.get("sparkVersion").toString().trim(),"3")){
+
+                EngineTypeLabel spark3EngineType= new EngineTypeLabel();
+                spark3EngineType.setEngineType(engineTypeLabel.getEngineType());
+                spark3EngineType.setVersion(SPARK3_ENGINE_VERSION.getValue());
+                stringValue = spark3EngineType.getStringValue();
+
+                logger.info("{} job name ,spark3 engineType stringValue is {}",job.getJobName(),stringValue);
+
+            }
+
+        }
+
+        logger.info("{} job name ,engineType stringValue is {}",job.getJobName(),stringValue);
+
+        labels.put(LabelKeyConstant.ENGINE_TYPE_KEY, stringValue);
         labels.put(LabelKeyConstant.USER_CREATOR_TYPE_KEY, job.getUser() + "-" + LINKIS_JOB_CREATOR_1_X.getValue(job.getJobProps()));
         labels.put(LabelKeyConstant.CODE_TYPE_KEY, parseRunType(job.getEngineType(), job.getRunType(), job));
 

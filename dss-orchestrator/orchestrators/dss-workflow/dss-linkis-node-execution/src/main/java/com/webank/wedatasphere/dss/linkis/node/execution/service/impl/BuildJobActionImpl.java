@@ -50,7 +50,7 @@ public class BuildJobActionImpl implements BuildJobAction {
 
     private Logger logger = LoggerFactory.getLogger(BuildJobActionImpl.class);
     private static BuildJobAction buildJobAction = new BuildJobActionImpl();
-    private static final  String  NEBULA = "nebula";
+    private static final String NEBULA = "nebula";
     private static final CommonVars<String> NEBULA_ENGINE_VERSION =
             CommonVars.apply("wds.linkis.nebula.engine.version", "3.0.0");
 
@@ -140,33 +140,33 @@ public class BuildJobActionImpl implements BuildJobAction {
 
         EngineTypeLabel engineTypeLabel = EngineTypeLabelCreator.createEngineTypeLabel(parseAppConnEngineType(job.getEngineType(), job));
         //TODO 升级linkis1.7.0版本之后，这段特殊的硬编码逻辑要去掉
-        if(NEBULA.equalsIgnoreCase( engineTypeLabel.getEngineType())){
+        if (NEBULA.equalsIgnoreCase(engineTypeLabel.getEngineType())) {
             engineTypeLabel.setVersion(NEBULA_ENGINE_VERSION.getValue());
         }
 
         String stringValue = engineTypeLabel.getStringValue();
         // spark3开关开启,并且引擎是Spark
-        if(WORKFLOW_SPARK3_SWITCH.getValue() && EngineType.SPARK().toString().equalsIgnoreCase(engineTypeLabel.getEngineType())){
+        if (WORKFLOW_SPARK3_SWITCH.getValue() && EngineType.SPARK().toString().equalsIgnoreCase(engineTypeLabel.getEngineType())) {
 
-            Map<String,Object> variableMap = TaskUtils.getVariableMap(job.getParams());
+            Map<String, Object> variableMap = TaskUtils.getVariableMap(job.getParams());
 
             // 判断sparkVersion参数为3,则使用spark3的引擎版本,否则使用spark默认引擎版本
-            if(MapUtils.isNotEmpty(variableMap)
-                    && variableMap.get("sparkVersion")!=null
-                    && StringUtils.startsWithIgnoreCase(variableMap.get("sparkVersion").toString().trim(),"3")){
+            if (MapUtils.isNotEmpty(variableMap)
+                    && variableMap.get("sparkVersion") != null
+                    && StringUtils.equalsIgnoreCase(variableMap.get("sparkVersion").toString().trim(), "3")) {
 
-                EngineTypeLabel spark3EngineType= new EngineTypeLabel();
+                EngineTypeLabel spark3EngineType = new EngineTypeLabel();
                 spark3EngineType.setEngineType(engineTypeLabel.getEngineType());
                 spark3EngineType.setVersion(SPARK3_ENGINE_VERSION.getValue());
                 stringValue = spark3EngineType.getStringValue();
 
-                logger.info("{} job name ,spark3 engineType stringValue is {}",job.getJobName(),stringValue);
+                logger.info("{} job name ,spark3 engineType stringValue is {}", job.getJobName(), stringValue);
 
             }
 
         }
 
-        logger.info("{} job name ,engineType stringValue is {}",job.getJobName(),stringValue);
+        logger.info("{} job name ,engineType stringValue is {}", job.getJobName(), stringValue);
 
         labels.put(LabelKeyConstant.ENGINE_TYPE_KEY, stringValue);
         labels.put(LabelKeyConstant.USER_CREATOR_TYPE_KEY, job.getUser() + "-" + LINKIS_JOB_CREATOR_1_X.getValue(job.getJobProps()));
@@ -174,7 +174,7 @@ public class BuildJobActionImpl implements BuildJobAction {
 
 
         //是否复用引擎，不复用就为空
-        if(!isAppconnJob(job) && !isReuseEngine(job.getParams())){
+        if (!isAppconnJob(job) && !isReuseEngine(job.getParams())) {
             labels.put("executeOnce", "");
         }
         Map<String, Object> paramMapCopy = (HashMap<String, Object>) SerializationUtils.clone(new HashMap<String, Object>(job.getParams()));
@@ -202,6 +202,7 @@ public class BuildJobActionImpl implements BuildJobAction {
 
     /**
      * 是否复用引擎，复用返回：true，不复用：false
+     *
      * @param params
      * @return
      */
@@ -224,13 +225,13 @@ public class BuildJobActionImpl implements BuildJobAction {
     /**
      * 是否为appconnjob
      */
-    private boolean isAppconnJob(Job job){
+    private boolean isAppconnJob(Job job) {
         return APPCONN.equals(job.getEngineType());
     }
 
     /**
      * spark自定义参数配置输入，例如spark.sql.shuffle.partitions=10。多个参数使用分号分隔。
-     *
+     * <p>
      * 如果节点指定了参数模板，则需要把节点内与模板相同的参数取消掉，保证模板优先级高于节点参数
      *
      * @param paramMapCopy
@@ -242,7 +243,7 @@ public class BuildJobActionImpl implements BuildJobAction {
         //如果节点指定了参数模板，则需要把节点内与模板相同的参数取消掉，保证模板优先级高于节点参数
         if (startupMap.containsKey("ec.conf.templateId")) {
             logger.info("remove keys in template");
-            logger.info("before remove startup map:{}",startupMap.keySet());
+            logger.info("before remove startup map:{}", startupMap.keySet());
             startupMap.remove("spark.driver.memory");
             startupMap.remove("spark.executor.memory");
             startupMap.remove("spark.executor.cores");
@@ -251,7 +252,7 @@ public class BuildJobActionImpl implements BuildJobAction {
             startupMap.remove("spark.conf");
             startupMap.remove("mapreduce.job.running.map.limit");
             startupMap.remove("mapreduce.job.running.reduce.limit");
-            logger.info("after remove startup map:{}",startupMap.keySet());
+            logger.info("after remove startup map:{}", startupMap.keySet());
         }
         Map<String, Object> configurationMap = TaskUtils.getMap(paramMapCopy, TaskConstant.PARAMS_CONFIGURATION);
         configurationMap.put(TaskConstant.PARAMS_CONFIGURATION_STARTUP, startupMap);

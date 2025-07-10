@@ -284,19 +284,16 @@ public class BuildJobActionImpl implements BuildJobAction {
     }
 
     private String getSparkVersion(Map<String, Object> params) {
-
         String sparkVersion = null;
-
-        if (params.get("configuration") != null) {
+        if (params.get("configuration") instanceof Map) {
             Map<String, Object> configurationMap = (Map<String, Object>) params.get("configuration");
-            if (configurationMap.get("runtime") != null) {
+            if (configurationMap.get("runtime") instanceof Map) {
                 Map<String, Object> runtimeMap = (Map<String, Object>) configurationMap.get("runtime");
-                if (runtimeMap.get("sparkVersion") != null) {
+                if (runtimeMap.get("sparkVersion") instanceof String) {
                     sparkVersion = (String) runtimeMap.get("sparkVersion");
                 }
             }
         }
-
         return sparkVersion;
     }
 

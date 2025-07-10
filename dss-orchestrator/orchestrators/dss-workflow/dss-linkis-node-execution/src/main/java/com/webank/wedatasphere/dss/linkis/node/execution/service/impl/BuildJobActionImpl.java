@@ -26,6 +26,7 @@ import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.linkis.common.conf.CommonVars;
+import org.apache.linkis.manager.label.conf.LabelCommonConfig;
 import org.apache.linkis.manager.label.constant.LabelKeyConstant;
 import org.apache.linkis.manager.label.entity.engine.EngineType;
 import org.apache.linkis.manager.label.entity.engine.EngineTypeLabel;
@@ -145,23 +146,22 @@ public class BuildJobActionImpl implements BuildJobAction {
         }
 
         String stringValue = engineTypeLabel.getStringValue();
-        // spark3开关开启,并且引擎是Spark
-        if (WORKFLOW_SPARK3_SWITCH.getValue() && EngineType.SPARK().toString().equalsIgnoreCase(engineTypeLabel.getEngineType())) {
 
-            Map<String, Object> variableMap = TaskUtils.getVariableMap(job.getParams());
+
+        //TODO 当默认引擎为spark3 可以去掉此段if代码
+        if (EngineType.SPARK().toString().equalsIgnoreCase(engineTypeLabel.getEngineType())) {
+
+            String sparkVersion = getSparkVersion(job.getParams());
 
             // 判断sparkVersion参数为3,则使用spark3的引擎版本,否则使用spark默认引擎版本
-            if (MapUtils.isNotEmpty(variableMap)
-                    && variableMap.get("sparkVersion") != null
-                    && StringUtils.equalsIgnoreCase(variableMap.get("sparkVersion").toString().trim(), "3")) {
+            if (StringUtils.isNotEmpty(sparkVersion) &&
+                    StringUtils.equalsIgnoreCase(sparkVersion.trim(), "3")) {
 
-                EngineTypeLabel spark3EngineType = new EngineTypeLabel();
-                spark3EngineType.setEngineType(engineTypeLabel.getEngineType());
-                spark3EngineType.setVersion(SPARK3_ENGINE_VERSION.getValue());
-                stringValue = spark3EngineType.getStringValue();
-
-                logger.info("{} job name ,spark3 engineType stringValue is {}", job.getJobName(), stringValue);
-
+                EngineTypeLabel sparkEngineType = new EngineTypeLabel();
+                sparkEngineType.setEngineType(engineTypeLabel.getEngineType());
+                sparkEngineType.setVersion(SPARK3_ENGINE_VERSION.getValue());
+                stringValue = sparkEngineType.getStringValue();
+                logger.info("{} job name ,spark engineType stringValue is {}", job.getJobName(), stringValue);
             }
 
         }
@@ -282,4 +282,22 @@ public class BuildJobActionImpl implements BuildJobAction {
     private void enrichParams(Job job) {
         job.getRuntimeParams().put("nodeType", job.getRunType());
     }
+
+    private String getSparkVersion(Map<String, Object> params) {
+
+        String sparkVersion = null;
+
+        if (params.get("configuration") != null) {
+            Map<String, Object> configurationMap = (Map<String, Object>) params.get("configuration");
+            if (configurationMap.get("runtime") != null) {
+                Map<String, Object> runtimeMap = (Map<String, Object>) configurationMap.get("runtime");
+                if (runtimeMap.get("sparkVersion") != null) {
+                    sparkVersion = (String) runtimeMap.get("sparkVersion");
+                }
+            }
+        }
+
+        return sparkVersion;
+    }
+
 }

@@ -44,6 +44,18 @@ class BMLService extends JavaLog {
         bmlClient = BmlClientFactory.createBmlClient(userName)
       }
     }
+    try {
+      val connectInfo = bmlClient.getBmlClientConnectInfo.clientConnectInfo
+      // 格式化Map为k=v形式并记录日志
+      val entries = new scala.collection.mutable.ListBuffer[String]()
+      connectInfo.foreach { case (k, v) =>
+        entries += s"$k=$v"
+      }
+      val infoStr = entries.mkString(", ")
+      logger.info(s"BML client connection info: $infoStr")
+    } catch {
+      case e: Exception => logger.warn("Failed to get BML client connection info", e)
+    }
     bmlClient
   }
 

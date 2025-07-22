@@ -282,23 +282,22 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
             }
 
             String pusername = projectVo.getPusername();
-            String editPriv = projectVo.getId() + KEY_SPLIT + ProjectUserPrivEnum.PRIV_EDIT.getRank()
-                    + KEY_SPLIT + projectRequest.getUsername();
-
-            LOGGER.info("user:{} get project privilege info ,workspaceId:{}, projectId:{}, projectName:{}, pusername:{}, editPriv:{}",
-                    projectRequest.getUsername(), projectRequest.getWorkspaceId(), projectVo.getId(), projectVo.getName(), pusername, editPriv);
-
-            Map<String, List<String>> userPricMap = new HashMap<>();
-            String[] tempstrArr = pusername.split(MODE_SPLIT);
-
-            // 拆分有projectId +"-" + priv + "-" + username的拼接而成的字段，
-            // 从而得到：查看权限用户、编辑权限用户、发布权限用a
-            for (String s : tempstrArr) {
-                String[] strArr = s.split(KEY_SPLIT);
-                if (strArr.length >= 3) {
-                    String key = strArr[0] + KEY_SPLIT + strArr[1];
-                    userPricMap.computeIfAbsent(key, k -> new ArrayList<>());
-                    userPricMap.get(key).add(strArr[2]);
+            if (StringUtils.isNotEmpty(pusername)) {
+                String editPriv = projectVo.getId() + KEY_SPLIT + ProjectUserPrivEnum.PRIV_EDIT.getRank()
+                        + KEY_SPLIT + projectRequest.getUsername();
+                LOGGER.info("user:{} get project privilege info ,workspaceId:{}, projectId:{}, projectName:{}, pusername:{}, editPriv:{}",
+                        projectRequest.getUsername(), projectRequest.getWorkspaceId(), projectVo.getId(), projectVo.getName(), pusername, editPriv);
+                Map<String, List<String>> userPricMap = new HashMap<>();
+                String[] tempstrArr = pusername.split(MODE_SPLIT);
+                // 拆分有projectId +"-" + priv + "-" + username的拼接而成的字段，
+                // 从而得到：查看权限用户、编辑权限用户、发布权限用a
+                for (String s : tempstrArr) {
+                    String[] strArr = s.split(KEY_SPLIT);
+                    if (strArr.length >= 3) {
+                        String key = strArr[0] + KEY_SPLIT + strArr[1];
+                        userPricMap.computeIfAbsent(key, k -> new ArrayList<>());
+                        userPricMap.get(key).add(strArr[2]);
+                    }
                 }
             }
             List<String> accessUsers = userPricMap.get(projectVo.getId() + KEY_SPLIT + ProjectUserPrivEnum.PRIV_ACCESS.getRank());

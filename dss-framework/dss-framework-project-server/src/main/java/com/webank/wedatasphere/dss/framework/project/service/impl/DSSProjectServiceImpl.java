@@ -282,12 +282,12 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
             }
 
             String pusername = projectVo.getPusername();
+            Map<String, List<String>> userPricMap = new HashMap<>();
             if (StringUtils.isNotEmpty(pusername)) {
                 String editPriv = projectVo.getId() + KEY_SPLIT + ProjectUserPrivEnum.PRIV_EDIT.getRank()
                         + KEY_SPLIT + projectRequest.getUsername();
                 LOGGER.info("user:{} get project privilege info ,workspaceId:{}, projectId:{}, projectName:{}, pusername:{}, editPriv:{}",
                         projectRequest.getUsername(), projectRequest.getWorkspaceId(), projectVo.getId(), projectVo.getName(), pusername, editPriv);
-                Map<String, List<String>> userPricMap = new HashMap<>();
                 String[] tempstrArr = pusername.split(MODE_SPLIT);
                 // 拆分有projectId +"-" + priv + "-" + username的拼接而成的字段，
                 // 从而得到：查看权限用户、编辑权限用户、发布权限用a

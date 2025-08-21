@@ -76,7 +76,7 @@ public class OrchestratorCopyJob implements Runnable {
         try {
             doOrchestratorCopy(orchestratorCopyVo.getUsername(), orchestratorCopyVo.getWorkspace(), newOrchestrator,
                     orchestratorCopyVo.getTargetProjectName(), Lists.newArrayList(orchestratorCopyVo.getDssLabel()), appId,
-                    orchestratorCopyVo.getEnableNodeIdList(),orchestratorCopyVo.getFlowProxyUser());
+                    orchestratorCopyVo.getEnableNodeIdList(),orchestratorCopyVo.getFlowProxyUser(),orchestratorCopyVo.getSkipThirdNode());
         } catch (Exception e) {
             //保存错误信息
             String errorMsg = "CopyOrcError: " + e.getMessage();
@@ -106,7 +106,8 @@ public class OrchestratorCopyJob implements Runnable {
                                     String projectName,
                                     List<DSSLabel> dssLabels, Long appId,
                                     List<String> enableNodeIdList,
-                                    String flowProxyUser) throws Exception {
+                                    String flowProxyUser,
+                                    boolean skipThirdNode) throws Exception {
         String copyInitVersion = OrchestratorUtils.generateNewCopyVersion(orchestratorCopyVo.getWorkflowNodeSuffix());
         String contextId = orchestratorCopyEnv.getContextService().createContextID(workspace.getWorkspaceName(), projectName, dssOrchestratorInfo.getName(), copyInitVersion, userName);
         DSSOrchestratorVersion dssOrchestratorVersion = new DSSOrchestratorVersion();
@@ -134,6 +135,7 @@ public class OrchestratorCopyJob implements Runnable {
                     refJobContent.put(OrchestratorRefConstant.ORCHESTRATION_NODE_SUFFIX, orchestratorCopyVo.getWorkflowNodeSuffix());
                     // 添加启用节点ID列表
                     refJobContent.put(OrchestratorRefConstant.ORCHESTRATION_ENABLE_NODE, enableNodeIdList);
+                    refJobContent.put(OrchestratorRefConstant.ORCHESTRATION_SKIP_THIRD_NODE, skipThirdNode);
                     // 添加copy工作流的代理用户
                     refJobContent.put(OrchestratorRefConstant.FLOW_PROXY_USER,flowProxyUser);
                     requestRef.setNewVersion(dssOrchestratorVersion.getVersion()).setRefJobContent(refJobContent);

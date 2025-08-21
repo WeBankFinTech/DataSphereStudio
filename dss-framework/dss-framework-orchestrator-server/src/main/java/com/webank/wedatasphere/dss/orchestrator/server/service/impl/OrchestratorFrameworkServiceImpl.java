@@ -409,7 +409,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
 
     @Override
     public String copyOrchestrator(String username, OrchestratorCopyRequest orchestratorCopyRequest, Workspace workspace,
-                                   List<String> enableNodeIdList,String flowProxyUser) throws Exception {
+                                   List<String> enableNodeIdList,String flowProxyUser, boolean skipThirdNode) throws Exception {
         if (orchestratorCopyRequest.getTargetOrchestratorName().length() > MAX_NAME_LENGTH) {
             DSSFrameworkErrorException.dealErrorException(60000, "编排名称过长，请限制在" + MAX_NAME_LENGTH + "以内");
         }
@@ -438,7 +438,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         OrchestratorCopyVo orchestratorCopyVo = new OrchestratorCopyVo.Builder(username, sourceProject.getId(), sourceProject.getName(), targetProject.getId(),
                 targetProject.getName(), sourceOrchestratorInfo, orchestratorCopyRequest.getTargetOrchestratorName(),
                 orchestratorCopyRequest.getWorkflowNodeSuffix(), new EnvDSSLabel(dssLabel),
-                workspace, Sender.getThisInstance(), enableNodeIdList, flowProxyUser).setCopyTaskId(null).build();
+                workspace, Sender.getThisInstance(), enableNodeIdList, flowProxyUser,skipThirdNode).setCopyTaskId(null).build();
         OrchestratorCopyJob orchestratorCopyJob = new OrchestratorCopyJob();
         orchestratorCopyJob.setTargetProject(targetProject);
         orchestratorCopyJob.setOrchestratorCopyVo(orchestratorCopyVo);
@@ -1050,7 +1050,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         orchestratorCopyRequest.setTargetProjectName(dssProject.getName());
         orchestratorCopyRequest.setWorkflowNodeSuffix(request.getCopyNodeSuffix());
 
-        String copyJobId = copyOrchestrator(username, orchestratorCopyRequest, workspace, enableNodeIdList,request.getFlowProxyUser());
+        String copyJobId = copyOrchestrator(username, orchestratorCopyRequest, workspace, enableNodeIdList,request.getFlowProxyUser(),true);
 
         DSSOrchestratorCopyInfo dssOrchestratorCopyInfo = new DSSOrchestratorCopyInfo();
         dssOrchestratorCopyInfo.setId(copyJobId);

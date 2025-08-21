@@ -126,7 +126,8 @@ class DSSWorkflowReceiver(workflowManager: WorkFlowManager)  extends Receiver {
         requestCopyWorkflow.getNewFlowName,
         requestCopyWorkflow.getTargetProjectId,
         requestCopyWorkflow.getEnableNodeList,
-        requestCopyWorkflow.getFlowProxyUser)
+        requestCopyWorkflow.getFlowProxyUser,
+        requestCopyWorkflow.getSkipThirdAppconn)
       new ResponseCopyWorkflow(copyFlow)
 
     case requestQueryWorkFlow: RequestQueryWorkFlow =>

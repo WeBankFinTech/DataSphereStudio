@@ -960,7 +960,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                                 String projectName, String version, String contextIdStr,
                                 String description, List<DSSLabel> dssLabels, String nodeSuffix,
                                 String newFlowName, Long newProjectId,List<String> enableNodeList,
-                                String flowProxyUser) throws DSSErrorException, IOException {
+                                String flowProxyUser,boolean skipThirdAppconn) throws DSSErrorException, IOException {
         DSSFlow dssFlow = flowMapper.selectFlowByID(rootFlowId);
         Sender orcSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getOrcSender(dssLabels);
         OrchestratorVo orchestratorVo = RpcAskUtils.processAskException(orcSender.ask(new RequestQuertByAppIdOrchestrator(dssFlow.getId())),
@@ -969,7 +969,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         deleteFlowMetaData(orchestratorId);
         DSSFlow rootFlowWithSubFlows = copyFlowAndSetSubFlowInDB(dssFlow, userName, description, nodeSuffix, newFlowName, newProjectId);
         updateFlowJson(userName, projectName, rootFlowWithSubFlows, version, null,
-                contextIdStr, workspace, dssLabels, nodeSuffix, orchestratorId,enableNodeList,flowProxyUser);
+                contextIdStr, workspace, dssLabels, nodeSuffix, orchestratorId,enableNodeList,flowProxyUser, skipThirdAppconn);
         DSSFlow copyFlow = flowMapper.selectFlowByID(rootFlowWithSubFlows.getId());
         copyFlow.setFlowIdParamConfTemplateIdTuples(rootFlowWithSubFlows.getFlowIdParamConfTemplateIdTuples());
         return copyFlow;
@@ -1084,7 +1084,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     private void updateFlowJson(String userName, String projectName, DSSFlow rootFlow,
                                 String version, Long parentFlowId, String contextIdStr,
                                 Workspace workspace, List<DSSLabel> dssLabels, String nodeSuffix,
-                                Long orchestratorId,List<String> enableNodeList,String flowProxyUser) throws DSSErrorException, IOException {
+                                Long orchestratorId,List<String> enableNodeList,String flowProxyUser,boolean skipThirdAppconn) throws DSSErrorException, IOException {
         String flowJson = bmlService.readTextFromBML(userName, rootFlow.getResourceId(), rootFlow.getBmlVersion());
         //如果包含subflow,需要一同导入subflow内容，并更新parrentflow的json内容
         // TODO: 2020/7/31 优化update方法里面的saveContent
@@ -1106,7 +1106,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         updateFlowJson = uploadFlowResourceToBml(userName, updateFlowJson, projectName, rootFlow);
         //上传节点的资源或调用appconn的copyRef
         updateFlowJson = updateWorkFlowNodeJsonForMultiThread(userName, projectName, updateFlowJson, rootFlow,
-                version, workspace, dssLabels);
+                version, workspace, dssLabels,skipThirdAppconn);
         // 更新对应节点的FlowJson
         saveFlowMetaData(rootFlow.getId(), updateFlowJson, orchestratorId);
         List<? extends DSSFlow> subFlows = rootFlow.getChildren();
@@ -1114,7 +1114,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         if (subFlows != null) {
             for (DSSFlow subflow : subFlows) {
                 updateFlowJson(userName, projectName, subflow, version, rootFlow.getId(),
-                        contextIdStr, workspace, dssLabels, nodeSuffix, orchestratorId,enableNodeList,flowProxyUser);
+                        contextIdStr, workspace, dssLabels, nodeSuffix, orchestratorId,enableNodeList,flowProxyUser,skipThirdAppconn);
                 templateIds.addAll(subflow.getFlowIdParamConfTemplateIdTuples());
             }
         }
@@ -1383,7 +1383,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
     private String updateWorkFlowNodeJsonForMultiThread(String userName, String projectName,
                                                         String flowJson, DSSFlow dssFlow,
-                                                        String version, Workspace workspace, List<DSSLabel> dssLabels) throws DSSErrorException, IOException{
+                                                        String version, Workspace workspace, List<DSSLabel> dssLabels,boolean skipThirdAppconn) throws DSSErrorException, IOException{
 
         if (StringUtils.isEmpty(version)) {
             logger.warn("version id is null when updateWorkFlowNodeJson");
@@ -1437,7 +1437,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                         String msg = String.format("%s note type not exist,please check appconn install successfully", nodeType);
                         logger.error(msg);
                         throw new DSSRuntimeException(msg);
-                    } else if (Boolean.TRUE.equals(nodeInfo.getSupportJump()) && nodeInfo.getJumpType() == 1) {
+                    } else if (!skipThirdAppconn && Boolean.TRUE.equals(nodeInfo.getSupportJump()) && nodeInfo.getJumpType() == 1) {
                         logger.info("nodeJsonMap.jobContent is:{}", nodeJsonMap.get("jobContent"));
                         CommonAppConnNode newNode = new CommonAppConnNode();
                         CommonAppConnNode oldNode = new CommonAppConnNode();

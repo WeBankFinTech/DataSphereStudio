@@ -79,7 +79,7 @@ public interface DSSFlowService {
                          String projectName, String version, String contextIdStr,
                          String description, List<DSSLabel> dssLabels,String nodeSuffix,
                          String newFlowName, Long newProjectId,List<String> enableNodeList,
-                         String flowProxyUser) throws DSSErrorException, IOException;
+                         String flowProxyUser,boolean skipThirdAppconn) throws DSSErrorException, IOException;
 
     Long getParentFlowID(Long id);
 

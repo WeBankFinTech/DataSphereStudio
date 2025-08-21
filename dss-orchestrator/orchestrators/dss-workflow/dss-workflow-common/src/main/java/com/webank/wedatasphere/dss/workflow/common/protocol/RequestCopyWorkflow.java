@@ -39,6 +39,7 @@ public class RequestCopyWorkflow {
    private List<String> enableNodeList;
 
    private String flowProxyUser;
+   private boolean skipThirdAppconn;
 
     public RequestCopyWorkflow(String userName,
                                Workspace workspace,
@@ -79,7 +80,8 @@ public class RequestCopyWorkflow {
                                String nodeSuffix,
                                String newFlowName,
                                List<String> enableNodeList,
-                               String flowProxyUser) {
+                               String flowProxyUser,
+                               boolean skipThirdAppconn) {
 
         this.userName = userName;
         this.workspace = workspace;
@@ -94,6 +96,7 @@ public class RequestCopyWorkflow {
         this.newFlowName = newFlowName;
         this.enableNodeList = enableNodeList;
         this.flowProxyUser = flowProxyUser;
+        this.skipThirdAppconn=skipThirdAppconn;
 
     }
 
@@ -191,6 +194,14 @@ public class RequestCopyWorkflow {
 
     public void setEnableNodeList(List<String> enableNodeList) {
         this.enableNodeList = enableNodeList;
+    }
+
+    public boolean getSkipThirdAppconn() {
+        return skipThirdAppconn;
+    }
+
+    public void setSkipThirdAppconn(boolean skipThirdAppconn) {
+        this.skipThirdAppconn = skipThirdAppconn;
     }
 
     public String getFlowProxyUser() {

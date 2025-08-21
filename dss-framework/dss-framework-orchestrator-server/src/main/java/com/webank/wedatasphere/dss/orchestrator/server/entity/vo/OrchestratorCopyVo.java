@@ -27,6 +27,7 @@ public class OrchestratorCopyVo implements Serializable {
     private List<String> enableNodeIdList;
 
     private String flowProxyUser;
+    private  boolean skipThirdNode;
 
     private OrchestratorCopyVo(Builder builder) {
         this.username = builder.username;
@@ -43,6 +44,7 @@ public class OrchestratorCopyVo implements Serializable {
         this.instanceName = builder.instanceName;
         this.enableNodeIdList = builder.enableNodeIdList;
         this.flowProxyUser = builder.flowProxyUser;
+        this.skipThirdNode=builder.skipThirdNode;
     }
 
 
@@ -64,6 +66,7 @@ public class OrchestratorCopyVo implements Serializable {
         private List<String> enableNodeIdList;
 
         private String flowProxyUser;
+        private  boolean skipThirdNode;
 
         public Builder(String username, Long sourceProjectId, String sourceProjectName, Long targetProjectId,
                        String targetProjectName, DSSOrchestratorInfo orchestrator, String targetOrchestratorName,
@@ -85,7 +88,7 @@ public class OrchestratorCopyVo implements Serializable {
         public Builder(String username, Long sourceProjectId, String sourceProjectName, Long targetProjectId,
                        String targetProjectName, DSSOrchestratorInfo orchestrator, String targetOrchestratorName,
                        String workflowNodeSuffix, DSSLabel dssLabel, Workspace workspace, String instanceName,
-                       List<String> enableNodeIdList,String flowProxyUser) {
+                       List<String> enableNodeIdList,String flowProxyUser,  boolean skipThirdNode) {
 
             this.username = username;
             this.sourceProjectId = sourceProjectId;
@@ -100,6 +103,7 @@ public class OrchestratorCopyVo implements Serializable {
             this.instanceName = instanceName;
             this.enableNodeIdList = enableNodeIdList;
             this.flowProxyUser = flowProxyUser;
+            this.skipThirdNode=skipThirdNode;
         }
 
 
@@ -176,6 +180,14 @@ public class OrchestratorCopyVo implements Serializable {
 
     public void setFlowProxyUser(String flowProxyUser) {
         this.flowProxyUser = flowProxyUser;
+    }
+
+    public boolean getSkipThirdNode() {
+        return skipThirdNode;
+    }
+
+    public void setSkipThirdNode(boolean skipThirdNode) {
+        this.skipThirdNode = skipThirdNode;
     }
 }
 

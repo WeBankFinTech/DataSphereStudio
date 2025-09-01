@@ -16,6 +16,7 @@
 
 package com.webank.wedatasphere.dss.workflow.service;
 
+import com.webank.wedatasphere.dss.common.entity.node.DSSNodeDefault;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
@@ -23,6 +24,7 @@ import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.entity.DSSFlowName;
 import com.webank.wedatasphere.dss.workflow.entity.NodeInfo;
+import com.webank.wedatasphere.dss.workflow.entity.StarRocksNodeInfo;
 import com.webank.wedatasphere.dss.workflow.entity.request.*;
 import com.webank.wedatasphere.dss.workflow.entity.response.*;
 import com.webank.wedatasphere.dss.workflow.entity.vo.ExtraToolBarsVO;
@@ -76,7 +78,8 @@ public interface DSSFlowService {
     DSSFlow copyRootFlow(Long rootFlowId, String userName, Workspace workspace,
                          String projectName, String version, String contextIdStr,
                          String description, List<DSSLabel> dssLabels,String nodeSuffix,
-                         String newFlowName, Long newProjectId) throws DSSErrorException, IOException;
+                         String newFlowName, Long newProjectId,List<String> enableNodeList,
+                         String flowProxyUser,boolean skipThirdAppconn) throws DSSErrorException, IOException;
 
     Long getParentFlowID(Long id);
 
@@ -93,6 +96,8 @@ public interface DSSFlowService {
     String getFlowJson(String userName, String projectName, DSSFlow dssFlow);
 
     DataDevelopNodeResponse queryDataDevelopNodeList(String username, Workspace workspace, DataDevelopNodeRequest request);
+
+    List<StarRocksNodeInfo> queryStarRocksNodeList(Long workspaceId);
 
     Map<String,Object> getDataDevelopNodeContent(String nodeId, Long contentId) throws DSSErrorException;
 
@@ -121,4 +126,12 @@ public interface DSSFlowService {
     void deleteNodeContent(List<Long> flowIdList);
 
     void getRootFlowProxy(DSSFlow dssFlow);
+
+    void editNodeContent(EditNodeContentRequest editNodeContentRequest,String ticketId) throws Exception;
+
+    BatchEditNodeContentResponse batchEditNodeContent(BatchEditNodeContentRequest batchEditNodeContentRequest,String ticketId) throws Exception;
+
+
+    List<DSSNodeDefault> getNodeInfoByName(QueryNodeInfoByNameRequest queryNodeInfoByNameRequest);
+
 }

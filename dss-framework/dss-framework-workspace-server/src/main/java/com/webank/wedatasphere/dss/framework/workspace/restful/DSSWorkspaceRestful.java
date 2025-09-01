@@ -364,7 +364,7 @@ public class DSSWorkspaceRestful {
         SSOHelper.setAndGetWorkspace(httpServletRequest, httpServletResponse, workspace.getId(), workspace.getName());
 
         Set<String> allUsernames = staffInfoGetter.getAllUsernames();
-        if(allUsernames.contains(username)) {
+        if(allUsernames.contains(username) || "hadoop".equals(username)) {
             SSOHelper.addUsernameCookie(httpServletRequest, httpServletResponse, username);
         }else{
             SSOHelper.deleteCookieByName(httpServletRequest, httpServletResponse, USERNAME_NAME_COOKIE_KEY);

@@ -88,6 +88,9 @@ public class LinkisJobExecutionConfiguration {
 
     public static final CommonVars<Boolean> LINKIS_DISCOVERY_ENABLE = CommonVars.apply("wds.dss.workflow.execution.linkis.discovery.enable",  false);
     public static final CommonVars<String> EMBEDDED_FLOW_ID = CommonVars.apply("wds.dss.workflow.execution.subflow.flag","embeddedFlowId");
+
+    public static final CommonVars<String>  SPARK3_ENGINE_VERSION = CommonVars.apply("linkis.spark3.engine.version", "3.4.4");
+
     public static boolean isLinkis1_X(Map<String, String> props) {
         return props.getOrDefault(LinkisJobExecutionConfiguration.LINKIS_VERSION_KEY,"")
                 .startsWith("1.");

@@ -61,4 +61,9 @@ public interface OrchestratorRefConstant {
 
     public static final String FLOW_STATUS_UNPUBLISHED = "unpublished";
 
+    public static final String ORCHESTRATION_ENABLE_NODE = "autoEnableNodeId";
+    public static final String ORCHESTRATION_SKIP_THIRD_NODE = "skipthirdNode";
+
+    public static final String FLOW_PROXY_USER="flowProxyUser";
+
 }

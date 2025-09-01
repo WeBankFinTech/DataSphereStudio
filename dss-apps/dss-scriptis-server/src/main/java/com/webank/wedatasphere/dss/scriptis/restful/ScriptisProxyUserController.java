@@ -33,6 +33,7 @@ public class ScriptisProxyUserController extends DssProxyUserController {
     @RequestMapping(path = "add", method = RequestMethod.POST)
     public Message add(@RequestBody ScriptisProxyUser userRep, HttpServletRequest req) {
         String username = SecurityFilter.getLoginUsername(req);
+        LOGGER.info("admin {} try to add proxy user, params:{}.", username, userRep);
         if(!ArrayUtils.contains(DSSCommonConf.SUPER_ADMIN_LIST, username)){
             return Message.error("Only super admin can add proxy users.");
         } else if(StringUtils.isEmpty(userRep.getUserName())){
@@ -40,9 +41,8 @@ public class ScriptisProxyUserController extends DssProxyUserController {
         } else if(StringUtils.isEmpty(userRep.getProxyUserName())){
             return Message.error("proxyUser is null.");
         } else if (dssProxyUserService.isExists(userRep.getUserName(), userRep.getProxyUserName(), null)) {
-            return Message.error("Failed to add proxy user，'userName：" + userRep.getUserName() + ", proxyName："+userRep.getProxyUserName()+" already exists.");
+            return Message.ok("Failed to add proxy user，'userName：" + userRep.getUserName() + ", proxyName："+userRep.getProxyUserName()+" already exists.");
         }
-        LOGGER.info("admin {} try to add proxy user, params:{}.", username, userRep);
         try {
             scriptisProxyUserService.insertProxyUser(userRep);
         } catch (Exception exception) {

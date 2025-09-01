@@ -17,13 +17,16 @@
 package com.webank.wedatasphere.dss.framework.workspace.service;
 
 import com.github.pagehelper.PageInfo;
+import com.webank.wedatasphere.dss.common.entity.workspace.DSSStarRocksCluster;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSUserRoleComponentPriv;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceAssociateDepartments;
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceStarRocksCluster;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceMenuVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceDepartmentVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceFavoriteVo;
+import com.webank.wedatasphere.dss.framework.workspace.bean.request.UpdateWorkspaceStarRocksClusterRequest;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceHomePageVO;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceHomepageSettingVO;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceOverviewVO;
@@ -121,4 +124,12 @@ public interface DSSWorkspaceService {
     boolean checkUserIfSettingAdmin(String username);
 
     void updateWorkspaceInfo(DSSWorkspace dssWorkspace);
+
+    List<DSSWorkspaceStarRocksCluster> updateStarRocksCluster(List<UpdateWorkspaceStarRocksClusterRequest> request, String ticketId, Workspace workspace, String userName);
+    List<DSSWorkspaceStarRocksCluster> getStarRocksCluster(Long workspaceId);
+    void deleteStarRocksClusterByWorkspaceId(Long workspaceId);
+
+
+    List<DSSStarRocksCluster> getDSSStarrocksCluster(Long workspaceId);
+
 }

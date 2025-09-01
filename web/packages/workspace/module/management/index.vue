@@ -93,6 +93,12 @@ export default {
         path: 'resTemplate',
         children: [],
       },
+      {
+        icon: 'resTemplateManage',
+        name: '工作流配置',
+        path: 'workspaceSettings',
+        children: [],
+      },
     ];
     return {
       mode: '',

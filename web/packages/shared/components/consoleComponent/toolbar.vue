@@ -285,7 +285,7 @@ export default {
   computed: {
     isNotApiAll() {
       return (
-        ['hql', 'sql', 'tsql'].includes(this.script.runType) &&
+        ['hql', 'sql', 'tsql', 'jdbc', 'node'].includes(this.script.runType) &&
         this.download.format === '2' && this.getResultUrl !== 'dss/apiservice'
       )
     },
@@ -339,7 +339,7 @@ export default {
         }
       }
       if (type === 'export') {
-        const checkResultSensitive = await this.$parent.checkResult()
+        const checkResultSensitive = await this.$parent.checkResult(this.currentPath)
         if (checkResultSensitive) {
           return
         }
@@ -374,7 +374,7 @@ export default {
       }
     },
     async downloadConfirm() {
-      const checkResultSensitive = await this.$parent.checkResult()
+      const checkResultSensitive = await this.$parent.checkResult(this.currentPath)
       if (checkResultSensitive) {
         return
       }

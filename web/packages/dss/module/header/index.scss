@@ -27,6 +27,29 @@
     margin-top: -2px;
     display: flex;
 }
+.workspacename-item {
+  display: flex;
+  &:hover {
+    .pro-item-star {
+      opacity: 1;
+    }
+  }
+  .pro-item-star {
+    display: block;
+    opacity: 0;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: url(../../assets/images/icon-nav-star.png) no-repeat;
+    background-size: contain;
+    margin-left: 10px;
+    &.favorited {
+      opacity: 1;
+      background: url(../../assets/images/icon-nav-stard.png) no-repeat;
+      background-size: contain;
+    }
+  }
+}
 .project-dro {
     vertical-align: top;
     height: 100%;
@@ -71,9 +94,10 @@
             align-items: center;
             flex-wrap: wrap;
             padding: 0 $padding-25;
+            line-height: 1.5;
             .proj-item {
                 // width: 200px;
-                padding: 0 10px;
+                padding: 0 10px 0 5px;
                 margin-right: 15px;
                 font-size: $font-size-14;
                 color: $text-tille-light-color;

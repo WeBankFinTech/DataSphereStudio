@@ -534,7 +534,7 @@
           },
           "field": {
             "copyColumnsName": "复制字段名",
-            "pasteName": "复制库名并粘贴至脚本"
+            "pasteName": "复制字段名并粘贴至脚本"
           }
         },
         "partitionsTitle": "分区大小",

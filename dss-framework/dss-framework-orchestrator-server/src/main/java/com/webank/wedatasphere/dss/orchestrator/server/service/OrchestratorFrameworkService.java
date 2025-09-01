@@ -43,7 +43,7 @@ public interface OrchestratorFrameworkService {
 
     OrchestratorUnlockVo unlockOrchestrator(String username, Workspace workspace, OrchestratorUnlockRequest request) throws DSSErrorException;
 
-    String copyOrchestrator(String username, OrchestratorCopyRequest orchestratorCopyRequest, Workspace workspace) throws Exception;
+    String copyOrchestrator(String username, OrchestratorCopyRequest orchestratorCopyRequest, Workspace workspace,List<String> enableNodeIdList,String flowProxyUser,boolean skipThirdNode) throws Exception;
 
     Pair<Long, List<OrchestratorCopyHistory>> getOrchestratorCopyHistory(String username, Workspace workspace, Long orchestratorId, Integer currentPage, Integer pageSize) throws Exception;
 
@@ -62,5 +62,10 @@ public interface OrchestratorFrameworkService {
     List<OrchestratorMeta> getAllOrchestratorMeta(OrchestratorMetaRequest orchestratorMetaRequest, List<Long> total,String username);
 
     DSSOrchestratorVersion getLatestOrchestratorVersion(Long orchestratorId);
+
+    DSSOrchestratorCopyInfo encryptCopyOrchestrator(EncryptCopyOrchestratorRequest request,Workspace workspace) throws  Exception;
+
+
+    DSSEncryptOrchestratorCopyInfo getDSSEncryptOrchestratorCopyInfo(String copyInfoId);
 
 }

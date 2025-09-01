@@ -228,6 +228,7 @@ public class DSSFrameworkProjectRestfulApi {
             dssProjectVo.setDescription(dbProject.getDescription());
             dssProjectVo.setId(dbProject.getId());
             dssProjectVo.setName(dbProject.getName());
+            dssProjectVo.setWorkspaceId(dbProject.getWorkspaceId());
             message = Message.ok().data("project", dssProjectVo);
         }
         return message;
@@ -322,7 +323,7 @@ public class DSSFrameworkProjectRestfulApi {
      * @return
      */
     @RequestMapping(path = "deleteProject", method = RequestMethod.POST)
-    public Message deleteProject(HttpServletRequest request, @RequestBody ProjectDeleteRequest projectDeleteRequest) {
+    public Message deleteProject(HttpServletRequest request, @RequestBody ProjectDeleteOrRestoreRequest projectDeleteRequest) {
         String username = SecurityFilter.getLoginUsername(request);
         Workspace workspace = SSOHelper.getWorkspace(request);
         Message message = executePreHook(projectHttpRequestHook -> projectHttpRequestHook.beforeDeleteProject(request, projectDeleteRequest));
@@ -342,6 +343,31 @@ public class DSSFrameworkProjectRestfulApi {
                         executeAfterHook(projectHttpRequestHook -> projectHttpRequestHook.afterDeleteProject(request, projectDeleteRequest),
                                 () -> Message.ok("删除工程成功.")),
                 String.format("用户 %s 删除工程失败. ", username));
+    }
+
+    /**
+     * 恢复近期删除的工程
+     *
+     * @param request
+     * @param projectRestoreRequest
+     * @return
+     */
+    @RequestMapping(path = "restoreProject", method = RequestMethod.POST)
+    public Message restoreProject(HttpServletRequest request, @RequestBody ProjectDeleteOrRestoreRequest projectRestoreRequest) {
+        String username = SecurityFilter.getLoginUsername(request);
+        Workspace workspace = SSOHelper.getWorkspace(request);
+
+        LOGGER.info("user {} begin to restoreProject, workspace {}, project entity: {}.", username, workspace.getWorkspaceName(), projectRestoreRequest);
+        return DSSExceptionUtils.getMessage(() -> {
+                    // 检查是否具有删除项目权限
+                    projectService.isDeleteProjectAuth(projectRestoreRequest.getId(), username);
+                    DSSProjectDO dssProjectDO = projectService.getProjectById(projectRestoreRequest.getId());
+                    projectService.restoreProject(username, projectRestoreRequest, workspace, dssProjectDO);
+                    AuditLogUtils.printLog(username, workspace.getWorkspaceId(), workspace.getWorkspaceName(), TargetTypeEnum.PROJECT,
+                            dssProjectDO.getId(), dssProjectDO.getName(), OperateTypeEnum.ENABLE, projectRestoreRequest);
+                },
+                () -> Message.ok("恢复工程成功."),
+                String.format("用户 %s 恢复工程失败. ", username));
     }
 
     @RequestMapping(path = "listApplicationAreas", method = RequestMethod.GET)

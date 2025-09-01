@@ -66,6 +66,7 @@
               </div>
             </div>
             <virtual-tree
+              ref="leftMenuTree"
               class="tree-container"
               keyText="id"
               :size="32"
@@ -124,6 +125,7 @@
                 :projectsTree="projectsTree"
                 :top-tab-list="tabList"
                 :create-project-handler="createProject"
+                @updateWorkflowInfo="updateWorkflowInfo"
                 @open-workflow="openWorkflow"
                 @delete-workflow="deleteWorkflow"
                 @rollback="onRollBack"
@@ -214,7 +216,7 @@
     <!-- 导入工作流 -->
     <ImportFlow v-model="importModal" ref="import" @finish="importSended" />
     <!-- 查找代码 -->
-    <CodeSearchDrawer v-model="showCodeDrawer" :currentMode="currentMode" @openFlowNode="openFlowNode" />
+    <CodeSearchDrawer v-model="showCodeDrawer" :currentMode="currentMode" @openFlowNode="openFlowNode" @openSubFlowNode="openSubFlowNode"/>
   </div>
 </template>
 <script>
@@ -633,23 +635,47 @@ export default {
         })
       })
     },
-    openFlowNode(evt, item, code) {
+    openSubFlowNode(evt, item, code,nodeInfo){
       let linenum = 0
       if (code) {
         linenum = code.number;
       } else {
         linenum = item.keyLines[0].number;
       }
-      // 当前查找只能在同工程下查找
-      // 根据参数找到对应node
-      const cur = this.projectsTree.filter(item => item.id == this.$route.query.projectID)[0];
-      if (cur) {
-        this.getFlow(cur, (flows) => {
+      if (nodeInfo && nodeInfo.id && nodeInfo.projectName && nodeInfo.orchestratorId && nodeInfo.appId) {
+      this.getFlow(nodeInfo, (flows) => {
           const node = flows.find(it => it.name == item.flowName);
           const query = {
             workspaceId: this.$route.query.workspaceId,
-            projectID: this.$route.query.projectID,
-            projectName: this.$route.query.projectName,
+            projectID: nodeInfo.id,
+            projectName: nodeInfo.projectName,
+            flowId: nodeInfo.orchestratorId,
+            appId: nodeInfo.appId,
+            nodeName: nodeInfo.nodeName,
+            origin: 'gitSearch',
+            tiemstamp: new Date().getTime()
+          }
+          // 子工作流直接开新页面打开
+          storage.set('openflownode', `${node.orchestratorId}_flowidname_${item.nodeName}`);
+          storage.set('revealline', linenum);
+          window.open(`/#/workflow?${qs.stringify(query)}`, '_blank');
+        });
+      }      
+    },
+    openFlowNode(evt, item, code,projectObj){
+      let linenum = 0
+      if (code) {
+        linenum = code.number;
+      } else {
+        linenum = item.keyLines[0].number;
+      }
+      if (projectObj) {
+        this.getFlow(projectObj, (flows) => {
+          const node = flows.find(it => it.name == item.flowName);
+          const query = {
+            workspaceId: this.$route.query.workspaceId,
+            projectID: projectObj.id,
+            projectName: projectObj.projectName,
             flowId: node.orchestratorId,
             tiemstamp: new Date().getTime()
           }
@@ -1198,6 +1224,12 @@ export default {
                 this.currentProjectData[key] = tempData[key];
               }
             }
+            // 修改项目后，左侧tree数据中的描述也需要更新，鼠标悬浮会展示
+            const currentProject = this.searchedProjectsTree.find(item => item.id=== this.currentProjectData.id)
+            if(currentProject) {
+              currentProject.description = this.currentProjectData.description || ''
+            }
+            this.$refs.leftMenuTree.refresData();
           })
           .catch(() => {
             typeof callback == "function" && callback();
@@ -1209,6 +1241,28 @@ export default {
     },
     reopen(it) {
       this.openWorkflow(it.query)
+    },
+    updateWorkflowInfo(data) {
+      const projectToUpdateIndex = this.projectsTree.findIndex(project => project.id === Number(data.projectId));
+      if (projectToUpdateIndex !== -1) {
+        const projectToUpdate = this.projectsTree[projectToUpdateIndex];
+        data.flowList.forEach(flow => {
+          const childToUpdate = projectToUpdate.children.find(child => child.id === flow.id);
+          if (childToUpdate) {
+            // 映射关系：只更新修改项目时会填写到的字段，参数模板字段不用更新，打开修改项目时会向接口拉取
+            childToUpdate.name = flow.orchestratorName;
+            childToUpdate.orchestratorName = flow.orchestratorName;
+            childToUpdate.orchestratorMode = flow.orchestratorMode;
+            childToUpdate.orchestratorWays = flow.orchestratorWays;
+            childToUpdate.uses = flow.uses;
+            childToUpdate.orchestratorLevel = flow.orchestratorLevel;
+            childToUpdate.description = flow.description;
+            childToUpdate.isDefaultReference = flow.isDefaultReference;
+          }
+        });
+        const copiedProjectsTree = _.cloneDeep(this.projectsTree);
+        this.searchedProjectsTree = this.filterTreeByKeyword(copiedProjectsTree, '');
+      }
     },
     /**
      * 打开工作流查看并将工作流信息存入tab列表

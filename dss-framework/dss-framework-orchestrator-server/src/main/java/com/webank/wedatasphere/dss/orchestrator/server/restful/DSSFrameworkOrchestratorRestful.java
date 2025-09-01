@@ -49,19 +49,22 @@ import com.webank.wedatasphere.dss.workflow.dao.LockMapper;
 import com.webank.wedatasphere.dss.workflow.entity.DSSFlowEditLock;
 import com.webank.wedatasphere.dss.workflow.lock.DSSFlowEditLockManager;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.math3.util.Pair;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
+
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -91,6 +94,8 @@ public class DSSFrameworkOrchestratorRestful {
 
     @Autowired
     private DSSWorkspaceService dssWorkspaceService;
+
+    private final  String encryptCopyWorkflowSuffix = "copy_cib";
 
 
     /**
@@ -206,7 +211,7 @@ public class DSSFrameworkOrchestratorRestful {
             return Message.error("当前工作流正在被复制，不允许再次复制");
         }
 
-        String copyJobId = orchestratorFrameworkService.copyOrchestrator(username, orchestratorCopyRequest, workspace);
+        String copyJobId = orchestratorFrameworkService.copyOrchestrator(username, orchestratorCopyRequest, workspace,null,null,false);
         AuditLogUtils.printLog(username, workspace.getWorkspaceId(), workspace.getWorkspaceName(), TargetTypeEnum.ORCHESTRATOR,
                 orchestratorCopyRequest.getSourceOrchestratorId(), orchestratorCopyRequest.getSourceOrchestratorName(), OperateTypeEnum.COPY, orchestratorCopyRequest);
 
@@ -760,6 +765,99 @@ public class DSSFrameworkOrchestratorRestful {
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
 
         return  Message.ok().data("data",orchestratorPluginService.batchPublishFlowCheck(batchPublishFlowCheckRequest,workspace));
+    }
+
+
+    @RequestMapping(value = "encryptCopyOrchestrator",method = RequestMethod.POST)
+    public Message encryptCopyOrchestrator(@RequestBody EncryptCopyOrchestratorRequest encryptCopyOrchestratorRequest) throws  Exception{
+
+        String minutes = new SimpleDateFormat("MMddHHmm").format(new Date());
+        if(StringUtils.isEmpty(encryptCopyOrchestratorRequest.getCopyFlowSuffix())){
+            encryptCopyOrchestratorRequest.setCopyFlowSuffix(encryptCopyWorkflowSuffix  + minutes);
+        }
+
+        if(StringUtils.isEmpty(encryptCopyOrchestratorRequest.getCopyNodeSuffix())){
+
+            encryptCopyOrchestratorRequest.setCopyNodeSuffix("cp" + minutes);
+        }
+
+        String username = SecurityFilter.getLoginUsername(httpServletRequest);
+        Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
+        encryptCopyOrchestratorRequest.setUsername(username);
+
+        if(StringUtils.isEmpty(encryptCopyOrchestratorRequest.getAccessUser())){
+            encryptCopyOrchestratorRequest.setAccessUser("hadoop");
+        }
+
+        encryptCopyOrchestratorRequest.setWorkspaceId(workspace.getWorkspaceId());
+
+        LOGGER.info("request encryptCopyOrchestrator body is {}",encryptCopyOrchestratorRequest);
+
+        String workspaceName = dssWorkspaceService.getWorkspaceName(encryptCopyOrchestratorRequest.getWorkspaceId());
+
+        if(StringUtils.isEmpty(workspaceName)){
+            return Message.error("工作空间不存在");
+        }
+
+        if (orchestratorFrameworkService.getOrchestratorCopyStatus(encryptCopyOrchestratorRequest.getOrchestratorId())) {
+            return Message.error("当前工作流正在被复制，不允许编辑");
+        }
+
+
+        DSSOrchestratorCopyInfo  dssOrchestratorCopyInfo = orchestratorFrameworkService.encryptCopyOrchestrator(encryptCopyOrchestratorRequest,workspace);
+
+        AuditLogUtils.printLog("hadoop", encryptCopyOrchestratorRequest.getWorkspaceId(), workspaceName, TargetTypeEnum.ORCHESTRATOR,
+                dssOrchestratorCopyInfo.getSourceOrchestratorId(), dssOrchestratorCopyInfo.getSourceOrchestratorName(), OperateTypeEnum.COPY, encryptCopyOrchestratorRequest);
+
+        return Message.ok("复制工作流已经开始，正在后台复制中，复制状态可以从复制历史查看...").data("orchestratorCopyInfo", dssOrchestratorCopyInfo);
+
+    }
+
+
+    @RequestMapping(path = "/{id}/encryptOrchestratorCopyInfo", method = RequestMethod.GET)
+    public Message getEncryptCopyOrchestratorStatus(@PathVariable("id") String copyInfoId) throws Exception {
+
+        return Message.ok("获取编排复制任务状态成功").data("encryptOrchestratorCopyInfo", orchestratorFrameworkService.getDSSEncryptOrchestratorCopyInfo(copyInfoId));
+    }
+
+
+    @RequestMapping(path = "deleteEncryptOrchestrator", method = RequestMethod.POST)
+    public Message deleteEncryptOrchestrator(@RequestBody OrchestratorDeleteRequest deleteRequest) throws Exception {
+
+        OrchestratorVo orchestrator =  orchestratorService.getOrchestratorVoById(deleteRequest.getId());
+
+        if(orchestrator.getDssOrchestratorInfo() == null  || StringUtils.isEmpty(orchestrator.getDssOrchestratorInfo().getName())){
+            DSSExceptionUtils.dealErrorException(63335, "未找到工作流信息,不能进行删除", DSSErrorException.class);
+        }
+
+        String orchestratorName = orchestrator.getDssOrchestratorInfo().getName();
+        // 编排名称 必须符合 copy_cibxxxxxxxx格式才允许删除
+        // \\S*copy_cib\\d{8}
+        String regex = String.format("\\S*%s\\d{8}",encryptCopyWorkflowSuffix);
+
+        if(!Pattern.matches(regex, orchestratorName)){
+            DSSExceptionUtils.dealErrorException(63335, String.format("%s 工作流不是企业明文工作流,不能进行删除",orchestratorName),
+                    DSSErrorException.class);
+        }
+
+        String username = SecurityFilter.getLoginUsername(httpServletRequest);
+        Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
+        if (orchestratorFrameworkService.getOrchestratorCopyStatus(deleteRequest.getId())) {
+            return Message.error("当前工作流正在被复制，不允许删除");
+        }
+        ProjectInfoRequest projectInfoRequest = new ProjectInfoRequest();
+        projectInfoRequest.setProjectId(deleteRequest.getProjectId());
+        DSSProject dssProject = (DSSProject) DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender().ask(projectInfoRequest);
+        if (dssProject.getWorkspaceId() != workspace.getWorkspaceId()) {
+            DSSExceptionUtils.dealErrorException(63335, "工作流所在工作空间和cookie中不一致，请刷新页面后，再次发布！", DSSErrorException.class);
+        }
+
+        CommonOrchestratorVo orchestratorVo = orchestratorFrameworkService.deleteOrchestrator(username, deleteRequest, workspace);
+
+        AuditLogUtils.printLog("hadoop", workspace.getWorkspaceId(), workspace.getWorkspaceName(), TargetTypeEnum.ORCHESTRATOR,
+                orchestratorVo.getOrchestratorId(), orchestratorVo.getOrchestratorName(), OperateTypeEnum.DELETE, deleteRequest);
+
+        return Message.ok("删除工作流编排模式成功");
     }
 
 }

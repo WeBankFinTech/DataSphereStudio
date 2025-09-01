@@ -107,7 +107,7 @@ public class MigrateServiceImpl implements MigrateService {
         } else if (!dbProject.getUsername().equals(dssProject.getUsername())) {
             LOG.error("fatal error, project {} 已经创建，但是创建人不是 {}", dssProject.getName(), dssProject.getCreateBy());
             throw new MigrateErrorException(40035, "project has been created by others");
-        } else if (dbProject.getVisible() != null && dbProject.getVisible().intValue() == 0) {
+        } else if (dbProject.getVisible() != null && dbProject.getVisible().intValue() != 1) {
             LOG.error("fatal error, project {} 已经被删除 {}", dssProject.getName());
             throw new MigrateErrorException(40036, "The project has been deleted.Please restore project before exporting");
         } else {

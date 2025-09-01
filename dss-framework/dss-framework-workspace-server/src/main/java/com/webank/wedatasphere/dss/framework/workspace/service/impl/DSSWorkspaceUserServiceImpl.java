@@ -18,9 +18,12 @@ package com.webank.wedatasphere.dss.framework.workspace.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.webank.wedatasphere.dss.common.entity.PageInfo;
+import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.framework.admin.service.DssAdminUserService;
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSUserDefaultWorkspace;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceUser;
 import com.webank.wedatasphere.dss.common.StaffInfo;
+import com.webank.wedatasphere.dss.framework.workspace.bean.request.UpdateUserDefaultWorkspaceRequest;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceRoleVO;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DepartmentUserTreeVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DepartmentUserVo;
@@ -31,6 +34,7 @@ import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceUserS
 import com.webank.wedatasphere.dss.common.StaffInfoGetter;
 import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceDBHelper;
 import com.webank.wedatasphere.dss.common.conf.WorkspaceServerConstant;
+import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +45,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -106,6 +111,8 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
     @Transactional(rollbackFor = Exception.class)
     public void deleteWorkspaceUser(String userName, int workspaceId) {
         dssWorkspaceUserMapper.removeAllRolesForUser(userName, workspaceId);
+        // 删除用户的默认工作空间信息
+        dssWorkspaceUserMapper.deleteUserDefaultWorkspace(userName, Long.valueOf(workspaceId));
     }
 
     @Override
@@ -255,5 +262,51 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
     @Override
     public List<String> getWorkspaceUserByRoleId(Long workspaceId, Integer roleId) {
         return dssWorkspaceUserMapper.getWorkspaceUserByRoleId(workspaceId, roleId);
+    }
+
+    @Override
+    public DSSUserDefaultWorkspace updateUserDefaultWorkspace(UpdateUserDefaultWorkspaceRequest request) throws DSSErrorException {
+
+        String username = request.getUsername();
+        Long  workspaceId = request.getWorkspaceId();
+
+        Long count = getCountByUsername(request.getUsername(), request.getWorkspaceId().intValue());
+        // 判断是否有权限操作工作空间  -> 无权限则抛错
+        if (count == null || count == 0) {
+            throw new DSSErrorException(30021, String.format("user: %s have no permission to access this workspace %s",
+                    username,request.getWorkspaceName()));
+        }
+
+        DSSUserDefaultWorkspace dssUserDefaultWorkspace = new DSSUserDefaultWorkspace();
+
+        // isDefaultWorkspace： 是  更新默认工作空间信息
+        if(Boolean.TRUE.equals(request.getIsDefaultWorkspace())){
+
+            dssUserDefaultWorkspace = dssWorkspaceUserMapper.getDefaultWorkspaceByUsername(username);
+
+            if(dssUserDefaultWorkspace == null){
+
+                dssUserDefaultWorkspace = new DSSUserDefaultWorkspace();
+                dssUserDefaultWorkspace.setWorkspaceId(workspaceId);
+                dssUserDefaultWorkspace.setUsername(username);
+                dssUserDefaultWorkspace.setCreateUser(username);
+                dssUserDefaultWorkspace.setUpdateUser(username);
+                dssWorkspaceUserMapper.insertUserDefaultWorkspace(dssUserDefaultWorkspace);
+
+            }else{
+
+                dssUserDefaultWorkspace.setWorkspaceId(workspaceId);
+                dssUserDefaultWorkspace.setUpdateUser(username);
+                dssWorkspaceUserMapper.updateUserDefaultWorkspace(dssUserDefaultWorkspace);
+            }
+
+        }else {
+            // isDefaultWorkspace:  否  取消默认工作空间信息
+            dssUserDefaultWorkspace.setWorkspaceId(workspaceId);
+            dssUserDefaultWorkspace.setUsername(username);
+            dssWorkspaceUserMapper.deleteUserDefaultWorkspace(username,workspaceId);
+        }
+
+        return  dssUserDefaultWorkspace;
     }
 }

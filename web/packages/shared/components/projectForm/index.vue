@@ -512,7 +512,7 @@ export default {
           'data-source-manager/info',
           {
             //获取数据源数据
-            pageSize: 300,
+            pageSize: 1000,
             currentPage: 1,
           },
           {

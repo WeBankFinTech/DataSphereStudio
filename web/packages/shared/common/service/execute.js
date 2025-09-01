@@ -80,7 +80,6 @@ function Execute(data) {
   });
   this.on('execute:queryState', () => {
     this.queryStatus({ isKill: false });
-    this.queryProgress(); // ?
   });
   this.on('stateEnd', () => {
     this.getResultPath();

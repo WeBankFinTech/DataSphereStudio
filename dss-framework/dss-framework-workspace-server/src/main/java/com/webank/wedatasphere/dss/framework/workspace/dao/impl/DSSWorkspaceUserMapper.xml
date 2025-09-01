@@ -69,5 +69,35 @@
             <result column="title_cn" property="privNameCn"/>
         </collection>
     </resultMap>
+    
+    
+    <select id="getDefaultWorkspaceByUsername"
+            resultType="com.webank.wedatasphere.dss.framework.workspace.bean.DSSUserDefaultWorkspace">
+        select id as id
+              ,username as username
+              ,workspace_id as workspaceId
+              ,create_user  as createUser
+              ,create_time  as createTime
+              ,update_user  as updateUser
+              ,update_time  as updateTime
+        from dss_user_default_workspace where username = #{username}
+    </select>
+
+    <insert id="insertUserDefaultWorkspace"
+            parameterType="com.webank.wedatasphere.dss.framework.workspace.bean.DSSUserDefaultWorkspace">
+        insert into dss_user_default_workspace (username,workspace_id,create_user,update_user)
+        values(#{username},#{workspaceId},#{createUser},#{updateUser})
+    </insert>
+
+    <update id="updateUserDefaultWorkspace"
+            parameterType="com.webank.wedatasphere.dss.framework.workspace.bean.DSSUserDefaultWorkspace">
+        update dss_user_default_workspace
+        set workspace_id =#{workspaceId},update_user=#{updateUser},update_time=now()
+        where username =#{username}
+    </update>
+
+    <delete id="deleteUserDefaultWorkspace" parameterType="com.webank.wedatasphere.dss.framework.workspace.bean.DSSUserDefaultWorkspace">
+           delete from dss_user_default_workspace where username =#{username} and workspace_id =#{workspaceId}
+    </delete>
 
 </mapper>

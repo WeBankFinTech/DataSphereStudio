@@ -2,6 +2,7 @@
   "name": "@dataspherestudio/exts",
   "version": "1.1.19",
   "dependencies": {
-    "@dataspherestudio/shared": "^1.1.19"
+    "@dataspherestudio/shared": "^1.1.19",
+    "@webank/wa-sdk": "^2.9.2"
   }
 }

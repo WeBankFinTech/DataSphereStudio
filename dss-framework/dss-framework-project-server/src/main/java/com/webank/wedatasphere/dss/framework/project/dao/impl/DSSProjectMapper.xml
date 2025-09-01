@@ -115,7 +115,7 @@
         GROUP_CONCAT(CONCAT(a.project_id,'-',a.priv,'-',a.username)) pusername
         FROM dss_project_user a
         LEFT JOIN dss_project b ON a.project_id = b.id AND a.workspace_id=b.workspace_id
-        WHERE b.workspace_id = #{workspaceId} AND a.priv >=1 AND b.visible = 0
+        WHERE b.workspace_id = #{workspaceId} AND a.priv >=1 AND b.visible != 1
         <if test="id!=null">
             AND b.id = #{id}
         </if>

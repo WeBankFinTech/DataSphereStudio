@@ -20,8 +20,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.webank.wedatasphere.dss.appconn.manager.utils.AppConnManagerUtils;
+import com.webank.wedatasphere.dss.common.StaffInfo;
+import com.webank.wedatasphere.dss.common.StaffInfoGetter;
 import com.webank.wedatasphere.dss.common.auditlog.OperateTypeEnum;
 import com.webank.wedatasphere.dss.common.auditlog.TargetTypeEnum;
+import com.webank.wedatasphere.dss.common.entity.node.DSSNodeDefault;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
@@ -41,6 +44,7 @@ import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
 import com.webank.wedatasphere.dss.workflow.dao.LockMapper;
 import com.webank.wedatasphere.dss.workflow.entity.DSSFlowEditLock;
 import com.webank.wedatasphere.dss.workflow.entity.request.*;
+import com.webank.wedatasphere.dss.workflow.entity.response.BatchEditNodeContentResponse;
 import com.webank.wedatasphere.dss.workflow.entity.vo.ExtraToolBarsVO;
 import com.webank.wedatasphere.dss.workflow.lock.DSSFlowEditLockManager;
 import com.webank.wedatasphere.dss.common.service.BMLService;
@@ -352,6 +356,7 @@ public class FlowRestfulApi {
         try {
             version = flowService.saveFlow(flowID, jsonFlow, null, userName, workspaceName, projectName, labels);
         }catch (Exception e) {
+            LOGGER.error("保存工作流失败", e);
             return Message.error("保存失败，原因为：" + e.getMessage());
         }
         DSSFlow dssFlow = flowService.getFlowByID(flowID);
@@ -404,6 +409,76 @@ public class FlowRestfulApi {
             return Message.error("批量编辑失败，原因为：" + e.getMessage());
         }
         return Message.ok("批量编辑成功");
+    }
+
+    @RequestMapping(value = "/editNodeContent",method = RequestMethod.POST)
+    public Message editNodeContent(@RequestBody EditNodeContentRequest editNodeContentRequest){
+
+        String userName = SecurityFilter.getLoginUsername(httpServletRequest);
+        String nodeName = editNodeContentRequest.getNodeName();
+
+        editNodeContentRequest.setUsername(userName);
+
+
+        try {
+
+            Cookie[] cookies = httpServletRequest.getCookies();
+            String ticketId = Arrays.stream(cookies).filter(cookie -> DSSWorkFlowConstant.BDP_USER_TICKET_ID.equals(cookie.getName())).findFirst().map(Cookie::getValue).get();
+
+            dssFlowService.editNodeContent(editNodeContentRequest,ticketId);
+        } catch (Exception e) {
+            LOGGER.error(String.format("%s 节点编辑失败",nodeName), e);
+            return Message.error(String.format("%s 节点编辑失败，原因为：%s",nodeName , e.getMessage()));
+        }
+        return Message.ok(String.format("%s 节点编辑成功",nodeName));
+    }
+
+
+    @RequestMapping(value = "/batchEditNodeContent",method = RequestMethod.POST)
+    public Message batchEditNodeContent(@RequestBody BatchEditNodeContentRequest batchEditNodeContentRequest){
+
+        String userName = SecurityFilter.getLoginUsername(httpServletRequest);
+
+        try {
+
+            if(batchEditNodeContentRequest  == null){
+                return Message.error("批量编辑节点失败,输入参数为空");
+            }
+
+            Cookie[] cookies = httpServletRequest.getCookies();
+            String ticketId = Arrays.stream(cookies).filter(cookie -> DSSWorkFlowConstant.BDP_USER_TICKET_ID.equals(cookie.getName())).findFirst().map(Cookie::getValue).get();
+            batchEditNodeContentRequest.setUsername(userName);
+            LOGGER.info("batchEditNodeContent params is {}",batchEditNodeContentRequest);
+            BatchEditNodeContentResponse batchEditNodeContentResponse = flowService.batchEditNodeContent(batchEditNodeContentRequest,ticketId);
+
+            if(batchEditNodeContentResponse !=null && CollectionUtils.isNotEmpty(batchEditNodeContentResponse.getFailNodeName())){
+                return Message.error("批量编辑节点失败").data("data",batchEditNodeContentResponse);
+            }
+
+            return  Message.ok("批量编辑节点完成").data("data",batchEditNodeContentResponse);
+        }catch (Exception e){
+            LOGGER.error("批量编辑节点失败", e);
+            return Message.error(String.format("批量编辑节点失败，原因为：%s" , e.getMessage()));
+        }
+
+
+    }
+
+
+    @RequestMapping(value = "/getNodeInfoByName",method = RequestMethod.POST)
+    public Message getNodeInfoByName(@RequestBody QueryNodeInfoByNameRequest queryNodeInfoByNameRequest){
+
+        List<DSSNodeDefault> dssNodeDefaultList = new ArrayList<>();
+        try {
+            LOGGER.info("getNodeInfoByName params is {}",queryNodeInfoByNameRequest);
+            dssNodeDefaultList = flowService.getNodeInfoByName(queryNodeInfoByNameRequest);
+
+        }catch (Exception e){
+            LOGGER.error("获取节点信息失败", e);
+            return Message.error(String.format("获取节点信息失败，原因为：%s" , e.getMessage()));
+        }
+
+        return Message.ok("获取节点信息成功").data("data",dssNodeDefaultList);
     }
 
 }

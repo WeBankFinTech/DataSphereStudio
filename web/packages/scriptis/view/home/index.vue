@@ -222,7 +222,8 @@ export default {
   },
   methods: {
     changeScriptTab({ type }) {
-      this.dataSourcetype = type
+      // console.log('changeScriptTab', type)
+      // this.dataSourcetype = type
     },
     getGlobalLimit() {
       return api.fetch(`/dss/scriptis/globalLimits`, {}, {

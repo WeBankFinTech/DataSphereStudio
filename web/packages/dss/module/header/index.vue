@@ -42,14 +42,19 @@
       <DropdownMenu slot="list" class="proj-list">
         <div class="proj-name">{{ $t('message.common.dss.worklist') }}</div>
         <div class="name-bar">
-          <span
-            v-for="p in workspaceList"
-            :key="p.id"
-            :class="{ active: p.id == currentWorkspace.id }"
-            class="proj-item"
-            @click="changeWorkspace(p)"
-          >{{ p.name }}</span
-          >
+          <div v-for="p in workspaceList" class="workspacename-item">
+            <span
+              class="pro-item-star"
+              :class="p.isDefaultWorkspace ? 'favorited' : ''"
+              :title="p.isDefaultWorkspace ? '默认工作空间,点击取消默认': '设为默认工作空间'"
+              @click="setFavorite(p)"
+            ></span>
+            <span
+              :class="{ active: p.id == currentWorkspace.id }"
+              class="proj-item"
+              @click="changeWorkspace(p)"
+            >{{ p.name }}</span>
+          </div>
         </div>
       </DropdownMenu>
     </Dropdown>
@@ -175,7 +180,8 @@ import {
   GetFavorites,
   AddFavorite,
   RemoveFavorite,
-  GetCollections
+  GetCollections,
+  setDefaultWorkspace
 } from '@dataspherestudio/shared/common/service/apiCommonMethod.js';
 
 export default {
@@ -370,6 +376,11 @@ export default {
           });
         });
       }
+    },
+    setFavorite(item) {
+      setDefaultWorkspace(item.id, !item.isDefaultWorkspace).then(() => {
+        this.getWorkspaces()
+      })
     },
     getWorkspaceCollections() {
       if (this.$route.query.workspaceId) {

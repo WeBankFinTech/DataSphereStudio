@@ -526,17 +526,20 @@ export default {
       } else if (this.script.nodeId) {
         // 工作流
         this.dispatch('workflowIndexedDB:getNodeCache', {
-          tabId: this.script.nodeId,
-          cb: ({resultList, resultSet}) => {
-            if (resultList) {
-              this.script.resultList = resultList;
-              this.script.resultSet = resultSet;
-              let result = this.script.resultList[this.script.resultSet] 
-              let columnPageNow = type == 'changeColumnPage' ? this.scriptViewState.columnPageNow : result && result.result ? result.result.columnPageNow : 1;
-              this.getResultData(columnPageNow)
-            } else {
-              this.getResultData(1)
+          nodeId: this.script.nodeId,
+          cb: (cache) => {
+            if (cache) {
+              const {resultList, resultSet} = cache
+              if (resultList) {
+                this.script.resultList = resultList;
+                this.script.resultSet = resultSet;
+                let result = this.script.resultList[this.script.resultSet] 
+                let columnPageNow = type == 'changeColumnPage' ? this.scriptViewState.columnPageNow : result && result.result ? result.result.columnPageNow : 1;
+                this.getResultData(columnPageNow)
+                return
+              }
             }
+            this.getResultData(1)
           }
         });
       } else if(this.script.id) {
@@ -566,27 +569,33 @@ export default {
       const paths = this.script.resultList.map(item => item.path);
       // 已扣减过流量的直接通过
       let hasDeducted = storage.get('senitive_result_'+ this.baseinfo.username) || [];
-      hasDeducted = hasDeducted.includes(this.taskID);
-      const checkType = !['hive','hql'].includes(this.script.scriptType)
-      const notScriptis = !['results', 'Home'].includes(this.$route.name)
-      if (checkType || hasDeducted || notScriptis) {
+      hasDeducted = hasDeducted.some(it => it == taskId);
+      let scriptType = '';
+      let notCheck = ['ServicesExecute'].includes(this.$route.name);
+      // scriptis
+      if (this.script.scriptType) {
+        scriptType = this.script.runType;
+        notCheck = notCheck || !['hive', 'hql', 'jdbc'].includes(this.script.scriptType)
+      }
+      // 工作流节点
+      if (this.script.nodeId && this.$parent.node) {
+        const nodeTypeMap = {'linkis.spark.sql': 'sql', 'linkis.hive.hql': 'hql', 'linkis.jdbc.jdbc': 'jdbc'}
+        scriptType = nodeTypeMap[this.$parent.node.type]
+      }
+      if (hasDeducted || notCheck || !scriptType) {
         return Promise.resolve(false);
       }
       // 检查结果集是否需要扣减用量
       const params = {
-        taskId: this.taskID,
-        scriptType: this.script.scriptType,
+        taskId: taskId,
+        scriptType,
         paths: paths
       };
       return new Promise((resolve, reject) => {
         api.fetch('/dss/datapipe/dataset/checkDatasetSensitive', params, 'post').then(res => {
           const result = res.result || []
           const sensitiveResult = []
-          let flag = false
           result.forEach((item, idx) => {
-            if (item.resultPath == resultPath && !item.hasSensitiveData) { // 当前查看的结果集不存在敏感数据
-              flag = true
-            }
             if (item.hasSensitiveData) {
               sensitiveResult.push({
                 ...item,
@@ -594,9 +603,6 @@ export default {
               })
             }
           })
-          if (flag) {
-            return resolve(false);
-          }
           if (sensitiveResult.length) {
             this.currentSesitiveResult = {
               ...this.currentSesitiveResult,
@@ -670,13 +676,16 @@ export default {
                 ])
               },
               onOk: () => {
-                this.useResult(paths, resolve)
+                this.useResult(taskId, paths, resolve)
               },
               onCancel: () => {
                 resolve(true)
               }
             });
           } else {
+            // 不包含敏感信息
+            const hasDeducted = storage.get('senitive_result_'+ this.baseinfo.username) || [];
+            storage.set('senitive_result_'+ this.baseinfo.username, [...hasDeducted,  taskId]);
             resolve(false)
           }
         }).catch(() => {
@@ -684,24 +693,24 @@ export default {
         })
       })
     },
-    useResult(paths, resolve) {
+    useResult(taskId, paths, resolve) {
       // 扣减用量
       const params = {
         paths,
-        taskId: this.taskID
+        taskId
       }
       api.fetch('/dss/datapipe/dataset/deductQuota', params, 'post').then(res => {
         let msg = ''
         if (res.result && !res.result.needDeduct) {
           const hasDeducted = storage.get('senitive_result_'+ this.baseinfo.username) || [];
-          storage.set('senitive_result_'+ this.baseinfo.username, [...hasDeducted,  this.taskID]);
+          storage.set('senitive_result_'+ this.baseinfo.username, [...hasDeducted,  taskId]);
           return resolve(false)
         }
         if (res.result.isSuccess) {
           msg = `包含企业信息明文，扣减用量${res.result.dataSetSize}，剩余用量${res.result.quota}quota`
           this.$Message.success(msg)
           const hasDeducted = storage.get('senitive_result_'+ this.baseinfo.username) || [];
-          storage.set('senitive_result_'+ this.baseinfo.username, [...hasDeducted,  this.taskID]);
+          storage.set('senitive_result_'+ this.baseinfo.username, [...hasDeducted,  taskId]);
           resolve(false)
         } else {
           const fileds = Object.keys(res.result.metadata)
@@ -942,7 +951,6 @@ export default {
     },
     updateCache(params) {
       if ('dss/apiservice' == this.getResultUrl) {
-        // this.script.resultList =
       } else if (this.script.nodeId) {
         params.resultList = this.script.resultList;
         this.dispatch('workflowIndexedDB:updateNodeCache', {
@@ -1024,7 +1032,6 @@ export default {
           ...cacheTablePositionData,
         }
       }
-      console.log('setItem', cacheTablePositionData)
       sessionStorage.setItem('table_position_' + positionMemoryKey, JSON.stringify(cacheTablePositionData));
     },
     onRowClick(currentRow) {

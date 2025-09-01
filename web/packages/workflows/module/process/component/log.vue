@@ -39,6 +39,9 @@ export default {
   beforeDestroy() {
   },
   watch: {
+    height(newVal) {
+      this.scriptViewState.bottomContentHeight = newVal || 250; // 更新bottomContentHeight
+    },
     logs(v) {
       this.script = this.convertLogs(v)
     }

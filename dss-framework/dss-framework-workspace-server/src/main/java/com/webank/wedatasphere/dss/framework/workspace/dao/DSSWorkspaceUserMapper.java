@@ -17,6 +17,7 @@
 package com.webank.wedatasphere.dss.framework.workspace.dao;
 
 
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSUserDefaultWorkspace;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSUserRoleComponentPriv;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceUser;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceRoleVO;
@@ -127,4 +128,13 @@ public interface DSSWorkspaceUserMapper {
 
     @Delete("delete from dss_project_user where username = #{username} ")
     void deleteProjectUserByUserName(String userName);
+
+
+    DSSUserDefaultWorkspace getDefaultWorkspaceByUsername(@Param("username") String username);
+
+    void insertUserDefaultWorkspace(DSSUserDefaultWorkspace dssUserDefaultWorkspace);
+
+    void updateUserDefaultWorkspace(DSSUserDefaultWorkspace dssUserDefaultWorkspace);
+
+    void deleteUserDefaultWorkspace(@Param("username") String username, @Param("workspaceId") Long workspaceId);
 }

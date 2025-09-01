@@ -45,8 +45,10 @@ import org.apache.linkis.bml.client.BmlClientFactory;
 import org.apache.linkis.bml.protocol.BmlDownloadResponse;
 import org.apache.linkis.common.io.FsPath;
 import org.apache.linkis.storage.source.FileSource;
+import org.apache.linkis.storage.source.FileSource$;
 import org.apache.linkis.ujes.client.UJESClient;
 import org.apache.linkis.ujes.client.response.JobExecuteResult;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.math3.util.Pair;
 import org.slf4j.Logger;
@@ -379,10 +381,9 @@ public class ApiServiceQueryServiceImpl implements ApiServiceQueryService {
 
                     InputStream inputStream = resource.inputStream();
 
-                    try (FileSource fileSource = FileSource.create(new FsPath(scriptPath), inputStream)) {
+                    try (FileSource fileSource = FileSource$.MODULE$.create(new FsPath(scriptPath), inputStream)) {
                         //todo   数组取了第一个
-                        Pair<Object, List<String[]>> sourcePair = fileSource.collect()[0];
-                        collect = new Pair<>(sourcePair.getKey(), new ArrayList<>(sourcePair.getValue()));
+                        collect = fileSource.collect()[0];
                         bmlCache.put(key, collect);
                     }
                 }

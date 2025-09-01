@@ -5,6 +5,7 @@ import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInf
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class OrchestratorCopyVo implements Serializable {
 
@@ -23,6 +24,11 @@ public class OrchestratorCopyVo implements Serializable {
     private final Long copyTaskId;
     private final String instanceName;
 
+    private List<String> enableNodeIdList;
+
+    private String flowProxyUser;
+    private  boolean skipThirdNode;
+
     private OrchestratorCopyVo(Builder builder) {
         this.username = builder.username;
         this.sourceProjectId = builder.sourceProjectId;
@@ -36,6 +42,9 @@ public class OrchestratorCopyVo implements Serializable {
         this.workspace = builder.workspace;
         this.copyTaskId = builder.copyTaskId;
         this.instanceName = builder.instanceName;
+        this.enableNodeIdList = builder.enableNodeIdList;
+        this.flowProxyUser = builder.flowProxyUser;
+        this.skipThirdNode=builder.skipThirdNode;
     }
 
 
@@ -54,6 +63,11 @@ public class OrchestratorCopyVo implements Serializable {
         private Long copyTaskId;
         private final String instanceName;
 
+        private List<String> enableNodeIdList;
+
+        private String flowProxyUser;
+        private  boolean skipThirdNode;
+
         public Builder(String username, Long sourceProjectId, String sourceProjectName, Long targetProjectId,
                        String targetProjectName, DSSOrchestratorInfo orchestrator, String targetOrchestratorName,
                        String workflowNodeSuffix, DSSLabel dssLabel, Workspace workspace, String instanceName) {
@@ -69,6 +83,29 @@ public class OrchestratorCopyVo implements Serializable {
             this.workspace = workspace;
             this.instanceName = instanceName;
         }
+
+
+        public Builder(String username, Long sourceProjectId, String sourceProjectName, Long targetProjectId,
+                       String targetProjectName, DSSOrchestratorInfo orchestrator, String targetOrchestratorName,
+                       String workflowNodeSuffix, DSSLabel dssLabel, Workspace workspace, String instanceName,
+                       List<String> enableNodeIdList,String flowProxyUser,  boolean skipThirdNode) {
+
+            this.username = username;
+            this.sourceProjectId = sourceProjectId;
+            this.sourceProjectName = sourceProjectName;
+            this.targetProjectId = targetProjectId;
+            this.targetProjectName = targetProjectName;
+            this.orchestrator = orchestrator;
+            this.targetOrchestratorName = targetOrchestratorName;
+            this.workflowNodeSuffix = workflowNodeSuffix;
+            this.dssLabel = dssLabel;
+            this.workspace = workspace;
+            this.instanceName = instanceName;
+            this.enableNodeIdList = enableNodeIdList;
+            this.flowProxyUser = flowProxyUser;
+            this.skipThirdNode=skipThirdNode;
+        }
+
 
         public Builder setCopyTaskId(Long copyTaskId){
             this.copyTaskId = copyTaskId;
@@ -126,6 +163,31 @@ public class OrchestratorCopyVo implements Serializable {
 
     public String getInstanceName() {
         return instanceName;
+    }
+
+
+    public List<String> getEnableNodeIdList() {
+        return enableNodeIdList;
+    }
+
+    public void setEnableNodeIdList(List<String> enableNodeIdList) {
+        this.enableNodeIdList = enableNodeIdList;
+    }
+
+    public String getFlowProxyUser() {
+        return flowProxyUser;
+    }
+
+    public void setFlowProxyUser(String flowProxyUser) {
+        this.flowProxyUser = flowProxyUser;
+    }
+
+    public boolean getSkipThirdNode() {
+        return skipThirdNode;
+    }
+
+    public void setSkipThirdNode(boolean skipThirdNode) {
+        this.skipThirdNode = skipThirdNode;
     }
 }
 

@@ -217,6 +217,7 @@ export default {
       this.$emit('change', result);
     });
   },
+
   mounted() {
     this._cacheChange = {};
     commit(this.$store, 'UPDATE_SHAPE_OPTIONS', { viewWidth: this.showViews.shapeView ? 180 : 0 });
@@ -224,6 +225,15 @@ export default {
       if (this.$refs.designerView) {
         this.$refs.designerView.initView();
       }
+      setTimeout(() => {
+        const nodeName = this.getQueryParamFromHash('nodeName')
+        if (this.state.nodes && this.state.nodes.length > 0 && nodeName) {
+          const curNode = this.state.nodes.filter(node => node.title === nodeName)[0];
+          if(curNode) {
+            this.nodeScroolIntoView(curNode);
+          }
+        }
+      }, 1000);
     })
   },
   methods: {
@@ -238,6 +248,19 @@ export default {
           'bottom': 0,
           'z-index': 100
         }
+      }
+    },
+    getQueryParamFromHash(paramName) {
+      const hash = window.location.hash.slice(1);
+      const [path, query] = hash.split('?');
+      if (!query) {
+        return null;
+      }
+      const params = new URLSearchParams(query);
+      if (params.has(paramName)) {
+        return params.get(paramName);
+      } else {
+        return null;
       }
     },
     modeChange(mode) {
@@ -441,7 +464,6 @@ export default {
          */
     setNodeRunState(key, state, readonly ) {
       if (readonly && this.state.disabled) return
-      console.warn(key, state, readonly)
       let node = this.getNodeByKey(key);
       if (node) {
         this.$set(node, 'runState', state);

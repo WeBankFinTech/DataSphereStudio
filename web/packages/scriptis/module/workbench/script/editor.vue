@@ -142,6 +142,7 @@ import setting from './setting.vue';
 import api from '@dataspherestudio/shared/common/service/api';
 import plugin from '@dataspherestudio/shared/common/util/plugin'
 import { throttle } from 'lodash';
+import eventbus from '@dataspherestudio/shared/common/helper/eventbus';
 import elementResizeEvent from '@dataspherestudio/shared/common/helper/elementResizeEvent';
 import storage from '@dataspherestudio/shared/common/helper/storage';
 
@@ -286,6 +287,7 @@ export default {
           desc: this.$t('message.scripts.largedatatip')
         })
       }
+      eventbus.emit('open-db-table-suggest')
     },
     handleConfigTip () {
       if (this.script.params && this.script.params.variable && this.script.params.variable.length > 0) {

@@ -158,6 +158,7 @@
 import draggable from "vuedraggable"
 import api from '@dataspherestudio/shared/common/service/api'
 import storage from '@dataspherestudio/shared/common/helper/storage'
+import eventbus from '@dataspherestudio/shared/common/helper/eventbus'
 import util from '@dataspherestudio/shared/common/util'
 import title from "./title.vue"
 import body from "./body.vue"
@@ -245,9 +246,13 @@ export default {
       if (work) {
         let supportedMode = find(this.getSupportModes(), (p) => p.rule.test(work.filename));
         if (supportedMode) {
+          const typeMap = {
+            "jdbc": "StarRocks",
+            "Nebula": "NebulaGraph",
+          }
           this.$emit('active-tab-change', {
             id: val,
-            type: supportedMode.scriptType == 'Nebula' ? 'NebulaGraph': 'Hive'
+            type: typeMap[supportedMode.scriptType] || 'Hive'
           })
         }
       }
@@ -261,15 +266,27 @@ export default {
     },
   },
   mounted() {
+    eventbus.on('open-db-table-suggest', this.updateCache)
+    this.getDatasourceType()
     this.init()
     elementResizeEvent.bind(this.$el, this.resize)
     this.initListenerCopilotEvent()
   },
   beforeDestroy() {
+    eventbus.clear('open-db-table-suggest')
     elementResizeEvent.unbind(this.$el)
     this.destroyCopilotEvent()
   },
   methods: {
+    async getDatasourceType() {
+      if (!this.starrocksTypeId) {
+          const { typeList } = await api.fetch('/data-source-manager/type/all', {}, 'get')
+          const starrockItem = typeList.find(it => {
+            return it.name === 'starrocks'
+          })
+          this.starrocksTypeId = starrockItem ?  starrockItem.id : ''
+        }
+    },
     destroyCopilotEvent() {
       plugin.clear('copilot_web_listener_viewTableData')
       plugin.clear('copilot_web_listener_queryStructure')
@@ -301,11 +318,15 @@ export default {
     },
     init() {
       this.loading = true;
-      this.dispatch('IndexedDB:getGlobalCache', {
-        id: this.getUserName(),
-      }, (cache) => {
-        this.updateCache(cache);
-      })
+      const closeSuggest = storage.get('close_db_table_suggest');
+      const uselsp = localStorage.getItem('scriptis-edditor-type') === 'lsp'
+      if (!closeSuggest || uselsp) {
+        this.dispatch('IndexedDB:getGlobalCache', {
+          id: this.getUserName(),
+        }, (cache) => {
+          this.updateCache(cache);
+        })
+      }
       // 获取hive库和表的信息，用于在tab页中的.sql脚本进行关键字联想
       // 首次登录打开时，得重新获取数据
       const worklist = storage.get(this.getUserName() + "tabs", "local")
@@ -585,10 +606,12 @@ export default {
         let dataSet = []
         api
           .fetch(
+            //'data-source-manager/info/connect-params',
             'data-source-manager/info',
             {
               //获取数据源数据
-              pageSize: 300,
+              pageSize: 1000,
+              //typeId: this.starrocksTypeId,
               currentPage: 1,
             },
             {
@@ -608,6 +631,7 @@ export default {
                   rst.queryList[i].versionId > 0 &&
                   rst.queryList[i].publishedVersionId &&
                   !['tdsql', 'mysql'].includes(rst.queryList[i].dataSourceType.name)
+                  //rst.queryList[i].connectParams.username === username
                 ) {
                   dataSet.push(rst.queryList[i])
                 }

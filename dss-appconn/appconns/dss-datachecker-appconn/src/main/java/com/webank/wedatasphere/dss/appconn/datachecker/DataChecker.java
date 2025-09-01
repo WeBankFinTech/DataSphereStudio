@@ -45,6 +45,7 @@ public class DataChecker {
 
     public final static String QUALITIS_CHECK = "qualitis.check";
     public final static String QUALITIS_SWITCH = "job.eventchecker.qualitis.switch";
+    public final static String DENY_VIEW_SWITCH = "deny.view.switch";
     public final static String QUALITIS_CHECK_DEFAULT = "qualitis.check.default";
     public final static String EXPAND_SECOND_PARTITION = "hourly.secondary.partition";
 
@@ -60,7 +61,7 @@ public class DataChecker {
     public DataChecker(Properties p, DataCheckerExecutionAction action) {
         this.p = p;
         dataCheckerAction = action;
-        maxWaitTime = Long.valueOf(p.getProperty(DataChecker.WAIT_TIME, "1")) * 3600 * 1000;
+        maxWaitTime = (long) (Double.valueOf(p.getProperty(DataChecker.WAIT_TIME, "1")) * 3600 * 1000);
         //test over time
 //        maxWaitTime = Long.valueOf(p.getProperty(DataChecker.WAIT_TIME, "1")) * 120 * 1000;
         queryFrequency = Integer.valueOf(p.getProperty(DataChecker.QUERY_FREQUENCY, "60000"));

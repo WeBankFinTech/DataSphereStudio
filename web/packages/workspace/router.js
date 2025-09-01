@@ -53,6 +53,14 @@ export const apiServicesRoutes = [
         import('./module/management/module/jurisdiction.vue'),
     },
     {
+      path: 'workspaceSettings',
+      name: 'workspaceSettings',
+      meta: {
+        publicPage: true,
+      },
+      component: () => import('./view/settings/index.vue'),
+    },
+    {
       path: 'dataSourceAdministration',
       name: 'dataSourceAdministration',
       meta: {

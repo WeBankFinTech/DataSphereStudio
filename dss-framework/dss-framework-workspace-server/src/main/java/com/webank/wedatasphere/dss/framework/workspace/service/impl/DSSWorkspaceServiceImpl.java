@@ -16,7 +16,9 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.service.impl;
 
-import cn.hutool.core.util.ObjectUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.github.pagehelper.page.PageMethod;
@@ -25,6 +27,7 @@ import com.webank.wedatasphere.dss.appconn.core.ext.OnlySSOAppConn;
 import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
 import com.webank.wedatasphere.dss.appconn.manager.utils.AppInstanceConstants;
 import com.webank.wedatasphere.dss.common.StaffInfoGetter;
+import com.webank.wedatasphere.dss.common.entity.workspace.DSSStarRocksCluster;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
@@ -36,6 +39,7 @@ import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.Workspa
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceFavoriteVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceMenuAppconnVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceMenuVo;
+import com.webank.wedatasphere.dss.framework.workspace.bean.request.UpdateWorkspaceStarRocksClusterRequest;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.*;
 import com.webank.wedatasphere.dss.framework.workspace.constant.ApplicationConf;
 import com.webank.wedatasphere.dss.framework.workspace.dao.*;
@@ -49,25 +53,34 @@ import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperation;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
+import com.webank.wedatasphere.dss.workflow.entity.StarRocksNodeInfo;
+import com.webank.wedatasphere.dss.workflow.entity.request.BatchEditFlowRequest;
+import com.webank.wedatasphere.dss.workflow.entity.request.EditFlowRequest;
+import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.linkis.common.exception.ErrorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.function.Supplier;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.webank.wedatasphere.dss.framework.workspace.util.DSSWorkspaceConstant.DEFAULT_DEMO_WORKSPACE_NAME;
 
 public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     private static final Logger LOGGER = LoggerFactory.getLogger(DSSWorkspaceServiceImpl.class);
-
+    private static final Pattern IPV4_PATTERN = Pattern.compile(
+            "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
+    );
     @Autowired
     private DSSWorkspaceMapper dssWorkspaceMapper;
     @Autowired
@@ -100,6 +113,10 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     @Autowired
     private DSSWorkspaceRoleCheckService roleCheckService;
 
+    @Autowired
+    private DSSWorkspaceStarRocksClusterMapper dssWorkspaceStarRocksClusterMapper;
+    @Autowired
+    private DSSFlowService dssFlowService;
     //创建工作空间
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -205,20 +222,30 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     public List<DSSWorkspace> getWorkspaces(String userName) {
         List<DSSWorkspace> workspaces = dssWorkspaceMapper.getWorkspaces(userName);
         workspaces = sortDssWorkspacesIndex(workspaces);
-        //用于展示demo的工作空间是不应该返回的,除非用户是管理员
-        if (dssWorkspaceUserMapper.isAdmin(userName) == 1) {
+        Integer isAdmin = dssWorkspaceUserMapper.isAdmin(userName);
+        // 获取默认工作空间
+        DSSUserDefaultWorkspace dssUserDefaultWorkspace = dssWorkspaceUserMapper.getDefaultWorkspaceByUsername(userName);
+        Long workspaceId = dssUserDefaultWorkspace == null ? null : dssUserDefaultWorkspace.getWorkspaceId();
+        // 如果用户未设置默认工作空间,且用户为管理员
+        if (workspaceId == null && isAdmin == 1){
             return workspaces;
-        } else {
-            //踢掉那个演示demo工作空间
-            List<DSSWorkspace> retWorkspaces = new ArrayList<>();
-            String[] defaultDemoWorkspaceNames = DEFAULT_DEMO_WORKSPACE_NAME.getValue().split(",");
-            for (DSSWorkspace workspace : workspaces) {
-                if (!ArrayUtils.contains(defaultDemoWorkspaceNames, workspace.getName())) {
-                    retWorkspaces.add(workspace);
-                }
-            }
-            return retWorkspaces;
         }
+
+        List<DSSWorkspace> retWorkspaces = new ArrayList<>();
+        String[] defaultDemoWorkspaceNames = DEFAULT_DEMO_WORKSPACE_NAME.getValue().split(",");
+        for (DSSWorkspace workspace : workspaces) {
+
+            // 除非用户是管理员, 否则踢掉那个演示demo工作空间
+            if (isAdmin != 1 && ArrayUtils.contains(defaultDemoWorkspaceNames, workspace.getName()) ) {
+                continue;
+            }
+
+            boolean  isDefaultWorkspace = workspaceId != null && workspace.getId() == workspaceId.intValue();
+            workspace.setIsDefaultWorkspace(isDefaultWorkspace);
+            retWorkspaces.add(workspace);
+        }
+
+        return  retWorkspaces;
     }
 
     @Override
@@ -274,18 +301,22 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
             dssWorkspaceHomePageVO.setWorkspaceId(workspaceIds.get(0));
             dssWorkspaceHomePageVO.setRoleName(workspaceDBHelper.getRoleNameById(minRoleId));
         } else {
-            String homepageUrl = "/workspaceHome?workspaceId=" + workspaceIds.get(0);
-            String[] defaultWorkspaceName = ApplicationConf.HOMEPAGE_DEFAULT_WORKSPACE.getValue().split(",");
-            DSSWorkspace defaultWorkspace = dssWorkspaces.stream()
-                    .filter(workspcae -> Arrays.stream(defaultWorkspaceName).anyMatch(n->n.equalsIgnoreCase(workspcae.getName()))).findFirst().orElse(null);
-            if(ObjectUtil.isNotEmpty(defaultWorkspace)){
-                homepageUrl = "/workspaceHome?workspaceId=" + defaultWorkspace.getId();
-            }
+            Integer workspaceId = workspaceIds.get(0);
+            String homepageUrl;
+
 
             if (ApplicationConf.HOMEPAGE_MODULE_NAME.getValue().equalsIgnoreCase(moduleName)) {
-                homepageUrl = ApplicationConf.HOMEPAGE_URL.getValue() + workspaceIds.get(0);
+
+                homepageUrl = ApplicationConf.HOMEPAGE_URL.getValue() + workspaceId;
+
+            }else{
+
+                workspaceId = getDefaultWorkspaceId(dssWorkspaces,userName,workspaceIds);
+                homepageUrl = "/workspaceHome?workspaceId=" + workspaceId;
+
             }
-            dssWorkspaceHomePageVO.setWorkspaceId(workspaceIds.get(0));
+
+            dssWorkspaceHomePageVO.setWorkspaceId(workspaceId);
             dssWorkspaceHomePageVO.setHomePageUrl(homepageUrl);
         }
         return dssWorkspaceHomePageVO;
@@ -307,6 +338,34 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
             }
         }
        return dssWorkspaceReq;
+    }
+
+    private Integer getDefaultWorkspaceId(List<DSSWorkspace> dssWorkspaces, String username,List<Integer> workspaceIds){
+
+        LOGGER.info("get user {} default workspace",username);
+        DSSUserDefaultWorkspace dssUserDefaultWorkspace = dssWorkspaceUserMapper.getDefaultWorkspaceByUsername(username);
+
+        if(dssUserDefaultWorkspace != null && workspaceIds.contains(dssUserDefaultWorkspace.getWorkspaceId().intValue())){
+            LOGGER.info("get user {} custom setting default workspace {}",
+                    username,dssUserDefaultWorkspace.getWorkspaceId());
+            return  dssUserDefaultWorkspace.getWorkspaceId().intValue();
+        }
+
+        String[] defaultWorkspaceName = ApplicationConf.HOMEPAGE_DEFAULT_WORKSPACE.getValue().split(",");
+
+        DSSWorkspace defaultWorkspace = dssWorkspaces.stream()
+                .filter(workspace -> Arrays.stream(defaultWorkspaceName)
+                        .anyMatch(n->n.equalsIgnoreCase(workspace.getName())))
+                .findFirst().orElse(null);
+
+        if (defaultWorkspace != null){
+            LOGGER.info("get user {} homepage default config workspace  {}",
+                    username,defaultWorkspace.getId());
+            return  defaultWorkspace.getId();
+        }
+        LOGGER.info("get user {} by add workspace time , get first workspace {}",username,workspaceIds.get(0));
+        return  workspaceIds.get(0);
+
     }
 
     @Override
@@ -823,5 +882,225 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     @Override
     public void updateWorkspaceInfo(DSSWorkspace dssWorkspace){
         dssWorkspaceMapper.updateWorkspaceInfo(dssWorkspace);
+    }
+
+    @Override
+    public List<DSSWorkspaceStarRocksCluster> updateStarRocksCluster(List<UpdateWorkspaceStarRocksClusterRequest> request, String ticketId, Workspace workspace, String userName) {
+
+        Long workspaceId = request.get(0).getWorkspaceId();
+        List<DSSWorkspaceStarRocksCluster> starRocksClusters = new ArrayList<>();
+        Set<String> clusterNames = new HashSet<>();
+        int count = 0;
+
+        List<DSSWorkspaceStarRocksCluster> itemsByWorkspaceId = dssWorkspaceStarRocksClusterMapper.getItemsByWorkspaceId(workspaceId);
+        Map<String, DSSWorkspaceStarRocksCluster> existsClusters = new HashMap<>();
+        if(CollectionUtils.isNotEmpty(itemsByWorkspaceId)){
+            existsClusters = itemsByWorkspaceId.stream()
+                    .collect(Collectors.toMap(DSSWorkspaceStarRocksCluster::getClusterName, cluster -> cluster));
+        }
+
+        for (UpdateWorkspaceStarRocksClusterRequest r : request) {
+
+            if (!clusterNames.add(r.getClusterName())) {
+                throw new DSSErrorException(90054, String.format("Two identical names %s are not allowed in workspace %s", r.getClusterName(), r.getWorkspaceName()));
+            }
+
+            if (StringUtils.isEmpty(r.getClusterName()) || StringUtils.isEmpty(r.getClusterIp())) {
+                LOGGER.warn("工作空间{} StarRocks集群名和ip不能为空", r.getWorkspaceName());
+                throw new DSSErrorException(90054, String.format("%s workspace StarRocks cluster name and ip cannot be empty.", r.getWorkspaceName()));
+            }
+
+            if (StringUtils.length(r.getClusterName()) > 256) {
+                LOGGER.warn("工作空间{}StarRocks集群名称{}超过256字符", r.getWorkspaceName(), r.getClusterName());
+                throw new DSSErrorException(90054, String.format("StarRocks cluster %s length cannot exceed 256 in workspace %s", r.getClusterName(), r.getWorkspaceName()));
+            }
+
+            // 已经存在的集群 不允许更改IP 和端口
+            if(existsClusters.containsKey(r.getClusterName())){
+                DSSWorkspaceStarRocksCluster dssWorkspaceStarRocksCluster = existsClusters.get(r.getClusterName());
+
+                if(ObjectUtils.notEqual(dssWorkspaceStarRocksCluster.getClusterIp(),r.getClusterIp())){
+                    LOGGER.warn("{} workspace, {} StarRocks cluster ip cannot be updated, ip is [{},{}]",r.getWorkspaceName(),r.getClusterName(),
+                            r.getClusterIp(),dssWorkspaceStarRocksCluster.getClusterIp());
+                    throw new DSSErrorException(90054, String.format("%s workspace, %s StarRocks cluster ip cannot be updated", r.getWorkspaceName(),r.getClusterName()));
+                }
+
+                if(ObjectUtils.notEqual(dssWorkspaceStarRocksCluster.getHttpPort(),r.getHttpPort())
+                        || ObjectUtils.notEqual(dssWorkspaceStarRocksCluster.getTcpPort(),r.getTcpPort())
+                ){
+                    LOGGER.warn("{} workspace, {} StarRocks cluster port cannot be updated",r.getWorkspaceName(),r.getClusterName());
+                    LOGGER.warn("tcp port is [{},{}],http port is [{},{}]",r.getTcpPort(),dssWorkspaceStarRocksCluster.getTcpPort(),
+                            r.getHttpPort(),dssWorkspaceStarRocksCluster.getHttpPort());
+                    throw new DSSErrorException(90054, String.format("%s workspace, %s StarRocks cluster port cannot be updated", r.getWorkspaceName(),r.getClusterName()));
+                }
+            }
+
+
+            if (Integer.parseInt(r.getHttpPort()) < 0 || Integer.parseInt(r.getHttpPort()) > 65535 || Integer.parseInt(r.getTcpPort()) < 0 || Integer.parseInt(r.getTcpPort()) > 65535) {
+                LOGGER.warn("工作空间{}StarRocks集群端口必须在0-65535之间", r.getWorkspaceName());
+                throw new DSSErrorException(90054, String.format("%s workspace StarRocks cluster port must be between 0 and 65535", r.getWorkspaceName()));
+            }
+
+            if (!IPV4_PATTERN.matcher(r.getClusterIp()).matches()) {
+                LOGGER.warn("工作空间{}StarRocks集群ip格式不准确", r.getWorkspaceName());
+                throw new DSSErrorException(90054, String.format("%s workspace StarRocks cluster ip is illegal", r.getWorkspaceName()));
+            }
+
+            if (r.getDefaultCluster()) {
+                count++;
+            }
+            if (count > 1) {
+                LOGGER.warn("工作空间{}不允许设置两个默认集群", r.getWorkspaceName());
+                throw new DSSErrorException(90054, String.format("%s workspace cannot set multiple default StarRocks cluster!", r.getWorkspaceName()) );
+            }
+        }
+
+        List<StarRocksNodeInfo> starRocksNodeInfos = dssFlowService.queryStarRocksNodeList(workspaceId);
+        Set<String> executeClusterSet = starRocksNodeInfos.stream().map(StarRocksNodeInfo::getNodeUiValue).collect(Collectors.toSet());
+
+        Map<String, UpdateWorkspaceStarRocksClusterRequest> requestCluster = request.stream().
+                collect(Collectors.toMap(UpdateWorkspaceStarRocksClusterRequest::getClusterName, r -> r));
+
+        for (DSSWorkspaceStarRocksCluster item : itemsByWorkspaceId) {
+            UpdateWorkspaceStarRocksClusterRequest requestOne = requestCluster.get(item.getClusterName());
+            if (requestOne == null) {
+                //请求中没有该集群，删除前需要校验有没有被引用，没有引用才允许删除
+                if (executeClusterSet.contains(item.getClusterName())) {
+                    throw new DSSErrorException(90054, String.format("集群 %s 在工作流节点中被引用，不允许删除", item.getClusterName()) );
+                } else {
+                    dssWorkspaceStarRocksClusterMapper.deleteItemById(item.getId());
+                }
+            } else {
+
+                item.setDefaultCluster(requestOne.getDefaultCluster());
+                item.setUpdateUser(requestOne.getUsername());
+                item.setUpdateTime(new Date());
+                LOGGER.info("更新集群{}的信息为{}", item.getClusterName(), item);
+                dssWorkspaceStarRocksClusterMapper.updateStarRocksCluster(item);
+                starRocksClusters.add(item);
+            }
+        }
+
+        for (UpdateWorkspaceStarRocksClusterRequest r : request) {
+            DSSWorkspaceStarRocksCluster existsOne = existsClusters.get(r.getClusterName());
+            //如果数据库不存在，就需要添加进去
+            if (existsOne == null) {
+                LOGGER.info("新增集群{}", r.getClusterName());
+                DSSWorkspaceStarRocksCluster dssWorkspaceStarRocksCluster = new DSSWorkspaceStarRocksCluster(r.getWorkspaceId(),
+                        workspace.getWorkspaceName(), r.getClusterName(), r.getClusterIp(), r.getHttpPort(), r.getTcpPort(),
+                        r.getDefaultCluster(), r.getUsername(), r.getUsername(), new Date(), new Date());
+                dssWorkspaceStarRocksClusterMapper.insertStarRocksCluster(dssWorkspaceStarRocksCluster);
+                starRocksClusters.add(dssWorkspaceStarRocksCluster);
+            }
+        }
+        return starRocksClusters;
+    }
+
+    @Override
+    public List<DSSWorkspaceStarRocksCluster> getStarRocksCluster(Long workspaceId) {
+        return dssWorkspaceStarRocksClusterMapper.getItemsByWorkspaceId(workspaceId);
+    }
+
+    @Override
+    public void deleteStarRocksClusterByWorkspaceId(Long workspaceId) {
+        List<StarRocksNodeInfo> starRocksNodeInfos = dssFlowService.queryStarRocksNodeList(workspaceId);
+        Set<String> executeClusterSet = starRocksNodeInfos.stream().filter(s -> "executeCluster".equals(s.getNodeUiKey())).map(StarRocksNodeInfo::getNodeUiValue).collect(Collectors.toSet());
+        List<DSSWorkspaceStarRocksCluster> itemsByWorkspaceId = dssWorkspaceStarRocksClusterMapper.getItemsByWorkspaceId(workspaceId);
+        for (DSSWorkspaceStarRocksCluster item : itemsByWorkspaceId) {
+            if (executeClusterSet.contains(item.getClusterName())) {
+                throw new DSSErrorException(90054, String.format("集群 %s 在工作流节点中被引用，不允许删除", item.getClusterName()) );
+            } else {
+                dssWorkspaceStarRocksClusterMapper.deleteItemByWorkspaceId(workspaceId);
+            }
+        }
+    }
+
+    @Override
+    public List<DSSStarRocksCluster> getDSSStarrocksCluster(Long workspaceId) {
+        List<DSSStarRocksCluster> starrocksClusterList = new ArrayList<>();
+
+        List<DSSWorkspaceStarRocksCluster> dssWorkspaceStarRocksClusterList = getStarRocksCluster(workspaceId);
+
+        for(DSSWorkspaceStarRocksCluster dssWorkspaceStarRocksCluster: dssWorkspaceStarRocksClusterList){
+            DSSStarRocksCluster dssStarrocksCluster = new DSSStarRocksCluster();
+            BeanUtils.copyProperties(dssWorkspaceStarRocksCluster,dssStarrocksCluster);
+            starrocksClusterList.add(dssStarrocksCluster);
+
+        }
+
+        return starrocksClusterList;
+    }
+
+    private BatchEditFlowRequest getEditFlowRequest(List<StarRocksNodeInfo> updateNodes, DSSWorkspaceStarRocksCluster oneByClusterName) throws JsonProcessingException {
+        Map<String, Map<String, String>> nodeKeyToUiMap = new HashMap<>();
+        for (StarRocksNodeInfo updateNode : updateNodes) {
+            String nodeKey = updateNode.getNodeKey() + "&" + updateNode.getNodeContentId() + "&" + updateNode.getOrchestratorId();
+            String nodeUiKey = updateNode.getNodeUiKey();
+            String nodeUiValue = updateNode.getNodeUiValue();
+            nodeKeyToUiMap.computeIfAbsent(nodeKey, k -> new HashMap<>())
+                    .put(nodeUiKey, nodeUiValue);
+        }
+        List<EditFlowRequest> editFlowRequestList = new ArrayList<>();
+        for (Map.Entry<String, Map<String, String>> outerEntry : nodeKeyToUiMap.entrySet()) {
+            String nodeKey = outerEntry.getKey();
+            Map<String, String> innerMap = outerEntry.getValue();
+            EditFlowRequest editFlowRequest = new EditFlowRequest();
+            String[] split = nodeKey.split("&");
+            editFlowRequest.setNodeKey(split[0]);
+            editFlowRequest.setId(Long.parseLong(split[1]));
+            editFlowRequest.setOrchestratorId(Long.parseLong(split[2]));
+            String reuseEngine = innerMap.getOrDefault("ReuseEngine", null);
+            String autoDisabled = innerMap.getOrDefault("auto.disable", null);
+            String params = constructParams(reuseEngine, autoDisabled, oneByClusterName.getClusterName(),
+                    oneByClusterName.getClusterIp(), oneByClusterName.getTcpPort());
+            editFlowRequest.setParams(params);
+            editFlowRequestList.add(editFlowRequest);
+        }
+
+        BatchEditFlowRequest batchEditFlowRequest = new BatchEditFlowRequest();
+        batchEditFlowRequest.setEditNodeList(editFlowRequestList);
+
+
+        return batchEditFlowRequest;
+    }
+
+    private String constructParams(String reuseEngine, String autoDisabled, String executeCluster, String host, String port) throws JsonProcessingException {
+        // 使用 Jackson 构造 JSON
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode configuration = mapper.createObjectNode();
+
+        // special
+        ObjectNode special = mapper.createObjectNode();
+        if (autoDisabled != null) {
+            special.put("auto.disabled", autoDisabled);
+        } else {
+            special.putNull("auto.disabled");
+        }
+
+        // runtime
+        ObjectNode runtime = mapper.createObjectNode();
+        if (executeCluster != null) {
+            runtime.put("executeCluster", executeCluster);
+        } else {
+            runtime.putNull("executeCluster");
+        }
+        runtime.put("linkis.datasource.type", "starrocks");
+        runtime.put("linkis.datasource.params.host", host);
+        runtime.put("linkis.datasource.params.port", port);
+
+        // startup
+        ObjectNode startup = mapper.createObjectNode();
+        startup.put("ReuseEngine", reuseEngine);
+
+        // 总的configuration
+        configuration.set("special", special);
+        configuration.set("runtime", runtime);
+        configuration.set("startup", startup);
+        ObjectNode rootNode = mapper.createObjectNode();
+        rootNode.set("configuration", configuration);
+
+        // 转成String
+        return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(rootNode);
+
     }
 }

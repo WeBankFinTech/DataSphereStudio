@@ -466,6 +466,7 @@ export default {
       }
     },
     getUserList(query) {
+      query = query ? query.trim() : '';
       this.loading1 = true
       if (this.list && query) {
         this.options = this.list.filter(item => {

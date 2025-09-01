@@ -76,6 +76,9 @@ export default {
     },
     open(v) {
       this.refresData(v)
+    },
+    height() {
+      this.refresData()
     }
   },
   data() {

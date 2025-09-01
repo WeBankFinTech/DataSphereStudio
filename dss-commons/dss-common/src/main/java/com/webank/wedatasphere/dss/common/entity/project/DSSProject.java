@@ -194,6 +194,9 @@ public class DSSProject implements Project {
                 ", workspaceName='" + workspaceName + '\'' +
                 ", editable=" + editable +
                 ", associateGit=" + associateGit +
+                ", releaseUsers=" + releaseUsers +
+                ", editUsers=" + editUsers +
+                ", accessUsers=" + accessUsers +
                 '}';
     }
 

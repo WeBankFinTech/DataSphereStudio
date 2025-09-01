@@ -20,14 +20,15 @@ import java.awt.image.BufferedImage
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream, InputStream}
 import java.util
 import java.util.{Base64, Iterator, UUID}
-
-import com.webank.wedatasphere.dss.appconn.sendemail.email.domain.{AbstractEmail, ExcelAttachment, MultiContentEmail, PdfAttachment, PngAttachment}
+import com.webank.wedatasphere.dss.appconn.sendemail.email.domain.{AbstractEmail, ExcelAttachment, MdAttachment, MultiContentEmail, PdfAttachment, PngAttachment}
 import com.webank.wedatasphere.dss.appconn.sendemail.emailcontent.domain.PictureEmailContent
 import org.apache.linkis.common.conf.Configuration
+
 import javax.imageio.{ImageIO, ImageReader}
 import org.apache.commons.codec.binary.Base64OutputStream
 import com.webank.wedatasphere.dss.appconn.sendemail.conf.SendEmailAppConnConfiguration._
 import com.webank.wedatasphere.dss.appconn.sendemail.exception.EmailSendFailedException
+
 import javax.imageio.stream.ImageInputStream
 import org.apache.commons.io.IOUtils
 import org.apache.linkis.common.utils.Utils
@@ -46,6 +47,12 @@ object PictureEmailContentParser extends AbstractEmailContentParser[PictureEmail
           val decoder = Base64.getDecoder
           val byteArr = decoder.decode(imageStr)
           multiContentEmail.addAttachment(new PdfAttachment(pdfName, Base64.getEncoder.encodeToString(byteArr)))
+        case "md" =>
+          val mdUUID: String = UUID.randomUUID.toString
+          val mdName = mdUUID + ".md"
+          val decoder = Base64.getDecoder
+          val byteArr = decoder.decode(imageStr)
+          multiContentEmail.addAttachment(new MdAttachment(mdName, Base64.getEncoder.encodeToString(byteArr)))
         case "excel" =>
           //val excelUUID: String = UUID.randomUUID.toString
           val excelName = emailContent.getFileName + ".xlsx"

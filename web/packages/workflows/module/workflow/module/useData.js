@@ -9,7 +9,9 @@ export const useData = () => {
     if(!params.orchestratorId) {
       return [];
     }
-
+    await api.fetch(`${apiPre}getWrokflowDefaultTemplates`, params, 'get').then(res => {
+      templateObjectArray = res.wrokflowDefaultTemplates || []
+    })
     templateIdArray = templateObjectArray.map((item) => {
       return item.templateId
     })
@@ -19,6 +21,18 @@ export const useData = () => {
   const getTemplateDatas = async (params) => {
     console.log('getTemplateDatas-params', params)
     let originTemplates = []
+    try {
+      await api.fetch(`${apiPre}getProjectTemplates`, params, 'get').then(res => {
+        originTemplates = res.templates || []
+      })
+      originTemplates.forEach(e => {
+        e.child.forEach(subE => {
+          subE.disabled = false
+          subE.enginType = e.enginType
+        })
+    })} catch (e) {
+      console.log('getTemplateDatas-error', e)
+    }
     return originTemplates
   }
   return {

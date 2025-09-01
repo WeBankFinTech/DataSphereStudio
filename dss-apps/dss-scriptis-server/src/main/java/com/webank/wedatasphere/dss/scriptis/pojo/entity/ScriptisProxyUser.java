@@ -23,6 +23,8 @@ public class ScriptisProxyUser extends DssProxyUserImpl {
     private Date createTime;
     private String remark;
 
+    private String expireTime;
+
     public Long getId() {
         return id;
     }
@@ -53,5 +55,13 @@ public class ScriptisProxyUser extends DssProxyUserImpl {
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    public String getExpireTime() {
+        return expireTime;
+    }
+
+    public void setExpireTime(String expireTime) {
+        this.expireTime = expireTime;
     }
 }

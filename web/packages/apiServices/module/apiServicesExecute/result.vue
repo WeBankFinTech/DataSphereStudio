@@ -6,9 +6,8 @@
       <we-panel-item
         ref="wePanelItemRef"
         :index="1"
-        :height="panelHeight"
-        :min="minPanelHeight"
-        :max="maxPanelHeight"
+        :height="250"
+        :min="50"
         @on-change="handlePanelChange">
         <Row class="content-top" :style="{height: `${currentPanelHeight}px`}">
           <i-col :span="workInfo && workInfo.comment ? 10 : 24">
@@ -47,7 +46,7 @@
           </i-col>
         </Row>
       </we-panel-item>
-      <we-panel-item :index="2">
+      <we-panel-item :index="2" :min="36">
         <results
           ref="currentConsole"
           getResultUrl="dss/apiservice"
@@ -119,9 +118,6 @@ export default {
       tip: {},
       height: 480,
       historyFormData: {},
-      panelHeight: 250,
-      minPanelHeight: 250,
-      maxPanelHeight: 375,
       currentPanelHeight: 250,
     }
   },
@@ -169,10 +165,8 @@ export default {
       }
     },
     handlePanelChange: debounce(function (data) {
-      if (data.height >= this.minPanelHeight && data.height <= this.maxPanelHeight) {
-        this.currentPanelHeight = data.height;
-        this.height = this.getClient();
-      }
+      this.currentPanelHeight = data.height;
+      this.height = this.getClient();
     }, 500),
     // 判断首页是否还有再执行的任务
     async initHomeTask() {

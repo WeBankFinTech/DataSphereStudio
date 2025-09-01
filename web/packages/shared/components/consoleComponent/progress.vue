@@ -66,7 +66,6 @@
 import steps from './steps.vue';
 import weToolbar from './toolbar_progress.vue';
 import api from '@dataspherestudio/shared/common/service/api';
-import log from '../../../editor/languages/log';
 /**
  * 脚本执行进度tab面板
  * ! 1. 与工作流节点执行console.vue 共用

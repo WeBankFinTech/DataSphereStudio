@@ -27,7 +27,7 @@ import org.apache.linkis.common.io.resultset.ResultSetReader
 import org.apache.linkis.common.io.{MetaData, Record}
 import org.apache.linkis.common.utils.Utils
 import org.apache.linkis.storage.LineRecord
-import org.apache.linkis.storage.resultset.ResultSetReaderFactory
+import org.apache.linkis.storage.resultset.ResultSetReader
 import org.apache.commons.io.IOUtils
 
 abstract class AbstractEmailContentParser[T] extends EmailContentParser {
@@ -43,7 +43,7 @@ abstract class AbstractEmailContentParser[T] extends EmailContentParser {
   }
 
   protected def getResultSetReader(fsPathStore: FsPathStoreEmailContent): ResultSetReader[_, _ ] = {
-    val reader = ResultSetReaderFactory.getResultSetReader(fsPathStore.getFsPath.getSchemaPath)
+    val reader = ResultSetReader.getResultSetReader(fsPathStore.getFsPath.getSchemaPath)
     reader.getMetaData
     reader
   }

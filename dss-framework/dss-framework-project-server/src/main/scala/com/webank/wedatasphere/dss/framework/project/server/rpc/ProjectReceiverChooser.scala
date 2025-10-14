@@ -17,10 +17,11 @@
 package com.webank.wedatasphere.dss.framework.project.server.rpc
 
 import com.webank.wedatasphere.dss.common.protocol.ProxyUserCheckRequest
-import com.webank.wedatasphere.dss.common.protocol.project.{ProjectInfoRequest, ProjectRelationRequest}
+import com.webank.wedatasphere.dss.common.protocol.project.{ProjectInfoRequest, ProjectRelationRequest, ProjectUserAuthModifyRequest}
 import com.webank.wedatasphere.dss.framework.project.service.{DSSProjectService, DSSProjectUserService}
-import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceUserService
+import com.webank.wedatasphere.dss.framework.workspace.service.{DSSWorkspaceUserService, DSSWorkspaceService}
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.{RequestProjectImportOrchestrator, RequestProjectUpdateOrcVersion}
+
 import javax.annotation.PostConstruct
 import org.apache.linkis.protocol.usercontrol.{RequestUserListFromWorkspace, RequestUserWorkspace}
 import org.apache.linkis.rpc.{RPCMessageEvent, Receiver, ReceiverChooser}
@@ -38,12 +39,15 @@ class ProjectReceiverChooser extends ReceiverChooser {
   private var dssWorkspaceUserService: DSSWorkspaceUserService = _
 
   @Autowired
+  private var dssWorkspaceService: DSSWorkspaceService = _
+
+  @Autowired
   private var dssProjectUserService: DSSProjectUserService = _
 
   private var receiver: Option[ProjectReceiver] = _
 
   @PostConstruct
-  def init(): Unit = receiver = Some(new ProjectReceiver(projectService, dssWorkspaceUserService, dssProjectUserService))
+  def init(): Unit = receiver = Some(new ProjectReceiver(projectService, dssWorkspaceUserService, dssProjectUserService ,dssWorkspaceService))
 
   override def chooseReceiver(event: RPCMessageEvent): Option[Receiver] = event.message match {
     case _: ProjectRelationRequest => receiver
@@ -53,6 +57,8 @@ class ProjectReceiverChooser extends ReceiverChooser {
     case _: RequestProjectImportOrchestrator => receiver
     case _: RequestProjectUpdateOrcVersion => receiver
     case _: ProxyUserCheckRequest => receiver
+    case _: ProjectInfoRequest => receiver
+    case _: ProjectUserAuthModifyRequest => receiver
     case _ => None
   }
 }

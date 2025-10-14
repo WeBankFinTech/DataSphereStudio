@@ -1,6 +1,7 @@
 <template>
   <Modal
     v-model="ProjectShow"
+    width="85"
     :title="
       actionType === 'add'
         ? $t('message.common.projectDetail.createProject')
@@ -24,6 +25,7 @@
           v-model="projectDataCurrent.name"
           :placeholder="$t('message.workflow.enterName')"
           :disabled="actionType === 'modify'"
+          @on-blur="checkName"
         ></Input>
       </FormItem>
       <FormItem
@@ -74,6 +76,7 @@
             v-for="item in devProcess"
             :label="item.dicValue"
             :key="item.dicKey"
+            :disabled="item.associateGit"
           >
             <SvgIcon class="icon-style" :icon-class="item.icon" />
             <span>{{ item.dicName }}</span>
@@ -97,6 +100,52 @@
             </span>
           </Checkbox>
         </CheckboxGroup>
+      </FormItem>
+      <FormItem
+        v-if="isIncludesDev"
+        label="是否接入Git"
+        prop="associateGit"
+      >
+        <RadioGroup v-model="projectDataCurrent.associateGit" @on-change="handleAssociateGitChange">
+            <Radio label="true">是</Radio>
+            <Radio label="false">否</Radio>
+        </RadioGroup>
+      </FormItem>
+      <FormItem
+        v-if="projectDataCurrent.associateGit === 'true'"
+        label="Git读写用户名"
+        prop="gitUser"
+      >
+        <Input
+          v-model="projectDataCurrent.gitUser"
+          placeholder="请输入Git读写用户名"
+          :disabled="projectDataCurrent.associateGitDisabled"
+        >
+        </Input>
+      </FormItem>
+      <FormItem
+        v-if="projectDataCurrent.associateGit === 'true'"
+        label="Token"
+        prop="gitToken"
+      >
+        <Input
+          v-model="projectDataCurrent.gitToken"
+          placeholder="请输入Token"
+          type="password"
+        >
+        </Input>
+      </FormItem>
+      <FormItem
+        label="数据源"
+        prop="datasource"
+        placeholder="请选择数据源"
+      >
+        <Select v-model="projectDataCurrent.datasource" multiple filterable
+          clearable :disabled="projectDataCurrent.createBy != getUserName() && mode == 'edit'">
+          <OptionGroup v-for="item in dataSourceList" :key="item.label" :label="item.label">
+              <Option v-for="sourceIt in item.children" :value="sourceIt.id" :key="sourceIt.id">{{ sourceIt.dataSourceName }}</Option>
+          </OptionGroup>
+        </Select>
       </FormItem>
       <FormItem
         :label="$t('message.common.projectDetail.publishPermissions')"
@@ -175,7 +224,7 @@
       <Button
         type="primary"
         size="large"
-        :disabled="submiting"
+        :disabled="submiting || isRepeat"
         :loading="submiting"
         @click="Ok"
       >{{ $t("message.workflow.ok") }}</Button
@@ -186,11 +235,13 @@
 <script>
 import tag from "@dataspherestudio/shared/components/tag/index.vue";
 import lubanSelect from "@dataspherestudio/shared/components/select/index.vue";
+import api from '@dataspherestudio/shared/common/service/api'
 import _ from "lodash";
 import {
   GetDicList,
   CheckProjectNameRepeat
 } from '@dataspherestudio/shared/common/service/apiCommonMethod.js';
+import storage from '@dataspherestudio/shared/common/helper/storage';
 export default {
   components: {
     "we-tag": tag,
@@ -251,32 +302,37 @@ export default {
       selectCompiling: [],
       projectDataCurrent: {},
       submiting: false,
+      isRepeat: false,
+      workspaceData: {},
+      datasourceListData: [],
+      initAssociateGit: null,
     };
   },
   computed: {
     formValid() {
-      let validateName = async (rule, value, callback) => {
-        // 校验是否重名
-        let repeat = false
-        try {
-          if (this.actionType === 'add') {
-            const res = await CheckProjectNameRepeat(value)
-            repeat = res.repeat
-          }
-        } catch (error) {
-          //
-        }
-        if (repeat && this.actionType === 'add') {
-          callback(
-            new Error(this.$t("message.common.projectDetail.nameUnrepeatable"))
-          );
-        } else {
-          callback();
-        }
-      };
+      // let validateName = async (rule, value, callback) => {
+      //   // 校验是否重名
+      //   try {
+      //     if (this.actionType === 'add') {
+      //       const res = await CheckProjectNameRepeat(value)
+      //       this.isRepeat = res.repeat;
+      //     }
+      //   } catch (error) {
+      //     //
+      //       this.isRepeat = true;
+      //   }
+      //   if (this.isRepeat && this.actionType === 'add') {
+      //     callback(
+      //       new Error(this.$t("message.common.projectDetail.nameUnrepeatable"))
+      //     );
+      //   } else {
+      //     callback();
+      //   }
+      // };
       return {
         name: [
           {
+            type: "string",
             required: true,
             message: this.$t("message.workflow.enterName"),
             trigger: "blur",
@@ -288,10 +344,11 @@ export default {
             message: this.$t("message.workflow.validNameDesc"),
             trigger: "blur",
           },
-          { validator: validateName, trigger: "blur" },
+          // { validator: validateName, trigger: "blur" },
         ],
         description: [
           {
+            type: "string",
             required: true,
             message: this.$t(
               "message.common.projectDetail.pleaseInputProjectDesc"
@@ -301,6 +358,7 @@ export default {
         ],
         product: [
           {
+            type: "string",
             required: true,
             message: this.$t("message.common.projectDetail.selectProduct"),
             trigger: "change",
@@ -330,11 +388,65 @@ export default {
             type: "array",
           },
         ],
+        associateGit: [
+          {
+            required: true,
+            message: this.$t("message.common.projectDetail.pleaseSelect"),
+            trigger: "blur",
+          },
+        ],
+        gitUser: [
+          {
+            required: true,
+            message: '请输入gitUser',
+            trigger: "blur",
+            type: "string",
+          },
+        ],
+        gitToken: [
+          {
+            required: true,
+            message: '请输入gitToken',
+            trigger: "blur",
+            type: "string",
+          },
+        ]
       };
     },
+    isIncludesDev() {
+      return this.projectDataCurrent.devProcessList && this.projectDataCurrent.devProcessList.includes('dev');
+    },
+    dataSourceList() {
+      const typeList = [];
+      const dataSet = [];
+
+      for (let i = 0; i < this.datasourceListData.length; i++) {
+        // expire 为false
+        // versionId 大于0
+        // publishedVersionId 存在此字段（未发布的数据源不含有此字段），且大于0
+        // 满足这三个条件的为有效数据源，需要在列表中被筛选
+        let item = this.datasourceListData[i]
+        if (
+          item.expire === false &&
+          item.versionId > 0 &&
+          item.publishedVersionId &&
+          item.createUser == this.projectDataCurrent.createBy
+        ) {
+          dataSet.push(item)
+          if (!typeList.includes(item.dataSourceType.name)) typeList.push(item.dataSourceType.name)
+        }
+      }
+      return typeList.map(it => {
+        return {
+          label: it,
+          children: dataSet.filter(item => item.dataSourceType.name === it)
+        }
+      })
+    }
   },
   mounted() {
     this.getData();
+    this.getDataSet();
   },
   watch: {
     ProjectShow(val) {
@@ -344,6 +456,8 @@ export default {
     },
     projectData(value) {
       const cloneObj = _.cloneDeep(value);
+      const ids = this.convertSource(cloneObj);
+      cloneObj.datasource = ids;
       this.projectDataCurrent = cloneObj;
       if (this.mode === 'add') {
         let curProcessList = [];
@@ -353,10 +467,66 @@ export default {
           }
         })
         this.projectDataCurrent.devProcessList = curProcessList;
-      }     
+      }
+      this.initAssociate();
     },
   },
   methods: {
+    async checkName () {
+      if(!this.projectDataCurrent.name) {
+        return
+      }
+      try {
+          if (this.actionType === 'add') {
+            const res = await CheckProjectNameRepeat(this.projectDataCurrent.name)
+            this.isRepeat = res.repeat;
+          }
+        } catch (error) {
+            this.isRepeat = true;
+        }
+        if (this.isRepeat && this.actionType === 'add') {
+          new Error(this.$t("message.common.projectDetail.nameUnrepeatable"))
+        }
+    },
+    convertSource(data) {
+      const ids = [];
+      (data.dataSourceList || []).forEach(it => {
+        this.dataSourceList.find(item => {
+          let findItem = item.children.find(child => child.dataSourceType.name == it.dataSourceType && child.dataSourceName == it.dataSourceName)
+          if (findItem) {
+            ids.push(findItem.id)
+            return
+          }
+        })
+      })
+      return ids
+    },
+    getUserName() {
+      return storage.get("baseInfo", "local")
+        ? storage.get("baseInfo", "local").username
+        : '';
+    },
+    getDataSet() {
+      api
+        .fetch(
+          'data-source-manager/info',
+          {
+            //获取数据源数据
+            pageSize: 1000,
+            currentPage: 1,
+          },
+          {
+            method: 'get',
+            cacheOptions: { time: 60000 }
+          }
+        )
+        .then((rst) => {
+          if (rst && rst.queryList) {
+            this.datasourceListData = rst.queryList || []
+          }
+        })
+        .catch(() => {})
+    },
     getData() {
       const params = {
         parentKey: "p_develop_process",
@@ -368,10 +538,36 @@ export default {
       });
     },
     Ok() {
+      const datasets = []
+      this.dataSourceList.forEach(cat =>  {
+        let sourceItem = cat.children.filter(item => this.projectDataCurrent.datasource.some(it => it == item.id))
+        if (sourceItem.length) {
+          sourceItem.forEach(item => {
+            datasets.push({
+              "dataSourceDesc": item.dataSourceDesc,     
+              "createTime": item.createTime,
+              "modifyTime": item.modifyTime,
+              "createUser": item.createUser,
+              "dataSourceName": item.dataSourceName,
+              "dataSourceType": item.dataSourceType.name,
+            })
+          })
+        }
+      })
       this.$refs.projectForm.validate((valid) => {
         if (valid) {
           this.submiting = true;
-          this.$emit("confirm", this.projectDataCurrent, (success) => {
+          const params = { ...this.projectDataCurrent };
+          params.dataSourceList = datasets;
+          params.associateGit = params.associateGit === 'true';
+          // if (!params.associateGit) {
+          //   delete params.gitUser;
+          //   delete params.gitToken;
+          // }
+          delete params.associateGitDisabled;
+          delete params.createBy;
+          delete params.datasource;
+          this.$emit("confirm", params, (success) => {
             if (success) {
               this.$refs.projectForm.resetFields();
               this.ProjectShow = false;
@@ -387,6 +583,7 @@ export default {
     },
     Cancel() {
       this.ProjectShow = false;
+      this.isRepeat = false;
       this.$refs.projectForm.resetFields();
       this.projectDataCurrent.business = this.originBusiness;
     },
@@ -403,16 +600,78 @@ export default {
       tmpArr.splice(index, 1);
       this.projectDataCurrent.business = tmpArr.toString();
     },
-    showProject(params,mode) {
+    showProject(params, mode) {
+      this.workspaceData = storage.get("currentWorkspace");
       this.ProjectShow = true
       this.$refs.projectForm.resetFields()
       // 新增只有一项自动勾选
       if (this.orchestratorModeList && this.orchestratorModeList.list.length === 1 && !params.name) {
         params.orchestratorModeList = [this.orchestratorModeList.list[0].dicKey]
       }
-      this.projectDataCurrent = {...params}
-      this.mode = mode
-    }
+      this.projectDataCurrent = {...params, datasource: this.convertSource(params)}
+      this.initAssociateGit = this.projectDataCurrent.associateGit
+      this.initAssociate('init');
+      this.mode = mode;
+    },
+    initAssociate(type) {
+      if (this.projectDataCurrent.associateGit) {
+        this.projectDataCurrent.associateGit = 'true';
+        this.projectDataCurrent.associateGitDisabled = true;
+      } else {
+        this.projectDataCurrent.associateGit = 'false';
+        this.projectDataCurrent.associateGitDisabled = false;
+      }
+      if (type === 'init') {
+        this.handleAssociateGit(this.projectDataCurrent.associateGit, 'init');
+      }
+    },
+    handleAssociateGit(val, type) {
+      const temps = [];
+      this.devProcess.forEach((item) => {
+        temps.push({
+          ...item,
+          associateGit: val === 'true' && item.dicValue === 'dev'
+        })
+      })
+      this.devProcess = temps;
+      // if (type !== 'init') {
+      //   this.projectDataCurrent.gitUser = '';
+      //   this.projectDataCurrent.gitToken = '';
+      // }
+    },
+    handleAssociateGitChange(val) {
+      // 编辑项目，最初为git项目的切换为非git项目时做弹窗提示
+      if (this.actionType === 'modify' && this.initAssociateGit && val === 'false') {
+         this.$Modal.info({
+              title: '提示',
+              content: '请注意切换后,工作流将无法提交到GIT中。',
+          });
+      }
+      // 编辑项目，最初为非git项目切换为git项目时，查询是否有对应git用户信息，有的话展示且不允许修改
+      if (this.actionType === 'modify' && !this.initAssociateGit && val === 'true') {
+        if (this.projectDataCurrent.id) {
+          api.fetch('dss/framework/project/getProjectGitInfo',
+          {
+            projectId: this.projectDataCurrent.id,
+          },
+          {
+            method: 'get',
+          }
+        )
+        .then((rst) => {
+          if(rst.gitUser) {
+            this.projectDataCurrent.gitUser =  rst.gitUser;
+            this.projectDataCurrent.gitToken =  rst.gitToken;
+            this.projectDataCurrent.associateGitDisabled = true;
+          } else {
+            this.projectDataCurrent.associateGitDisabled = false;
+          }
+        })
+        .catch(() => {})
+        }
+      }
+      this.handleAssociateGit(val);
+    },
   },
 };
 </script>
@@ -424,9 +683,9 @@ export default {
   color: black;
 }
 .project_form {
-  height: 60vh;
+  height: 70vh;
   overflow-y: auto;
   padding: 10px;
-  max-height: 500px;
+  max-height: 80vh;
 }
 </style>

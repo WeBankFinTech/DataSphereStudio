@@ -16,19 +16,24 @@
  */
 
 import api from '@dataspherestudio/shared/common/service/api';
+import storage from '@dataspherestudio/shared/common/helper/storage';
 import Vue from 'vue';
 export default {
   name: 'HiveSidebar',
-  events: ['showHive', 'getAllDbsAndTables', 'getAllowMap', 'HiveSidebar:getDatabase', 'HiveSidebar:getTables', 'HiveSidebar:getTablePartitions', 'HiveSidebar:deletedAndRefresh'],
-  dispatchs: ['Workbench:add', 'Workbench:run', 'Workbench:pasteInEditor', 'HiveSidebar:getTables', 'WorkSidebar:showTree', 'HdfsSidebar:showTree', 'IndexedDB:getTree', 'IndexedDB:appendTree'],
+  events: ['showHive', 'getAllDbsAndTables', 'getAllowMap', 'HiveSidebar:deletedAndRefresh'],
+  dispatchs: ['Workbench:add', 'Workbench:run', 'Workbench:pasteInEditor', 'WorkSidebar:showTree', 'HdfsSidebar:showTree', 'IndexedDB:getTree', 'IndexedDB:appendTree'],
   data: {
     API_PATH: process.env.VUE_APP_MN_CONFIG_PREFIX || `http://${window.location.host}/api/rest_j/v1/`,
     ALLOW_MAP: ['_ind', '_share', '_work', '_qml', '_tmp', '_bak'],
   },
   methods: {
     getAllDbsAndTables() {
+      const closeSuggest = storage.get('close_db_table_suggest');
+      if (closeSuggest) {
+        return Promise.resolve([])
+      }
       return new Promise((resolve, reject) => {
-        api.fetch(`/datasource/all`, 'get').then((rst) => {
+        api.fetch(`/datasource/getByAccessTime`, 'get').then((rst) => {
           const hiveList = [];
           if (rst.dbs) {
             rst.dbs.forEach((list) => {

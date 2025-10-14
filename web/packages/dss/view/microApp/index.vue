@@ -62,7 +62,9 @@ export default {
       return tail.join('&');
     },
     humpToLine(str){
-      return str.replace(/([A-Z])/g, '_$1').toLowerCase().slice(1);
+      let s = str.replace(/([A-Z])/g, '_$1').toLowerCase().slice(1);
+      // 去掉多余空格
+      return s.replace(/\s+/g, '');
     },
     async initMicroApp() {
       console.log(process.env.VUE_APP_MICRO_PREFIX)

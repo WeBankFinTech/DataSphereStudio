@@ -332,6 +332,7 @@ export default {
           { label: this.$t('message.scripts.hiveTableExport.FH'), value: ';' },
           { label: this.$t('message.scripts.hiveTableExport.ZBF'), value: '\\t' },
           { label: this.$t('message.scripts.hiveTableExport.KG'), value: '%20' },
+          { label: this.$t('message.scripts.hiveTableExport.SX'), value: '|' },
         ],
         exportTypes: [
           { label: 'xlsx', value: 'xlsx' },

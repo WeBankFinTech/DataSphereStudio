@@ -30,6 +30,8 @@ import java.util.List;
 public interface FlowMapper {
     DSSFlow selectFlowByID(Long id);
 
+    List<DSSFlow> selectFlowListByID(List<Long> list);
+
     void insertFlow(DSSFlow dssFlow) throws DuplicateKeyException;
 
     void insertFlowRelation(@Param("flowID") Long flowID, @Param("parentFlowID") Long parentFlowID);
@@ -59,4 +61,6 @@ public interface FlowMapper {
     @Select("select creator from dss_flow where id = #{flowId}")
     String getCreatorById(@Param("flowId") Long flowId);
     List<String> getSubflowName(Long parentFlowID);
+
+    List<DSSFlow> selectFlowListByOrchestratorId(@Param("orchestratorIdList") List<Long> orchestratorIdList);
 }

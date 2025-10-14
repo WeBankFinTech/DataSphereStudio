@@ -36,6 +36,11 @@ public class RequestCopyWorkflow {
    private String nodeSuffix;
    private String newFlowName;
 
+   private List<String> enableNodeList;
+
+   private String flowProxyUser;
+   private boolean skipThirdAppconn;
+
     public RequestCopyWorkflow(String userName,
                                Workspace workspace,
                                Long rootFlowId,
@@ -59,6 +64,39 @@ public class RequestCopyWorkflow {
         this.targetProjectId = targetProjectId;
         this.nodeSuffix = nodeSuffix;
         this.newFlowName = newFlowName;
+
+    }
+
+
+    public RequestCopyWorkflow(String userName,
+                               Workspace workspace,
+                               Long rootFlowId,
+                               String contextIdStr,
+                               String projectName,
+                               String orcVersion,
+                               String description,
+                               List<DSSLabel> dssLabels,
+                               Long targetProjectId,
+                               String nodeSuffix,
+                               String newFlowName,
+                               List<String> enableNodeList,
+                               String flowProxyUser,
+                               boolean skipThirdAppconn) {
+
+        this.userName = userName;
+        this.workspace = workspace;
+        this.rootFlowId = rootFlowId;
+        this.contextIdStr = contextIdStr;
+        this.projectName = projectName;
+        this.orcVersion = orcVersion;
+        this.description = description;
+        this.dssLabels = dssLabels;
+        this.targetProjectId = targetProjectId;
+        this.nodeSuffix = nodeSuffix;
+        this.newFlowName = newFlowName;
+        this.enableNodeList = enableNodeList;
+        this.flowProxyUser = flowProxyUser;
+        this.skipThirdAppconn=skipThirdAppconn;
 
     }
 
@@ -148,5 +186,29 @@ public class RequestCopyWorkflow {
 
     public void setNewFlowName(String newFlowName) {
         this.newFlowName = newFlowName;
+    }
+
+    public List<String> getEnableNodeList() {
+        return enableNodeList;
+    }
+
+    public void setEnableNodeList(List<String> enableNodeList) {
+        this.enableNodeList = enableNodeList;
+    }
+
+    public boolean getSkipThirdAppconn() {
+        return skipThirdAppconn;
+    }
+
+    public void setSkipThirdAppconn(boolean skipThirdAppconn) {
+        this.skipThirdAppconn = skipThirdAppconn;
+    }
+
+    public String getFlowProxyUser() {
+        return flowProxyUser;
+    }
+
+    public void setFlowProxyUser(String flowProxyUser) {
+        this.flowProxyUser = flowProxyUser;
     }
 }

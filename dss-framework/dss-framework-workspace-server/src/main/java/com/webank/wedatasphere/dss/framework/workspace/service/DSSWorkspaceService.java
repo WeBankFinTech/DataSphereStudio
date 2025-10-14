@@ -17,13 +17,16 @@
 package com.webank.wedatasphere.dss.framework.workspace.service;
 
 import com.github.pagehelper.PageInfo;
+import com.webank.wedatasphere.dss.common.entity.workspace.DSSStarRocksCluster;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSUserRoleComponentPriv;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceAssociateDepartments;
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceStarRocksCluster;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceMenuVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceDepartmentVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceFavoriteVo;
+import com.webank.wedatasphere.dss.framework.workspace.bean.request.UpdateWorkspaceStarRocksClusterRequest;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceHomePageVO;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceHomepageSettingVO;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceOverviewVO;
@@ -64,6 +67,8 @@ public interface DSSWorkspaceService {
 
     String getWorkspaceName(Long workspaceId);
 
+    int getWorkspaceId(String workspaceName);
+
     /**
      * 工作空间管理员权限判断(is_admin=1的用户才拥有工作空间操作权限)
      * @param userName
@@ -80,6 +85,8 @@ public interface DSSWorkspaceService {
     public boolean isAdminUser(Long workspaceId, String username);
 
     List<String> getAllDepartmentWithOffices();
+
+    List<String> getAllDepartments();
 
     void associateDepartments(Long workspaceId, String departments, String roles,String user) throws DSSErrorException;
 
@@ -111,4 +118,18 @@ public interface DSSWorkspaceService {
     boolean checkAdminByWorkspace(String username, int workspaceId);
 
     PageInfo<DSSUserRoleComponentPriv> getAllUserPrivs(Integer currentPage, Integer pageSize);
+
+    int transferWorkspace(String workspaceName,String oldOwner,String newOwner,String desc) throws DSSErrorException;
+
+    boolean checkUserIfSettingAdmin(String username);
+
+    void updateWorkspaceInfo(DSSWorkspace dssWorkspace);
+
+    List<DSSWorkspaceStarRocksCluster> updateStarRocksCluster(List<UpdateWorkspaceStarRocksClusterRequest> request, String ticketId, Workspace workspace, String userName);
+    List<DSSWorkspaceStarRocksCluster> getStarRocksCluster(Long workspaceId);
+    void deleteStarRocksClusterByWorkspaceId(Long workspaceId);
+
+
+    List<DSSStarRocksCluster> getDSSStarrocksCluster(Long workspaceId);
+
 }

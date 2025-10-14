@@ -21,7 +21,7 @@
     <parent>
         <artifactId>dss</artifactId>
         <groupId>com.webank.wedatasphere.dss</groupId>
-        <version>1.1.0.20-SNAPSHOT</version>
+        <version>1.15.0-SNAPSHOT</version>
         <relativePath>../../../../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -146,7 +146,7 @@
 
         <dependency>
             <groupId>org.apache.linkis</groupId>
-            <artifactId>linkis-cs-client</artifactId>
+            <artifactId>linkis-pes-client</artifactId>
             <version>${linkis.version}</version>
             <scope>provided</scope>
         </dependency>

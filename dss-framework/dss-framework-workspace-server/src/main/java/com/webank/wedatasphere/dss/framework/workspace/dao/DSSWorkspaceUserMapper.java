@@ -17,6 +17,7 @@
 package com.webank.wedatasphere.dss.framework.workspace.dao;
 
 
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSUserDefaultWorkspace;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSUserRoleComponentPriv;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceUser;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceRoleVO;
@@ -122,4 +123,18 @@ public interface DSSWorkspaceUserMapper {
     @MapKey("userName")
     Map<String, DSSUserRoleComponentPriv> getWorkspaceRolePrivByUsername(@Param("list") List<DSSUserRoleComponentPriv> list);
 
+    @Select("select distinct username from dss_workspace_user_role where workspace_id = #{workspaceId} and role_id = #{roleId} order by id desc")
+    List<String> getWorkspaceUserByRoleId(@Param("workspaceId") Long workspaceId,@Param("roleId") Integer roleId);
+
+    @Delete("delete from dss_project_user where username = #{username} ")
+    void deleteProjectUserByUserName(String userName);
+
+
+    DSSUserDefaultWorkspace getDefaultWorkspaceByUsername(@Param("username") String username);
+
+    void insertUserDefaultWorkspace(DSSUserDefaultWorkspace dssUserDefaultWorkspace);
+
+    void updateUserDefaultWorkspace(DSSUserDefaultWorkspace dssUserDefaultWorkspace);
+
+    void deleteUserDefaultWorkspace(@Param("username") String username, @Param("workspaceId") Long workspaceId);
 }

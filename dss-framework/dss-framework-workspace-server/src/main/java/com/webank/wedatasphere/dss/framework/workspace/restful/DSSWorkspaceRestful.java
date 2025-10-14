@@ -16,35 +16,50 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.restful;
 
+import cn.hutool.core.util.StrUtil;
+import com.webank.wedatasphere.dss.common.StaffInfoGetter;
 import com.webank.wedatasphere.dss.common.auditlog.OperateTypeEnum;
 import com.webank.wedatasphere.dss.common.auditlog.TargetTypeEnum;
+
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
+import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.framework.admin.service.DssAdminUserService;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace;
-import com.webank.wedatasphere.dss.framework.workspace.bean.NoticeContent;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceFavoriteVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceMenuVo;
+import com.webank.wedatasphere.dss.framework.workspace.bean.itsm.ItsmRequest;
+import com.webank.wedatasphere.dss.framework.workspace.bean.itsm.ItsmResponse;
 import com.webank.wedatasphere.dss.framework.workspace.bean.request.CreateWorkspaceRequest;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceHomePageVO;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceOverviewVO;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceVO;
+import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceRoleCheckService;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceRoleService;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceService;
-import com.webank.wedatasphere.dss.framework.workspace.service.NoticeService;
 import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceDBHelper;
 import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceUtils;
+import com.webank.wedatasphere.dss.git.common.protocol.GitUserEntity;
+import com.webank.wedatasphere.dss.git.common.protocol.request.GitConnectRequest;
+import com.webank.wedatasphere.dss.git.common.protocol.request.GitUserInfoRequest;
+import com.webank.wedatasphere.dss.git.common.protocol.request.GitUserUpdateRequest;
+import com.webank.wedatasphere.dss.git.common.protocol.response.GitConnectResponse;
+import com.webank.wedatasphere.dss.git.common.protocol.response.GitUserInfoResponse;
+import com.webank.wedatasphere.dss.git.common.protocol.response.GitUserUpdateResponse;
+import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.common.exception.AppStandardWarnException;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import org.apache.linkis.common.exception.ErrorException;
+import org.apache.linkis.rpc.Sender;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -53,6 +68,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.webank.wedatasphere.dss.framework.workspace.util.DSSWorkspaceConstant.WORKSPACE_ID_STR;
+import static com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper.USERNAME_NAME_COOKIE_KEY;
 
 @RequestMapping(path = "/dss/framework/workspace", produces = {"application/json"})
 @RestController
@@ -73,9 +89,9 @@ public class DSSWorkspaceRestful {
     private HttpServletRequest httpServletRequest;
     @Autowired
     private HttpServletResponse httpServletResponse;
-
     @Autowired
-    private NoticeService noticeService;
+    private StaffInfoGetter staffInfoGetter;
+
 
     @RequestMapping(path = "createWorkspace", method = RequestMethod.POST)
     public Message createWorkspace(@RequestBody CreateWorkspaceRequest createWorkspaceRequest) throws ErrorException {
@@ -94,6 +110,122 @@ public class DSSWorkspaceRestful {
         return Message.ok().data("workspaceId", workspaceId).data("workspaceName", workSpaceName);
     }
 
+
+    /**
+     * 提供给ITSM 单使用， 新建或者修改工作空间信息接口
+     */
+    @RequestMapping(path = "updateWorkspace", method = RequestMethod.POST)
+    public ItsmResponse updateWorkspace(@RequestBody ItsmRequest itsmRequest, HttpServletRequest req, HttpServletResponse resp) {
+        LOGGER.info("itrtsm try to update workspace, itsm id:{}.", itsmRequest.getExternalId());
+        // 获取请求头中的timestamp和sign字段
+        String timestamp = req.getHeader("timeStamp");
+        String sign = req.getHeader("sign");
+        // 验证鉴权
+        if (!WorkspaceUtils.validateAuth(timestamp, sign)) {
+            // 鉴权失败，返回错误信息
+            LOGGER.error("Authentication failed.");
+            // 设置HTTP状态码为403
+            resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            return ItsmResponse.error().retDetail("Authentication failed.");
+        }
+        List<Map<String, String>> dataList = itsmRequest.getDataList();
+
+        // 鉴权成功
+        if (dataList.isEmpty()) {
+            return ItsmResponse.error().retDetail("data is empty");
+        }
+
+        String createUser = itsmRequest.getCreateUser();
+
+        for (Map<String, String> table : dataList) {
+            String workspaceName = table.get("workspaceName");
+
+            if(StrUtil.isEmpty(workspaceName)){
+                LOGGER.error(workspaceName + " workspace is empty");
+                return ItsmResponse.error().retDetail("工作空间信息不能为空！");
+            }
+
+            workspaceName = workspaceName.trim();
+            // 判断命名空间是否存在
+            boolean exists = dssWorkspaceService.existWorkspaceName(workspaceName);
+            String option = table.get("option");
+            String desc = table.get("desc");
+            // 工作空间owner为NULl，则获取提单人信息
+            String workspaceOwner = table.getOrDefault("workspaceOwner", createUser).trim();
+            String oldOwner = table.get("oldOwner");
+            String newOwner = table.get("newOwner");
+
+            if ("add".equalsIgnoreCase(option)) {
+                // 新建
+                if (exists) {
+                    LOGGER.error(workspaceName + " workspace info is exists!");
+                    return ItsmResponse.error().retDetail(workspaceName + "同名工作空间已存在,不能再次创建！");
+                }
+
+                try {
+                    // 判断用户是否可以设置为管理员
+                    if(!dssWorkspaceService.checkUserIfSettingAdmin(workspaceOwner)){
+                        return ItsmResponse.error().retDetail("无权限进行该操作");
+                    }
+
+                    int workspaceId = dssWorkspaceService.createWorkspace(workspaceName, "", workspaceOwner, desc,
+                            null, "DSS", "project");
+
+                    AuditLogUtils.printLog(workspaceOwner, workspaceId, workspaceName, TargetTypeEnum.WORKSPACE, workspaceId, workspaceName,
+                            OperateTypeEnum.CREATE, itsmRequest);
+
+                } catch (Exception e) {
+                    LOGGER.info("{} workspace add fail , (工作空间 申请失败)", workspaceName);
+                    LOGGER.error(e.getMessage());
+                    return  ItsmResponse.error().retDetail(workspaceName + "工作空间新建失败!\n" + e.getMessage());
+                }
+
+            } else if ("modify".equalsIgnoreCase(option)) {
+                // 修改
+                if (!exists) {
+                    LOGGER.error(workspaceName + " workspace info not exists, not modify!");
+                    return ItsmResponse.error().retDetail(workspaceName + "工作空间名称不存在,不能进行修改！");
+                }
+
+                if(StrUtil.isEmpty(oldOwner) || StrUtil.isEmpty(newOwner)){
+                    return ItsmResponse.error().retDetail(workspaceName + "工作空间的新Owner和原Owner不能为空！");
+                }
+
+                oldOwner = oldOwner.trim();
+                newOwner = newOwner.trim();
+
+                if(oldOwner.equalsIgnoreCase(newOwner)){
+                    return ItsmResponse.error().retDetail(workspaceName + "工作空间的新Owner和原Owner不能是同一个用户！");
+                }
+
+                try {
+
+                    // 判断用户是否可以设置为管理员
+                    if(!dssWorkspaceService.checkUserIfSettingAdmin(newOwner)){
+                        return ItsmResponse.error().retDetail("无权限进行该操作");
+                    }
+
+                    int workspaceId = dssWorkspaceService.transferWorkspace(workspaceName,oldOwner,newOwner,desc);
+
+                    AuditLogUtils.printLog(newOwner, workspaceId, workspaceName, TargetTypeEnum.WORKSPACE, workspaceId, workspaceName,
+                            OperateTypeEnum.UPDATE, itsmRequest);
+
+                } catch (Exception e) {
+                    LOGGER.error("{} workspace modify fail , (工作空间 申请失败)", workspaceName);
+                    LOGGER.error(e.getMessage(), e);
+                    return  ItsmResponse.error().retDetail(workspaceName + "工作空间信息修改失败!\n"+ e.getMessage());
+                }
+
+            } else {
+                return ItsmResponse.error().retDetail(workspaceName + "无法进行该操作,请正确选择操作选项!");
+            }
+
+        }
+        LOGGER.info("success to update workspace, itsm id:{}.", itsmRequest.getExternalId());
+        return ItsmResponse.ok().retDetail("Success to update workspace");
+
+    }
+
     /**
      * 返回所有office,格式为：a-b-c
      *
@@ -104,6 +236,18 @@ public class DSSWorkspaceRestful {
     public Message listAllDepartments(@RequestParam(value = WORKSPACE_ID_STR, required = false) String workspaceId) {
         List<String> departments = dssWorkspaceService.getAllDepartmentWithOffices();
         return Message.ok().data("departmentWithOffices", departments);
+    }
+
+    /**
+     * 返回所有department
+     *
+     * @param workspaceId
+     * @return
+     */
+    @RequestMapping(path = "getAllDepartments", method = RequestMethod.GET)
+    public Message getAllDepartments(@RequestParam(value = WORKSPACE_ID_STR, required = false) String workspaceId) {
+        List<String> departments = dssWorkspaceService.getAllDepartments();
+        return Message.ok().data("departments", departments);
     }
 
     /**
@@ -201,15 +345,8 @@ public class DSSWorkspaceRestful {
      */
     @RequestMapping(path = "getWorkSpaceStr", method = RequestMethod.GET)
     public Message getWorkSpaceStr(@RequestParam(name = "workspaceName") String workspaceName) {
-        String username = SecurityFilter.getLoginUsername(httpServletRequest);
-        DSSWorkspace workspaceEntity;
-        try {
-            workspaceEntity = dssWorkspaceService.getWorkspacesByName(workspaceName, username);
-        } catch (DSSErrorException e) {
-            LOGGER.error("User {} get workspace {} failed.", username, workspaceName, e);
-            return Message.error(e);
-        }
-        Workspace workspace = SSOHelper.setAndGetWorkspace(httpServletRequest, httpServletResponse, workspaceEntity.getId(), workspaceName);
+        int workspaceId = dssWorkspaceService.getWorkspaceId(workspaceName);
+        Workspace workspace = SSOHelper.setAndGetWorkspace(httpServletRequest, httpServletResponse, workspaceId, workspaceName);
         return Message.ok("succeed.").data("workspaceStr", DSSCommonUtils.COMMON_GSON.toJson(workspace));
     }
 
@@ -223,7 +360,16 @@ public class DSSWorkspaceRestful {
             LOGGER.error("User {} get workspace {} failed.", username, workspaceId, e);
             return Message.error(e);
         }
+
         SSOHelper.setAndGetWorkspace(httpServletRequest, httpServletResponse, workspace.getId(), workspace.getName());
+
+        Set<String> allUsernames = staffInfoGetter.getAllUsernames();
+        if(allUsernames.contains(username) || "hadoop".equals(username)) {
+            SSOHelper.addUsernameCookie(httpServletRequest, httpServletResponse, username);
+        }else{
+            SSOHelper.deleteCookieByName(httpServletRequest, httpServletResponse, USERNAME_NAME_COOKIE_KEY);
+        }
+
         List<String> roles = dssWorkspaceRoleService.getRoleInWorkspace(username, workspaceId.intValue());
         if (roles == null || roles.isEmpty()) {
             LOGGER.error("username {}, in workspace {} roles are null or empty", username, workspaceId);
@@ -339,11 +485,38 @@ public class DSSWorkspaceRestful {
         return Message.ok().data("favoriteId", favoriteId);
     }
 
-    @GetMapping("getNotice")
-    public Message getNotice(){
-        List<NoticeContent> noticeContent= noticeService.getNoticeContent();
-        return Message.ok("公告获取成功").data("notices", noticeContent);
-    }
 
+    @RequestMapping(value = "/updateWorkspaceInfo",method = RequestMethod.POST)
+    public Message updateWorkspaceInfo(@RequestBody Map<String, String> json) throws  DSSErrorException{
+
+        Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
+        String username = SecurityFilter.getLoginUsername(httpServletRequest);
+
+        String workspaceId= json.getOrDefault("workspaceId",String.valueOf(workspace.getWorkspaceId()));
+
+        if(!workspaceId.equals(String.valueOf(workspace.getWorkspaceId()))){
+            throw  new DSSErrorException(90053,"当前工作空间与cookie中的不一致，重新刷新页面后在操作");
+        }
+
+        String enabledFlowKeywordsCheck = json.getOrDefault("enabledFlowKeywordsCheck","0");
+        String isDefaultReference = json.getOrDefault("isDefaultReference","0");
+
+        DSSWorkspace dssWorkspace = new DSSWorkspace();
+        dssWorkspace.setId(Integer.parseInt(workspaceId));
+        dssWorkspace.setEnabledFlowKeywordsCheck(enabledFlowKeywordsCheck);
+        dssWorkspace.setIsDefaultReference(isDefaultReference);
+
+        if (!dssWorkspaceService.checkAdminByWorkspace(username, dssWorkspace.getId())) {
+            return Message.error(String.format("%s 用户不是当前工作空间管理员,无权限进行该操作!",username));
+        }
+
+        dssWorkspaceService.updateWorkspaceInfo(dssWorkspace);
+
+        AuditLogUtils.printLog(username, workspaceId, workspace.getWorkspaceName(), TargetTypeEnum.WORKSPACE, workspaceId, workspace.getWorkspaceName(),
+                OperateTypeEnum.UPDATE, json);
+
+        return  Message.ok().data("workspaceId", workspaceId);
+
+    }
 }
 

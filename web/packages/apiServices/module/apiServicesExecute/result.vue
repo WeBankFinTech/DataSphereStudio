@@ -1,44 +1,68 @@
 <template>
   <div class="dataServicesContent">
-    <Row class="content-top">
-      <i-col span="10">
-        <h3 class="title">{{$t('message.apiServices.apiTestInfo.params')}}</h3>
-        <Form ref="searchFrom" class="search-from" :label-width="100" :disabled="isHistory" :model="conditionResult">
-          <FormItem v-for="(item, index) in conditionResult.items" :prop="`items.${index}.defaultValue`" :key="item.id"  :rules="[{
-            required: item.required,
-            message: $t('message.apiServices.placeholder.emter'),
-            trigger: 'blur'
-          }]">
-            <div class="label-class" :title="item.displayName || item.name" slot="label">
-              {{ `${item.displayName || item.name}:` }}
-              <div :title="item.details || ''" class="details-tip"><Icon type="md-help-circle" /></div>
-            </div>
-            <Input class="input-bar" :class="{ verificationValue: tip[item.name] }" :disabled="isHistory" @on-blur="verificationValue(item)" :type="inputType(item.type)" v-model="item.defaultValue" :placeholder="item.description || $t('message.apiServices.placeholder.emter')">
-            </Input>
-          </FormItem>
-          <Button class="execute-button" type="primary" :disabled="isHistory" @click="search">{{buttonText}}</Button>
-        </Form>
-      </i-col>
-      <i-col span="10">
-        <template v-if="workInfo && workInfo.comment">
-          <h3 class="title">{{$t('message.apiServices.query.comment')}}</h3>
-          <Alert class="alert-bar" show-icon>{{ workInfo.comment }}</Alert>
-        </template>
-      </i-col>
-    </Row>
-    <results
-      ref="currentConsole"
-      getResultUrl="dss/apiservice"
-      :isHistory="isHistory"
-      :historyList="historyList"
-      :work="workInfo"
-      :dispatch="dispatch"
-      :height="height"
-      @executRun="executRun"
-      @viewHistory="viewHistory"
-      @updateHistory="updateHistory"
-    >
-    </results>
+    <we-panel
+      ref="wePanelRef"
+      diretion="vertical">
+      <we-panel-item
+        ref="wePanelItemRef"
+        :index="1"
+        :height="250"
+        :min="50"
+        @on-change="handlePanelChange">
+        <Row class="content-top" :style="{height: `${currentPanelHeight}px`}">
+          <i-col :span="workInfo && workInfo.comment ? 10 : 24">
+            <h3 class="title">{{$t('message.apiServices.apiTestInfo.params')}}</h3>
+            <Form ref="searchFrom" class="search-from" :label-width="100" :disabled="isHistory" :model="conditionResult">
+              <FormItem v-for="(item, index) in conditionResult.items" :prop="`items.${index}.defaultValue`" :key="item.id"  :rules="item.maxLength && !isHistory ? [
+              {
+                required: item.required,
+                message: $t('message.apiServices.placeholder.emter'),
+                trigger: 'blur'
+              },{
+                max: item.maxLength, 
+                message: $t('message.apiServices.placeholder.limitStrLength', { maxLength: item.maxLength })
+              }]:[
+              {
+                required: item.required,
+                message: $t('message.apiServices.placeholder.emter'),
+                trigger: 'blur'
+              }
+              ]">
+                <div class="label-class" :title="item.displayName || item.name" slot="label">
+                  {{ `${item.displayName || item.name}:` }}
+                  <div :title="item.details || ''" class="details-tip"><Icon type="md-help-circle" /></div>
+                </div>
+                <Input class="input-bar" :class="{ verificationValue: tip[item.name] }" :disabled="isHistory" @on-blur="verificationValue(item)" :type="inputType(item.type)" v-model="item.defaultValue" :placeholder="item.description || $t('message.apiServices.placeholder.emter')">
+                </Input>
+              </FormItem>
+              <Button class="execute-button" type="primary" :loading="excuteLoading" :disabled="isHistory" @click="search">{{buttonText}}</Button>
+            </Form>
+          </i-col>
+          <i-col span="10" v-if="workInfo && workInfo.comment">
+            <template>
+              <h3 class="title">{{$t('message.apiServices.query.comment')}}</h3>
+              <Alert class="alert-bar" show-icon>{{ workInfo.comment }}</Alert>
+            </template>
+          </i-col>
+        </Row>
+      </we-panel-item>
+      <we-panel-item :index="2" :min="36">
+        <results
+          ref="currentConsole"
+          getResultUrl="dss/apiservice"
+          :isHistory="isHistory"
+          :historyList="historyList"
+          :work="workInfo"
+          :dispatch="dispatch"
+          :height="height"
+          :getClient="getClient"
+          @executRun="executRun"
+          @viewHistory="viewHistory"
+          @updateHistory="updateHistory"
+        >
+        </results>
+      </we-panel-item>
+    </we-panel>
     <Modal :title="$t('message.apiServices.apiTestInfo.params')" v-model="conditionShow" @on-ok="confirmSelect">
       <CheckboxGroup v-model="selectCondition">
         <Checkbox v-for="item in conditionList" :key="item.id" :label="item.id" :disabled="!!item.required">
@@ -51,6 +75,7 @@
 <script>
 import results from '@dataspherestudio/shared/components/consoleComponent';
 import api from '@dataspherestudio/shared/common/service/api';
+import {debounce} from 'lodash';
 export default {
   name: "ModuleApiServiceExecute",
   components: {
@@ -91,8 +116,9 @@ export default {
       conditionShow: false,
       excuteLoading: false,
       tip: {},
-      height: 500,
-      historyFormData: {}
+      height: 480,
+      historyFormData: {},
+      currentPanelHeight: 250,
     }
   },
   computed: {
@@ -131,6 +157,17 @@ export default {
     this.$refs.currentConsole.killExecute(false);
   },
   methods: {
+    getClient() {
+      if (this.$refs.wePanelRef && this.$refs.wePanelItemRef) {
+        return this.$refs.wePanelRef.$el.clientHeight - this.$refs.wePanelItemRef.$el.clientHeight;
+      } else {
+        return 480;
+      }
+    },
+    handlePanelChange: debounce(function (data) {
+      this.currentPanelHeight = data.height;
+      this.height = this.getClient();
+    }, 500),
     // 判断首页是否还有再执行的任务
     async initHomeTask() {
       if (this.workInfo.shouldRuning) {
@@ -156,14 +193,10 @@ export default {
     // 验证发布和更新的默认值是否满足条件
     verificationValue (row) {
       let flag;
-      if(row.defaultValue.length > 1024 && Number(row.type) !== 4) {
-        this.$Message.error({ content: this.$t('message.apiServices.more1024') });
-        flag = true;
-      } else if(row.type == 4 && row.defaultValue.split('\n').length > 5000) {
-        this.$Message.error({ content: this.$t('message.apiServices.moreline') });
+      if (row.maxLength && (row.defaultValue || '').length > row.maxLength) {
         flag = true;
       } else {
-        flag = false
+        flag = false;
       }
       console.warn(row)
       this.$set(this.tip, row.name, flag)
@@ -337,6 +370,9 @@ export default {
     margin: 0 25px;
     .content-top {
       padding: 25px;
+      max-height: 600px;
+      min-height: 120px;
+      overflow-y: auto;
       .alert-bar {
         margin-left: 15px;
       }

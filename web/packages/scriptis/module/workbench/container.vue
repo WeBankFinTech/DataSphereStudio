@@ -13,7 +13,6 @@
         >
           <draggable
             class="list-group"
-            style="height:24px;margin:0"
             tag="ul"
             v-model="worklist"
             v-bind="dragOptions"
@@ -21,25 +20,23 @@
             @end="isDragging = false"
             @change="changeOrder"
           >
-            <transition-group type="transition" name="flip-list">
-              <template v-for="(work, index) in worklist">
-                <div
-                  :key="work.id"
-                  :class="{active:work.id==current}"
-                  class="workbench-tab-item"
-                  ref="work_item"
-                  v-if="work.type !== 'backgroundScript'"
-                >
-                  <we-title
-                    :node="node"
-                    :index="index"
-                    :work="work"
-                    @on-choose="onChooseWork"
-                    @on-remove="removeWork"
-                  />
-                </div>
-              </template>
-            </transition-group>
+            <template v-for="(work, index) in worklist">
+              <div
+                :key="work.id"
+                :class="{active:work.id==current}"
+                class="workbench-tab-item"
+                ref="work_item"
+                v-if="work.type !== 'backgroundScript'"
+              >
+                <we-title
+                  :node="node"
+                  :index="index"
+                  :work="work"
+                  @on-choose="onChooseWork"
+                  @on-remove="removeWork"
+                />
+              </div>
+            </template>
           </draggable>
         </div>
         <div v-else ref="tab-list-scroll" class="workbench-tab work-list-tab">
@@ -161,6 +158,7 @@
 import draggable from "vuedraggable"
 import api from '@dataspherestudio/shared/common/service/api'
 import storage from '@dataspherestudio/shared/common/helper/storage'
+import eventbus from '@dataspherestudio/shared/common/helper/eventbus'
 import util from '@dataspherestudio/shared/common/util'
 import title from "./title.vue"
 import body from "./body.vue"
@@ -242,6 +240,22 @@ export default {
         this.dispatch("Workbench:setResultCache", { id: oldVal })
         this.revealInSidebar()
       }
+      const work = this.worklist.find(
+        (item) => item.id === val
+      )
+      if (work) {
+        let supportedMode = find(this.getSupportModes(), (p) => p.rule.test(work.filename));
+        if (supportedMode) {
+          const typeMap = {
+            "jdbc": "StarRocks",
+            "Nebula": "NebulaGraph",
+          }
+          this.$emit('active-tab-change', {
+            id: val,
+            type: typeMap[supportedMode.scriptType] || 'Hive'
+          })
+        }
+      }
     },
     workListLength() {
       this.toggleCtrlBtn(this)
@@ -252,15 +266,27 @@ export default {
     },
   },
   mounted() {
+    eventbus.on('open-db-table-suggest', this.updateCache)
+    this.getDatasourceType()
     this.init()
     elementResizeEvent.bind(this.$el, this.resize)
     this.initListenerCopilotEvent()
   },
   beforeDestroy() {
+    eventbus.clear('open-db-table-suggest')
     elementResizeEvent.unbind(this.$el)
     this.destroyCopilotEvent()
   },
   methods: {
+    async getDatasourceType() {
+      if (!this.starrocksTypeId) {
+          const { typeList } = await api.fetch('/data-source-manager/type/all', {}, 'get')
+          const starrockItem = typeList.find(it => {
+            return it.name === 'starrocks'
+          })
+          this.starrocksTypeId = starrockItem ?  starrockItem.id : ''
+        }
+    },
     destroyCopilotEvent() {
       plugin.clear('copilot_web_listener_viewTableData')
       plugin.clear('copilot_web_listener_queryStructure')
@@ -292,11 +318,15 @@ export default {
     },
     init() {
       this.loading = true;
-      this.dispatch('IndexedDB:getGlobalCache', {
-        id: this.getUserName(),
-      }, (cache) => {
-        this.updateCache(cache);
-      })
+      const closeSuggest = storage.get('close_db_table_suggest');
+      const uselsp = localStorage.getItem('scriptis-edditor-type') === 'lsp'
+      if (!closeSuggest || uselsp) {
+        this.dispatch('IndexedDB:getGlobalCache', {
+          id: this.getUserName(),
+        }, (cache) => {
+          this.updateCache(cache);
+        })
+      }
       // 获取hive库和表的信息，用于在tab页中的.sql脚本进行关键字联想
       // 首次登录打开时，得重新获取数据
       const worklist = storage.get(this.getUserName() + "tabs", "local")
@@ -328,7 +358,7 @@ export default {
         if(lastActivedWork) {
           work = lastActivedWork
         }
-        if(work) {
+        if (work) {
           this.chooseWork(work)
         }
         this.openQueryTab();
@@ -352,7 +382,7 @@ export default {
           })
           .then((args) => {
             hiveList = args
-            that.$emit('get-dbtable-length', hiveList.length)
+            storage.set('all-db-tables-length', hiveList.length, "local")
           })
       }
 
@@ -487,6 +517,7 @@ export default {
                   id: work.data.id,
                   filename: work.filename,
                   filepath: work.filepath,
+                  dataSetValue: work.dataSetValue,
                   code: work.data.data,
                   type: work.type,
                   data: work.data,
@@ -571,6 +602,46 @@ export default {
         })
       }
       let work = null
+      if (supportedMode.application === 'jdbc' || supportedMode.application === 'ck') {
+        let dataSet = []
+        api
+          .fetch(
+            //'data-source-manager/info/connect-params',
+            'data-source-manager/info',
+            {
+              //获取数据源数据
+              pageSize: 1000,
+              //typeId: this.starrocksTypeId,
+              currentPage: 1,
+            },
+            {
+              method: 'get',
+              cacheOptions: { time: 60000 }
+            }
+          )
+          .then((rst) => {
+            if (rst && rst.queryList) {
+              for (let i = 0; i < rst.queryList.length; i++) {
+                // expire 为false
+                // versionId 大于0
+                // publishedVersionId 存在此字段（未发布的数据源不含有此字段），且大于0
+                // 满足这三个条件的为有效数据源，需要在列表中被筛选
+                if (
+                  rst.queryList[i].expire === false &&
+                  rst.queryList[i].versionId > 0 &&
+                  rst.queryList[i].publishedVersionId &&
+                  !['tdsql', 'mysql'].includes(rst.queryList[i].dataSourceType.name)
+                  //rst.queryList[i].connectParams.username === username
+                ) {
+                  dataSet.push(rst.queryList[i])
+                }
+              }
+            }
+          })
+          .catch(() => {})
+        option.dataSetList = dataSet
+      }
+     
       if (option.type !== "backgroundScript") {
         // 如果已经在tabs中，则打开
         let repeatWork = find(this.worklist, (work) => work.id == option.id)
@@ -842,10 +913,11 @@ export default {
       // node页面和scriptis页面操作不同，由于scriptis页面有缓存，所以关闭页面并不会注销组件，所以先判断是node页面触发的还是scriptis页面触发的，然后再判断是有那个编辑器触发的
       if (!this.node && Object.keys(node).length <= 0) {
         const work = find(this.worklist, (work) => work.id === this.current)
-        if (!work)
+        if (!work) {
           return this.$Message.warning(
             this.$t("message.scripts.container.warning.noSelectedScript")
           )
+        }
         this.dispatch("Workbench:insertValue", {
           id: this.current,
           value,
@@ -1302,7 +1374,7 @@ export default {
       width: calc(100% - 45px);
       overflow: hidden;
       &.work-list-tab {
-        overflow-x: auto;
+        overflow-x: overlay;
         overflow-y: hidden;
         padding-left: 16px;
         &::-webkit-scrollbar {
@@ -1317,10 +1389,10 @@ export default {
           box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.2);
           border-radius: 3px;
         }
-        .list-group > span {
-          white-space: nowrap;
-          display: block;
-          height: 0;
+        .list-group {
+          display: flex;
+          align-items: center;
+          padding-top: 4px;
         }
       }
       .workbench-tab-item {
@@ -1345,6 +1417,8 @@ export default {
           @include bg-color(#e8eef4, $dark-workspace-body-bg-color);
           color: $primary-color;
           @include font-color($primary-color, $dark-primary-color);
+          border: 1px solid #2E92F7;
+          max-width: none;
         }
 
         &:hover {
@@ -1389,10 +1463,7 @@ export default {
     }
   }
   .workbench-container {
-    height: calc(100% - 48px);
-    &.node {
-      height: 100%;
-    }
+    height: calc(100% - 45px);
     @keyframes ivu-progress-active {
       0% {
         opacity: 0.3;

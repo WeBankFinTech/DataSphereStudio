@@ -18,8 +18,13 @@ package com.webank.wedatasphere.dss.framework.workspace.service;
 
 
 import com.webank.wedatasphere.dss.common.entity.PageInfo;
+import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSUserDefaultWorkspace;
+import com.webank.wedatasphere.dss.framework.workspace.bean.request.UpdateUserDefaultWorkspaceRequest;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceRoleVO;
+import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DepartmentUserTreeVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.StaffInfoVO;
+import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 
 import java.util.List;
 
@@ -50,7 +55,10 @@ public interface DSSWorkspaceUserService {
     List<StaffInfoVO> listAllDSSUsers();
 
     List<String> getAllWorkspaceUsers(long workspaceId);
-    PageInfo<String> getAllWorkspaceUsersPage(long workspaceId, Integer pageNow, Integer pageSize);
+
+    List<DepartmentUserTreeVo> getAllWorkspaceUsersDepartment(long workspaceId) ;
+
+    PageInfo<String> getAllWorkspaceUsersPage(long workspaceId, Integer pageNow, Integer pageSize,boolean paged);
 
     List<Integer> getUserWorkspaceIds(String userName);
 
@@ -66,4 +74,11 @@ public interface DSSWorkspaceUserService {
     void clearUserByUserName(String userName);
 
     void revokeUserRoles(String userName, Integer[] workspaceIds, Integer[] roleIds);
+
+    List<String> getWorkspaceUserByRoleId(Long workspaceId,Integer roleId);
+
+    void updateWorkspaceRole(List<Integer> roles, long workspaceId,String newOwner);
+
+
+    DSSUserDefaultWorkspace updateUserDefaultWorkspace(UpdateUserDefaultWorkspaceRequest request) throws DSSErrorException;
 }

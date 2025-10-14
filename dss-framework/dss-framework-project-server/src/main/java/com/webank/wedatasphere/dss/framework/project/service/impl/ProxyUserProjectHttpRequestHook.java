@@ -1,11 +1,13 @@
 package com.webank.wedatasphere.dss.framework.project.service.impl;
 
+import com.webank.wedatasphere.dss.common.constant.project.ProjectUserPrivEnum;
+import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectUser;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectCreateRequest;
-import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectDeleteRequest;
+import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectDeleteOrRestoreRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectModifyRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectQueryRequest;
-import com.webank.wedatasphere.dss.framework.project.entity.response.ProjectResponse;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectService;
+import com.webank.wedatasphere.dss.framework.project.service.DSSProjectUserService;
 import com.webank.wedatasphere.dss.framework.project.service.ProjectHttpRequestHook;
 import com.webank.wedatasphere.dss.framework.proxy.conf.ProxyUserConfiguration;
 import com.webank.wedatasphere.dss.framework.proxy.exception.DSSProxyUserErrorException;
@@ -23,6 +25,7 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -36,14 +39,17 @@ import org.slf4j.Logger;
  */
 @Component
 public class ProxyUserProjectHttpRequestHook implements ProjectHttpRequestHook {
-    private static final Logger LOGGER= LoggerFactory.getLogger(ProxyUserProjectHttpRequestHook.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProxyUserProjectHttpRequestHook.class);
     @Autowired
     private DSSProjectService dssProjectService;
     @Autowired
     private DssProxyUserService dssProxyUserService;
 
+    @Autowired
+    private DSSProjectUserService dssProjectUserService;
+
     private Message doProxyUserFunction(HttpServletRequest request, Function<String, Message> function) {
-        if(!ProxyUserConfiguration.isProxyUserEnable()) {
+        if (!ProxyUserConfiguration.isProxyUserEnable()) {
             return null;
         }
         String proxyUser;
@@ -51,8 +57,8 @@ public class ProxyUserProjectHttpRequestHook implements ProjectHttpRequestHook {
             proxyUser = dssProxyUserService.getProxyUser(request);
         } catch (DSSProxyUserErrorException e) {
             LOGGER.error("getProxyUser Failed,cookie is :{}", Arrays.stream(request.getCookies())
-                    .map(cookie->String.format("%s=%s",cookie.getName(),cookie.getValue())).collect(Collectors.joining(",")));
-            LOGGER.error("getProxyUser failed.",e);
+                    .map(cookie -> String.format("%s=%s", cookie.getName(), cookie.getValue())).collect(Collectors.joining(",")));
+            LOGGER.error("getProxyUser failed.", e);
             return Message.error(e.getMessage());
         }
         return function.apply(proxyUser);
@@ -73,14 +79,13 @@ public class ProxyUserProjectHttpRequestHook implements ProjectHttpRequestHook {
     @Override
     public Message beforeCreateProject(HttpServletRequest request, ProjectCreateRequest projectCreateRequest) {
         return doProxyUserFunction(request, proxyUser -> {
-            if(CollectionUtils.isNotEmpty(projectCreateRequest.getAccessUsers()) ||
-                    CollectionUtils.isNotEmpty(projectCreateRequest.getEditUsers()) || CollectionUtils.isNotEmpty(projectCreateRequest.getReleaseUsers())) {
-                return Message.error("This environment is not allowed to set accessUsers, editUsers or ReleaseUsers(本环境不允许设置发布权限、编辑权限和查看权限，请删除相关权限后再重试).");
+            if (CollectionUtils.isNotEmpty(projectCreateRequest.getEditUsers()) || CollectionUtils.isNotEmpty(projectCreateRequest.getReleaseUsers())) {
+                return Message.error("This environment is not allowed to set editUsers or ReleaseUsers(本环境不允许设置发布权限、编辑权限，请删除相关权限后再重试).");
             }
-            String userName= SecurityFilter.getLoginUsername(request);
-            if(userName.equals(proxyUser)
-                    &&!StringUtils.startsWithIgnoreCase(proxyUser,"WTSS_")
-                    &&!StringUtils.startsWithIgnoreCase(proxyUser,"hduser")){
+            String userName = SecurityFilter.getLoginUsername(request);
+            if (userName.equals(proxyUser)
+                    && !StringUtils.startsWithIgnoreCase(proxyUser, "WTSS_")
+                    && !StringUtils.startsWithIgnoreCase(proxyUser, "hduser")) {
                 return Message.error("only ops proxy user can create project(只允许代理用户创建工程).");
             }
             projectCreateRequest.getEditUsers().add(proxyUser);
@@ -98,25 +103,72 @@ public class ProxyUserProjectHttpRequestHook implements ProjectHttpRequestHook {
             // 这里直接使用代理用户来查询
             projectQueryRequest.setUsername(proxyUser);
             projectQueryRequest.setWorkspaceId(workspace.getWorkspaceId());
-            List<ProjectResponse> projectResponseList = dssProjectService.getListByParam(projectQueryRequest);
-            if(CollectionUtils.isEmpty(projectResponseList)) {
+
+            List<DSSProjectUser> dssProjectUsers = dssProjectUserService.getProjectPriv(projectModifyRequest.getId());
+
+            if (CollectionUtils.isEmpty(dssProjectUsers)) {
                 return Message.error("You have no permission to modify this project.");
-            } else if(!CollectionUtils.isEqualCollection(projectModifyRequest.getEditUsers(), projectResponseList.get(0).getEditUsers()) ||
-                    !CollectionUtils.isEqualCollection(projectModifyRequest.getReleaseUsers(), projectResponseList.get(0).getReleaseUsers()) ||
-                    CollectionUtils.isNotEmpty(projectModifyRequest.getAccessUsers())) {
-                return Message.error("This environment is not allowed to set accessUsers, editUsers or ReleaseUsers(本环境不允许设置发布权限、编辑权限和查看权限，请删除相关权限后再重试).");
             }
+
+            Integer editPriv = ProjectUserPrivEnum.PRIV_EDIT.getRank();
+            List<String> editUsers = projectModifyRequest.getEditUsers();
+
+            Integer releasePriv = ProjectUserPrivEnum.PRIV_RELEASE.getRank();
+            List<String> releaseUsers = projectModifyRequest.getReleaseUsers();
+
+            if (!isSameUser(editPriv, dssProjectUsers, editUsers, projectModifyRequest)
+                    || !isSameUser(releasePriv, dssProjectUsers, releaseUsers, projectModifyRequest)) {
+
+                return Message.error("This environment is not allowed to set accessUsers, " +
+                        "editUsers or ReleaseUsers(本环境不允许设置编辑、发布权限，请删除相关权限后再重试).");
+            }
+
             return null;
         });
     }
 
     @Override
-    public Message beforeDeleteProject(HttpServletRequest request, ProjectDeleteRequest projectDeleteRequest) {
+    public Message beforeDeleteProject(HttpServletRequest request, ProjectDeleteOrRestoreRequest projectDeleteRequest) {
         return null;
     }
 
     @Override
     public Message beforeGetDeletedProject(HttpServletRequest request, ProjectQueryRequest projectRequest) {
         return doProxyUserConsumer(request, projectRequest::setUsername);
+    }
+
+
+    public Boolean isSameUser(Integer priv, List<DSSProjectUser> dssProjectUsers, List<String> inputUser, ProjectModifyRequest projectModifyRequest) {
+
+        // 根据priv过滤出需要的用户信息
+        List<String> projectUsers = dssProjectUsers.stream()
+                .filter(projectUser -> Objects.equals(priv, projectUser.getPriv()))
+                .map(DSSProjectUser::getUsername).collect(Collectors.toList());
+
+        // 过滤代理用户信息，取实名用户
+        List<String> realUsers = projectUsers.stream().filter(
+                user -> !StringUtils.startsWithIgnoreCase(user, "WTSS_")
+                        && !StringUtils.startsWithIgnoreCase(user, "hduser")
+        ).collect(Collectors.toList());
+
+        if (!CollectionUtils.isEqualCollection(inputUser, projectUsers)
+                && !CollectionUtils.isEqualCollection(inputUser, realUsers)
+        ) {
+            return false;
+
+        }
+
+        // 判断输入的用户是否和实名用户一致
+        if (CollectionUtils.isEqualCollection(inputUser, realUsers)) {
+
+            if (Objects.equals(ProjectUserPrivEnum.PRIV_EDIT.getRank(), priv)) {
+                projectModifyRequest.setEditUsers(projectUsers);
+            } else if (Objects.equals(ProjectUserPrivEnum.PRIV_RELEASE.getRank(), priv)) {
+                projectModifyRequest.setReleaseUsers(projectUsers);
+            }
+        }
+
+        return true;
+
     }
 }

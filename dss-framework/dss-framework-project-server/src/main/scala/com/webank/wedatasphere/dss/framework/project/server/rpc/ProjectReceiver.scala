@@ -17,13 +17,13 @@
 package com.webank.wedatasphere.dss.framework.project.server.rpc
 
 import java.util
-
 import com.webank.wedatasphere.dss.common.entity.project.DSSProject
 import com.webank.wedatasphere.dss.common.protocol.project._
+import com.webank.wedatasphere.dss.common.protocol.workspace.{StarRocksClusterListRequest, StarRocksClusterListResponse}
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectDO
 import com.webank.wedatasphere.dss.framework.project.entity.vo.ProjectInfoVo
 import com.webank.wedatasphere.dss.framework.project.service.{DSSProjectService, DSSProjectUserService}
-import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceUserService
+import com.webank.wedatasphere.dss.framework.workspace.service.{DSSWorkspaceService, DSSWorkspaceUserService}
 import org.apache.linkis.protocol.usercontrol.{RequestUserListFromWorkspace, RequestUserWorkspace, ResponseUserWorkspace, ResponseWorkspaceUserList}
 import org.apache.linkis.rpc.{Receiver, Sender}
 import org.springframework.beans.BeanUtils
@@ -36,7 +36,8 @@ import scala.concurrent.duration.Duration
 @Component
 class ProjectReceiver(projectService: DSSProjectService,
                       dssWorkspaceUserService: DSSWorkspaceUserService,
-                      projectUserService: DSSProjectUserService) extends Receiver {
+                      projectUserService: DSSProjectUserService,
+                      dssWorkspaceService: DSSWorkspaceService) extends Receiver {
 
   override def receive(message: Any, sender: Sender): Unit = {
 
@@ -76,6 +77,22 @@ class ProjectReceiver(projectService: DSSProjectService,
         val projectDo: DSSProjectDO = projectService.getProjectById(projectId)
         val privList = projectUserService.getProjectUserPriv(projectId, userName).map(_.getPriv)
         new ProjectUserAuthResponse(projectId, userName, privList, projectDo.getCreateBy)
+
+      case projectInfoListRequest: ProjectInfoListRequest =>
+        val projects = projectService.getDSSProjectByName(projectInfoListRequest.getProjectNames)
+        new ProjectInfoListResponse(projects)
+
+      case projectListQueryRequest: ProjectListQueryRequest =>
+        val projectList = projectService.queryProject(projectListQueryRequest)
+        new ProjectListQueryResponse(projectList)
+
+      case projectUserAuthModifyRequest : ProjectUserAuthModifyRequest =>
+          projectService.projectAuthModify(projectUserAuthModifyRequest)
+
+      case starRocksClusterListRequest : StarRocksClusterListRequest =>
+        val starRocksClusterList = dssWorkspaceService.getDSSStarrocksCluster(starRocksClusterListRequest.getWorkspaceId)
+        new StarRocksClusterListResponse(starRocksClusterList)
+
     }
   }
 

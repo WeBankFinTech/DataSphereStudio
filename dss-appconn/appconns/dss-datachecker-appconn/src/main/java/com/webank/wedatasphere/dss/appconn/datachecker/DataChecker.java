@@ -28,12 +28,28 @@ import java.util.Properties;
 public class DataChecker {
     public final static String SOURCE_TYPE = "source.type";
     public final static String DATA_OBJECT = "check.object";
+    /**
+     * 检查对象在节点中的序号
+     */
+    public final static String DATA_OBJECT_NUM = "check.sn.object.num";
     public final static String WAIT_TIME = "max.check.hours";
     public final static String QUERY_FREQUENCY = "query.frequency";
     public final static String TIME_SCAPE = "time.scape";
     public final static String MASK_URL = "bdp.mask.url";
     public final static String MASK_APP_ID = "bdp.mask.app.id";
     public final static String MASK_APP_TOKEN = "bdp.mask.app.token";
+    public final static String CONTEXTID_USER = "contextId.user";
+    public final static String CONTEXTID_PROJECT_NAME = "contextId.projectName";
+    public final static String CONTEXTID_FLOW_NAME = "contextId.flowName";
+    public final static String NAME_NAME = "nodeName";
+
+    public final static String QUALITIS_CHECK = "qualitis.check";
+    public final static String QUALITIS_SWITCH = "job.eventchecker.qualitis.switch";
+    public final static String DENY_VIEW_SWITCH = "deny.view.switch";
+    public final static String QUALITIS_CHECK_DEFAULT = "qualitis.check.default";
+    public final static String EXPAND_SECOND_PARTITION = "hourly.secondary.partition";
+
+
 
     private Properties p;
     private static final Logger logger = LoggerFactory.getLogger(DataChecker.class);;
@@ -45,10 +61,10 @@ public class DataChecker {
     public DataChecker(Properties p, DataCheckerExecutionAction action) {
         this.p = p;
         dataCheckerAction = action;
-        maxWaitTime = Long.valueOf(p.getProperty(DataChecker.WAIT_TIME, "1")) * 3600 * 1000;
+        maxWaitTime = (long) (Double.valueOf(p.getProperty(DataChecker.WAIT_TIME, "1")) * 3600 * 1000);
         //test over time
 //        maxWaitTime = Long.valueOf(p.getProperty(DataChecker.WAIT_TIME, "1")) * 120 * 1000;
-        queryFrequency = Integer.valueOf(p.getProperty(DataChecker.QUERY_FREQUENCY, "30000"));
+        queryFrequency = Integer.valueOf(p.getProperty(DataChecker.QUERY_FREQUENCY, "60000"));
 
     }
 
@@ -66,23 +82,23 @@ public class DataChecker {
             }
         }catch (Exception ex){
             dataCheckerAction.setState(RefExecutionState.Failed);
-            throw new  RuntimeException("get DataChecker result failed", ex);
+            throw ex;
         }
 
     }
 
-    public void begineCheck(RefExecutionAction action){
+    public void begineCheck(DataCheckerExecutionAction action){
         boolean success=false;
         try {
             success= wbDao.validateTableStatusFunction(p, logger,action);
         }catch (Exception ex){
             dataCheckerAction.setState(RefExecutionState.Failed);
             logger.error("datacheck error",ex);
-            throw new  RuntimeException("get DataChecker result failed", ex);
+            throw  ex;
         }
         if(success) {
             dataCheckerAction.setState(RefExecutionState.Success);
-        }else {
+        } else if (dataCheckerAction.getState() != RefExecutionState.Failed) {
             dataCheckerAction.setState(RefExecutionState.Running);
         }
     }

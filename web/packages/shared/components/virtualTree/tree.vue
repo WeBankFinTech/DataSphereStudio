@@ -65,7 +65,10 @@ export default {
     keyText: { // 节点数据唯一id
       type: String,
       default: '_id'
-    }
+    },
+    computeStyle: {
+      type: Function
+    },
   },
   watch: {
     list() {
@@ -73,6 +76,9 @@ export default {
     },
     open(v) {
       this.refresData(v)
+    },
+    height() {
+      this.refresData()
     }
   },
   data() {
@@ -145,7 +151,8 @@ export default {
         key: `${this.showData[index][this.keyText]}_${index}`,
         props: {
           item: this.showData[index],
-          render: this.render
+          render: this.render,
+          computeStyle: this.computeStyle
         },
         nativeOn: {
           click: (ev) => {

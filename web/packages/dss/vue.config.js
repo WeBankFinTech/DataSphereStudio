@@ -173,8 +173,6 @@ function resolve(dir) {
 //       "connect-src": [
 //         "'self'",
 //         "ws:",
-//         "https://***REMOVED***",
-//         "http://adm.webank.io"
 //       ],
 //       "img-src": [
 //         "data:",
@@ -300,5 +298,6 @@ module.exports = {
   },
   devServer: {
     disableHostCheck: true
-  }
+  },
+  transpileDependencies: ['vscode-uri']
 }

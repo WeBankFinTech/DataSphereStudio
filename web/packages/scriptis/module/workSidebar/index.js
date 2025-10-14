@@ -28,7 +28,7 @@ export default {
   dispatchs: {
     Workbench: ['add', 'run', 'openFile', 'remove', 'updateTab', 'checkExist', 'deleteDirOrFile', 'isOpenTab'],
     HdfsSidebar: ['showTree'],
-    HiveSidebar: ['showHive', 'getDatabase', 'getTables', 'getTablePartitions'],
+    HiveSidebar: ['showHive'],
     IndexedDB: ['getTabs', 'appendTree', 'getTree'],
   },
   data: {

@@ -10,7 +10,7 @@
         <virtual-list ref="fieldList" wtag="ul" :size="size" :remain="remain">
           <li
             v-for="(item, index) in rowlist"
-            :key="item.title + index"
+            :key="item.key"
             :data-item="index"
             class="filter-view-item"
           >
@@ -31,14 +31,14 @@
         <div style="margin-bottom: 10px; margin-top: 2px; font-size: 14">
           {{$t("message.common.dss.selectedcol")}}({{ selectedList.length }})
         </div>
-        <div class="selected-list" :style="{ height: height - 53 + 'px' }">
+        <div class="selected-list" :style="{ height: height - 53 - 24 + 'px' }">
           <div v-if="selected.length < 1">
             {{$t("message.common.dss.colfiltertip")}}<br />
             {{$t("message.common.dss.colfiltertip_1")}}
           </div>
           <div
             v-for="(it, index) in selectedList"
-            :key="it.title"
+            :key="it.key"
             class="filter-view-item"
           >
             <span class="filter-view-item-text" :title="it.title">{{
@@ -49,18 +49,28 @@
         </div>
       </div>
     </div>
+    <!-- <div style="display: flex;">
+      <Page
+        style="display: inline-block;align-items: center;"
+        :total="page.total"
+        :current="page.current"
+        size="small"
+        @on-change="changePage"/>
+      <span>共 {{page.total}} 列</span> 
+    </div> -->
     <div class="buts-warp">
       <Checkbox v-model="checkAll" @on-change="(value) => changeCheckAll(value)"
       >{{ $t("message.common.selectAll") }}</Checkbox
       >
       <Button type="primary" @click="onCancel">{{ $t("message.common.clear") }}</Button>
-      <Button type="primary" @click="reset">{{ $t("message.common.reset") }}</Button>
+      <Button type="primary" @click="reset" title="点击还原全部列">{{ $t("message.common.reset") }}</Button>
       <Button type="primary" @click="changeHeads()">{{ $t("message.common.ok") }}</Button>
       <Button type="primary" @click="close">{{ $t("message.common.close") }}</Button>
     </div>
   </div>
 </template>
 <script>
+import { debounce } from 'lodash';
 import virtualList from '@dataspherestudio/shared/components/virtualList'
 export default {
   components: {
@@ -90,6 +100,11 @@ export default {
       searchName: '',
       selected: [],
       rowlist: [],
+      page: {
+        total: 0,
+        current: 1,
+        size: 10,
+      },
     }
   },
   computed: {
@@ -116,9 +131,12 @@ export default {
   },
   mounted() {
     this.filterSearch()
-    this.selected = this.headRows.filter(it => this.checked.some(item => item === it.title))
+    this.selected = this.headRows.filter(it => this.checked.some(item => item === it.key))
   },
   methods: {
+    changePage() {
+
+    },
     hanlderCheck(e) {
       const item = e.target.dataset.item || e.target.parentNode.dataset.item
       if (item === undefined) return
@@ -133,7 +151,7 @@ export default {
         this.$Message.warning(this.$t('message.common.dss.maxcol'))
       }
     },
-    filterSearch() {
+    filterSearch: debounce(function () {
       this.checkAll = false
       if (!this.searchName) {
         this.rowlist = this.headRows
@@ -141,7 +159,7 @@ export default {
       this.rowlist = this.headRows
         .filter((it) => it.title.indexOf(this.searchName) > -1)
       this.layout()
-    },
+    }, 500),
     getItemprops(index) {
       return {
         key: index,
@@ -170,13 +188,13 @@ export default {
         }
       } else {
         this.selected = this.selected.filter((item) => {
-          return !this.rowlist.some((it) => it.title === item.title)
+          return !this.rowlist.some((it) => it.key === item.key)
         })
       }
     },
     changeHeads() {
       if (this.selectedList.length) {
-        this.$emit('on-check', this.selectedList.map(it => it.title))
+        this.$emit('on-check', this.selectedList.map(it => it.key))
       } else {
         this.$Message.warning(this.$t('message.common.checkone'))
       }
@@ -192,7 +210,7 @@ export default {
       this.selected = []
     },
     isSelect(item) {
-      const idx = this.selected.findIndex((it) => it.title === item.title)
+      const idx = this.selected.findIndex((it) => it.key === item.key)
       return idx > -1
     },
     removeItem(idx) {
@@ -211,7 +229,7 @@ export default {
   @include bg-color(#fff, $dark-menu-base-color);
   border: 1px solid #dcdee2;
   @include border-color($border-color-base, #525354);
-  border-left: none;
+  // border-left: none;
   padding: 10px;
   z-index: 2;
   .select-panel {

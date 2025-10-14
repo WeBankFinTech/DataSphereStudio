@@ -42,7 +42,7 @@
             </div>
             <div v-if="bottomTab.fieldDetail & isShowFieldDetailTab" :class="{active: scriptViewState.showPanel == 'fieldDetail'}"
               class="workbench-tab-item" style="min-width: 200px" @click="showPanelTab('fieldDetail')">
-              <span>{{ $t('message.common.progress.inconsistentFieldsDetail') }}</span>
+              <span>{{ codePrecheckTitle }}</span>
             </div>
             <template v-for="(comp, index) in extComponents">
               <component
@@ -55,6 +55,17 @@
                 :class="{active: scriptViewState.showPanel == comp.name}"
                 @click.native="showPanelTab(comp.name)" />
             </template>
+          </div>
+          <div v-if="bottomTab.show_result && scriptResult.totalColumn <= 10000 && scriptResult.totalColumn > 500" class="column-pagination">
+            <span>列分页：500列 / 页，共{{ scriptResult.totalColumn }}列</span>
+            <Page
+              :total="scriptResult.totalColumn"
+              :current="scriptViewState.columnPageNow || 1"
+              :page-size="500"
+              :simple="true"
+              size="small"
+              @on-change="onChangeColPage"
+            />
           </div>
           <span class="workbench-tab-full-btn" @click="configLogPanel">
             <Icon :type="scriptViewState.bottomPanelFull?'md-contract':'md-expand'" />
@@ -90,7 +101,8 @@
             :history="script.history"
             :script-view-state="scriptViewState"
             :run-type="script.runType"
-            :node="node" />
+            :node="node"
+            @update-from-history="updateFromHistory"/>
           <field
             v-if="bottomTab.show_fieldDetail"
             :codePrecheckRes="script.codePrecheckRes"
@@ -139,9 +151,12 @@ import log from '@dataspherestudio/shared/components/consoleComponent/log.vue';
 import field from './field.vue';
 import weProgress from '@dataspherestudio/shared/components/consoleComponent/progress.vue';
 import mixin from '@dataspherestudio/shared/common/service/mixin';
-import plugin from '@dataspherestudio/shared/common/util/plugin'
+import plugin from '@dataspherestudio/shared/common/util/plugin';
+import { EXECUTE_COMPLETE_TYPE } from '@dataspherestudio/shared/common/config/const';
 
-const extComponents = plugin.emitHook('script_console_tabs') || []
+// const extComponents = plugin.emitHook('script_console_tabs') || []
+const extComponents = []
+const typeMap ={'.py': 'pyspark','.hql': 'hive sql', '.sql': 'spark sql', '.scala': 'spark scala', '.txt': '文本'};
 
 export default {
   name: 'editor-script',
@@ -189,12 +204,14 @@ export default {
         showPanel,
         bottomPanelFull: false,
         cacheLogScroll: 0,
+        columnPageNow: 1,
       },
       execute: null,
       postType: 'http',
       saveLoading: false,
       extComponents,
       isShowFieldDetailTab: false,
+      codePrecheckTitle: '字段数据类型不一致详情',
     };
   },
   mixins: [mixin],
@@ -205,6 +222,8 @@ export default {
         bodyRows: [],
         type: 'EMPTY',
         total: 0,
+        totalColumn: 0,
+        columnPageNow: 1,
         path: ''
       };
       if (this.script.resultList) {
@@ -257,6 +276,15 @@ export default {
       if (this.node) {
         this.resizePanel()
       }
+      const needFix = storage.get(`cache_needfix_${this.script.id}`);
+      if (needFix) {
+        this.checkAIFix(
+          needFix.taskId,
+          needFix.code,
+          needFix.errCode,
+          needFix.errMessage
+        )
+      }
     },
     'work.unsave': function(v) {
       if (this.node && v) {
@@ -270,8 +298,6 @@ export default {
     if (this.work.data) {
       delete this.work.data.oldData;
       this.script = this.work.data;
-      // 用缓存的scriptViewState替换当前this.scriptViewState
-      this.scriptViewState = this.script.scriptViewState;
     } else if (this.work.type === 'historyScript') {
       this.initHistory();
       return;
@@ -293,8 +319,6 @@ export default {
         readOnly: this.readonly
       }));
       delete this.work.specialSetting;
-      // 把新创建的scriptViewState挂到script对象上
-      this.script.scriptViewState = this.scriptViewState;
     }
 
     // 删掉无用的code和params，因为已经存储在script对象中
@@ -306,11 +330,9 @@ export default {
         tabId: this.script.id,
         cb: (resultList) => {
           if (resultList) {
-
             this.script.resultList = dropRight(toArray(resultList), 3);
             this.script.resultSet = resultList.resultSet;
             this.showPanelTab(resultList.showPanel);
-
           }
         }
       });
@@ -334,12 +356,6 @@ export default {
         }
       });
     }
-    this.dispatch('IndexedDB:getHistory', {
-      tabId: this.script.id,
-      cb: (historyList) => {
-        this.script.history = dropRight(values(historyList));
-      }
-    });
     let cacheWork = await this.getCacheWork(this.work);
     this._running_scripts_key = 'running_scripts_' + this.userName;
     if (cacheWork) { // 点击运行后脚本正在执行中未关掉Tab刷新页面时执行进度恢复
@@ -351,6 +367,7 @@ export default {
         // cacheWork.taskID && .execID && cacheWork.data && cacheWork.data.running
       if (taskID && execID && data && data.running) {
         let dbProgress = JSON.parse(JSON.stringify(this.script.progress));
+        delete cacheWork.data.history;
         this.script = cacheWork.data;
         this.script.progress = dbProgress;
         this.run({
@@ -382,6 +399,12 @@ export default {
         this.script.status = 'Inited';
       }
     }
+    this.dispatch('IndexedDB:getHistory', {
+      tabId: this.script.id,
+      cb: (historyList) => {
+        this.script.history = dropRight(values(historyList));
+      }
+    });
     // 加入用户名来区分不同账户下的tab
     this.dispatch('IndexedDB:recordTab', { ...this.work, userName: this.userName });
   },
@@ -398,6 +421,9 @@ export default {
       return null;
     };
     this.autoSave();
+    if (this.scriptResult && this.scriptResult.columnPageNow && this.scriptResult.columnPageNow != this.scriptViewState.columnPageNow) {
+      this.scriptViewState.columnPageNow = this.scriptResult.columnPageNow;
+    }
   },
   beforeDestroy() {
     // 关闭tab页面不再继续轮询接口
@@ -427,6 +453,7 @@ export default {
     }
     window.onbeforeunload = null;
     plugin.off('copilot_web_listener_inster', this.insterCode)
+    this.$Notice.close('codefixnotice')
   },
   methods: {
     /**
@@ -434,10 +461,13 @@ export default {
           eventType?: any,
           arg?: {}
       }]
-     * @param {*} param0 
+     * @param {*} param0
      */
     initListenerCopilotEvent() {
       plugin.on('copilot_web_listener_inster', this.insterCode)
+    },
+    onChangeColPage(v) {
+      this.scriptViewState = {...this.scriptViewState, columnPageNow: v}
     },
     insterCode({ code }) {
       if (this.current !== this.work.id) return
@@ -523,7 +553,6 @@ export default {
       }
     },
     'Workbench:removeTab'() {
-      // fix http://172.0.0.1/#/product/100199/bug/detail/199545
       if (this.node) {
         this.resizePanel()
       }
@@ -552,6 +581,21 @@ export default {
       } else {
         params = this.convertSettingParams(this.script.params)
       }
+      if (params.configuration && option.dataSetValue) {
+        if (params.configuration.runtime) {
+          params.configuration.runtime = {
+            ...params.configuration.runtime,
+            'wds.linkis.engine.runtime.datasource': option.dataSetValue,
+          }
+        } else {
+          params.configuration = {
+            ...params.configuration,
+            runtime: {
+              'wds.linkis.engine.runtime.datasource': option.dataSetValue,
+            },
+          }
+        }
+      }
       let initData = {
         method: '/api/rest_j/v1/entrance/execute',
         websocketTag: this.work.id,
@@ -577,23 +621,86 @@ export default {
       this.isShowFieldDetailTab = true;
       this.showPanelTab('fieldDetail');
     },
+    showDiyParamsInfo(executionCode, variableData) {
+      // 步骤 1: 提取代码中的变量表达式
+      const regex = /\$\{([^}]*)\}/g;
+      let match;
+      const variablesInCode = new Set();
+
+      while ((match = regex.exec(executionCode)) !== null) {
+        const expression = match[1].trim(); // 提取变量表达式并去除前后空白字符
+
+        // 步骤 2: 处理变量表达式
+        if (expression.includes('+') || expression.includes('-')) {
+          // 表达式中有加减符号，按加减符号分隔
+          const parts = expression.split(/\s*[\+\-]\s*/);
+          parts.forEach(part => {
+            if (part && !/^\d+$/.test(part.trim())) { // 过滤掉纯数字
+              variablesInCode.add(part.trim());
+            }
+          });
+        } else {
+          // 表达式中没有加减符号，直接视作一个变量
+          variablesInCode.add(expression);
+        }
+      }
+      // console.log('variablesInCode', variablesInCode);
+      // 执行代码中无变量,返回 false
+      if(variablesInCode.size === 0) {
+        return false
+      }
+      // console.log('validDiyParams-variablesInCode', variablesInCode)
+      // 步骤 2: 检查变量是否存在
+      for (let variable of variablesInCode) {
+        const found = variableData.some(data => data.key === variable);
+        if (!found) {
+        // 如果执行代码中存在某变量，但在参数列表中不存在，则返回 false
+          // console.log('不存在的变量', variable)
+          return false;
+        }
+      }
+
+      return true; // 所有变量都存在，则返回 true
+    },
+    filterComments(code) {
+        // 拆分成行
+        const lines = code.split('\n');
+
+        // 过滤每一行
+        const filteredLines = lines.map(line => {
+            // 找到注释符的位置
+            const commentIndex = line.indexOf('--');
+
+            if (commentIndex === 0) {
+                // 注释符在句首，过滤整行
+                return '';
+            } else if (commentIndex > 0) {
+                // 注释符在句中，过滤注释部分
+                return line.substring(0, commentIndex).trim();
+            } else {
+                // 没有注释符，保留原行
+                return line;
+            }
+        });
+
+        // 合并过滤后的行
+        return filteredLines.join('\n').trim();
+    },
     async run(option, cb) {
+      this.scriptViewState.columnPageNow = 1;
       this.handleLines = {}
-      this.script.codePrecheckRes = {};
+      this.script.validParamsInfoRes = {};
       this.isShowFieldDetailTab = false;
       if (option && option.id === this.script.id) {
-        if (window.$Wa) window.$Wa.clickStat('run',this.script.fileName);
         if (this.scriptViewState.topPanelFull) {
           this.dispatch('Workbench:setTabPanelSize');
           this.scriptViewState.topPanelFull = false;
         }
-        if (this.$refs.progressTab) {
-          this.$refs.progressTab.updateErrorMsg({})
-        }
-        setTimeout(()=>{
-          this.showPanelTab('progress');
-        }, 100)
         const data = this.getExecuteData(option);
+        if (this.execute) {
+          this.execute.off();
+          this.execute = null;
+        }
         // 执行
         this.execute = new Execute(data);
         this.isLogShow = false;
@@ -606,15 +713,28 @@ export default {
           },
           logLine: 1,
         };
+        // code-preckcheck执行依赖progress页先展示，延时有关联影响
+        if (this.scriptViewState.showPanel != 'progress') {
+            setTimeout(()=>{
+              this.showPanelTab('progress');
+            }, 100)
+        }
+
+        let runPrecheck = false;
         if (option && option.isRestore) {
           this.execute.restore(option);
         } else {
+          if (this.$refs.progressTab) {
+            this.$refs.progressTab.updateErrorMsg({})
+            this.$refs.progressTab.updateCodePreCheck({});
+          }
           this.dispatch('IndexedDB:clearLog', this.script.id);
           this.dispatch('IndexedDB:clearResult', this.script.id);
           this.dispatch('IndexedDB:clearProgress', this.script.id);
           this.resetProgress();
           this.resetData();
           this.execute.start();
+          runPrecheck = true;
         }
         // 运行时，如果是临时脚本且未保存状态时，弹出一个警告的提醒，否则直接保存。
         if (!this.work.filepath && this.work.unsave && !this.node) {
@@ -624,7 +744,7 @@ export default {
             duration: 3,
           });
         } else {
-          this.save();
+          this.save('', option.dataSetValue, 'run');
         }
         this.execute.once('sendStart', (code) => {
           const name = this.work.filepath || this.work.filename;
@@ -677,6 +797,7 @@ export default {
         });
 
         this.execute.on('history', (ret) => {
+          this.script.history = this.script.history || []
           const index = findIndex(this.script.history, (o) => o.taskID == ret.taskID);
           const findHis = index > -1 ? this.script.history[index] : undefined;
           let newItem = null;
@@ -762,21 +883,23 @@ export default {
           } else if (ret.status == 'Failed') {
             this.showPanelTab('log')
           }
+          this.checkAIFix(ret.taskID, code, ret.errCode, ret.errDesc)
         });
         this.execute.on('result', (ret) => {
           this.showPanelTab('result');
-          const storeResult = {
-            'headRows': ret.metadata,
-            'bodyRows': ret.fileContent,
-            'total': ret.totalLine,
-            'type': ret.type,
-            'path': this.execute.currentResultPath,
-            'current': 1,
-            'size': 20,
-            tipMsg: ret.tipMsg,
-            hugeData: !!ret.hugeData
-          };
-          this.$set(this.execute.resultList[0], 'result', storeResult);
+          // const storeResult = {
+          //   'headRows': ret.metadata,
+          //   'bodyRows': ret.fileContent,
+          //   'total': ret.totalLine,
+          //   'type': ret.type,
+          //   'totalColumn': ret.totalColumn,
+          //   'path': this.execute.currentResultPath,
+          //   'current': 1,
+          //   'size': 20,
+          //   tipMsg: ret.tipMsg,
+          //   hugeData: !!ret.hugeData
+          // };
+          // this.$set(this.execute.resultList[0], 'result', storeResult);
           this.$set(this.script, 'resultSet', 0);
           this.script.resultList = this.execute.resultList;
           this.dispatch('IndexedDB:getResult', {
@@ -886,7 +1009,7 @@ export default {
             if (this.script.steps.indexOf(status) === -1) {
               this.script.steps.push(status);
               // 针对可能有WaitForRetry状态后，后台会重新推送Scheduled或running状态的时候
-            } else if (this.script.steps.indexOf(status) !== -1 && lastStep !== status) {
+            } else if (this.script.steps.indexOf('WaitForRetry') !== -1 && lastStep !== status) {
               this.script.steps.push(status);
             }
             this.dispatch('IndexedDB:updateProgress', {
@@ -984,23 +1107,52 @@ export default {
           });
         });
         // 只有hive或者spark引擎类型才会调用代码关联审查 置于末尾，不影响其余事件
-        if ((this.script.application === 'spark' && this.script.runType === 'sql') || (this.script.application === 'hive' && this.script.runType === 'hql')) {
-          var formData = new FormData();
+        if (runPrecheck && (
+          (this.script.application === 'spark' && this.script.runType === 'sql')
+          || (this.script.application === 'hive' && this.script.runType === 'hql'))) {
           const variable = isEmpty(this.script.params.variable) ? {} : util.convertArrayToObject(this.script.params.variable);
           let params = {
             'variable': variable,
             'configuration': {}
           };
-          formData.append('params', JSON.stringify(params));
-          formData.append('code', this.script.executionCode);
-          formData.append('engineType', this.script.application);
-          formData.append('type', 'union');
-          const codePrecheckRes = await api.fetch('/validator/code-precheck',formData,'post');
-          // 如果拿到代码审查结果时，代码已运行完成，则不进行操作
-          if (this.$refs.progressTab && (!this.script.progress || !this.script.progress.costTime)) {
-            this.script.codePrecheckRes = codePrecheckRes;
-            this.$refs.progressTab.updateCodePreCheck(codePrecheckRes);
+          const codePrecheckRes = await api.fetch('/validator/code-precheck', {
+            params: JSON.stringify(params),
+            code: this.script.executionCode,
+            engineType: this.script.application,
+            type: 'union'
+          }, {
+            method: 'post',
+            useFormQuery: true,
+          });
+          setTimeout(()=>{
+            // 如果拿到代码审查结果时，代码已运行完成，则不进行操作
+            if (this.$refs.progressTab && (!this.script.progress || !this.script.progress.costTime)) {
+              this.script.codePrecheckRes = codePrecheckRes;
+              this.$refs.progressTab.updateCodePreCheck(codePrecheckRes);
+              if (this.script.codePrecheckRes.checkData && this.script.codePrecheckRes.checkData.length > 0 && this.script.codePrecheckRes.checkData[0].detailTitle) {
+                this.codePrecheckTitle = this.script.codePrecheckRes.checkData[0].detailTitle
+              } else {
+                this.codePrecheckTitle = '字段数据类型不一致详情'
+              }
+            }
+          }, 150)
+        setTimeout(()=>{
+          // 如果当前执行代码中配置的参数都在配置参数中,做提示
+          const filterCode = this.filterComments(this.script.executionCode)
+          const diyParamsInfoValidRes = this.showDiyParamsInfo(filterCode, this.script.params.variable)
+          let paramsRes = {
+              content: '',
+              isShow: false
+            }
+          if(diyParamsInfoValidRes) {
+            paramsRes = {
+              content: '脚本存在已配置的自定义参数,请知悉',
+              isShow:true
+            }
           }
+          this.script.validParamsInfoRes = paramsRes;
+          this.$refs.progressTab.updateParamsInfo(paramsRes);
+        } , 150)
         }
       }
     },
@@ -1016,6 +1168,7 @@ export default {
       this.script.steps = ['Submitted'];
       this.script.resultList = null;
       this._execute_last_progress = null;
+      this.scriptViewState.columnPageNow = 1;
     },
     resetProgress() {
       this.script.progress = {
@@ -1026,40 +1179,46 @@ export default {
       };
     },
     stop(cb) {
-      if (this.execute && this.execute.id) {
-        api.fetch(`/entrance/${this.execute.id}/kill`, {taskID: this.execute.taskID}, 'get').then(() => {
-          this.execute.trigger('stop');
-          this.execute.trigger('error');
-          this.execute.trigger('kill');
-          // 停止执行
-          const name = this.work.filepath || this.work.filename;
-          this.$Notice.close(name);
-          this.$Notice.warning({
-            title: this.$t('message.scripts.notice.kill.title'),
-            desc: `${this.$t('message.scripts.notice.kill.desc')} ${this.work.filename} ！`,
-            name: name,
-            duration: 3,
-          });
-          // kill请求发送成功后status还没有变成Canceled，会有状态请求的轮询，此时应当等待canceled之后才能进行下次执行 dpms 400007
-          const fn = () => {
-            if (this.script.steps.indexOf('Cancelled') > -1) {
-              cb()
-            } else {
-              this.canceledTimeout = setTimeout(() => {
-                fn()
-              }, 1000)
+      clearTimeout(this.killTimer)
+      const killAct = () => {
+        if (this.execute && this.execute.id) {
+          api.fetch(`/entrance/${this.execute.id}/kill`, {taskID: this.execute.taskID}, 'get').then(() => {
+            this.execute.trigger('stop');
+            this.execute.trigger('error');
+            this.execute.trigger('kill');
+            // 停止执行
+            const name = this.work.filepath || this.work.filename;
+            this.$Notice.close(name);
+            this.$Notice.warning({
+              title: this.$t('message.scripts.notice.kill.title'),
+              desc: `${this.$t('message.scripts.notice.kill.desc')} ${this.work.filename} ！`,
+              name: name,
+              duration: 3,
+            });
+            // kill请求发送成功后status还没有变成Canceled，会有状态请求的轮询，此时应当等待canceled之后才能进行下次执行 dpms 400007
+            const fn = () => {
+              if (this.script.steps.indexOf('Cancelled') > -1) {
+                cb()
+              } else {
+                this.canceledTimeout = setTimeout(() => {
+                  fn()
+                }, 1000)
+              }
             }
-          }
-          fn()
-        }).catch(() => {
-          this.execute.queryStatusaAfterKill = 0
+            fn()
+          }).catch(() => {
+            this.execute.queryStatusaAfterKill = 0
+            cb();
+          });
+          this.script.running = false;
+        } else {
+          this.killTimer = setTimeout(() => {
+            killAct()
+          }, 500)
           cb();
-        });
-      } else {
-        cb();
-        this.script.steps = []; // socket downgrade事件之前点击运行，终止运行loading后恢复
-        this.script.running = false;
+        }
       }
+      killAct()
     },
     autoSave() {
       clearTimeout(this.autoSaveTimer);
@@ -1069,8 +1228,71 @@ export default {
         }, 1000 * 60 * 5);
       }
     },
-    nodeSave() {
+    async getCurWorkspaceValidRes () {
+      try {
+        const id = this.$route.query.workspaceId;
+        const res = await api.fetch(
+          `dss/framework/workspace/workspaces/${id}`,
+          {},
+          'get'
+        );
+        const result = res.workspace.enabledFlowKeywordsCheck || '0';
+        return result === '1' ? true: false;
+      } catch (err) {
+        console.warn(err);
+      }
+    },
+    containsKeywords(keywords, scriptCode) {
+      // 将脚本代码转换为小写，以便忽略大小写
+      const lowerCaseScript = scriptCode.toLowerCase();
+      for (let keyword of keywords) {
+      // 对关键字中的正则表达式特殊字符进行转义
+      const escapedKeyword = this.escapeRegExp(keyword);
+      // 创建正则表达式，确保关键字作为一个完整的单词出现（使用 \b 匹配单词边界）
+      const regex = new RegExp(`\\b${escapedKeyword}\\b`, 'i');
+      // 如果当前关键字作为一个完整的单词存在于脚本代码中，立即返回 true
+      if (regex.test(lowerCaseScript)) {
+        return true;
+      }
+      }
+      // 如果所有关键字都不作为一个完整的单词存在于脚本代码中，返回 false
+      return false;
+    },
+    escapeRegExp(string) {
+      return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& 表示匹配到的整个字符串
+    },
+    async workspaceKeyValid() {
+      const validType = ['sql','hql','py'];
+      if (this.script.runType && validType.includes(this.script.runType)) {
+        const curWorkspaceValidRes = await this.getCurWorkspaceValidRes();
+        if(curWorkspaceValidRes) {
+          const keyWords = ['insert', 'create table']
+          const containsKeywordsResult = this.containsKeywords(keyWords, this.script.data)
+          return containsKeywordsResult;
+        }
+      }
+      return true
+    },
+    async handleNodeSave(auto, type) {
       if (this.readonly) return this.$Message.warning(this.$t('message.scripts.notSave'));
+      const r = await this.workspaceKeyValid();
+      // 校验通过、自动保存时或者运行时不弹窗
+      if (r || auto || type === 'run') {
+        this.nodeSave();
+      } else {
+        const content = `<p class="ellipse-p">${this.node.title}节点不包含关键字insert或create table</p>`;
+        this.$Modal.confirm({
+            title: '节点关键字检查',
+            content: content,
+            okText: '继续保存',
+            cancelText:'返回修改',
+            onOk: () => {
+                this.nodeSave();
+            },
+        });
+      }
+    },
+    nodeSave() {
       let params = {
         fileName: this.script.fileName,
         scriptContent: this.script.data,
@@ -1110,6 +1332,7 @@ export default {
 
           }, false);
           this.work.unsave = false;
+          this.work.data.data = this.script.data;
           // 提交最新的内容，更新script.data和script.oldData
           this.script.oldData = this.script.data;
           // 保存时更新下缓存。
@@ -1128,15 +1351,42 @@ export default {
           this.work.unsave = true;
         });
     },
-    async save(auto) {
+    async save(auto, dataSetValue, type) {
       if (this.node && Object.keys(this.node).length > 0) {
-        this.nodeSave();
+        this.handleNodeSave(auto, type);
       } else {
         const params = {
           path: this.work.filepath,
           scriptContent: this.script.data,
           params: this.convertSettingParams(this.script.params),
         };
+        if (dataSetValue) {
+          this.work.dataSetValue = dataSetValue;
+          if (isEmpty(params.params.configuration)) {
+            params.params.configuration.runtime = {
+              'wds.linkis.engine.runtime.datasource': dataSetValue,
+            }
+          } else {
+            params.params.configuration.runtime = {
+              ...params.params.configuration.runtime,
+              'wds.linkis.engine.runtime.datasource': dataSetValue,
+            }
+          }
+          if (this.work.data.params.configuration && this.work.data.params.configuration.runtime) {
+            this.work.data.params.configuration.runtime[
+              'wds.linkis.engine.runtime.datasource'
+            ] = dataSetValue;
+          } else {
+            this.work.data.params.configuration.runtime = {
+              'wds.linkis.engine.runtime.datasource': dataSetValue
+            }
+          }
+          this.work.data.params.configuration.runtime[
+            'wds.linkis.engine.runtime.datasource'
+          ] = dataSetValue;
+        } else if(!this.work.dataSetValue && params.params.configuration && params.params.configuration.runtime) {
+          delete params.params.configuration.runtime['wds.linkis.engine.runtime.datasource']
+        }
           // this.work.code = this.script.data;
         const isHdfs = this.work.filepath.indexOf('hdfs') === 0;
         if (this.script.data) {
@@ -1195,15 +1445,32 @@ export default {
       }
     },
     showPanelTab(type) {
-      this.scriptViewState = {
+      const scriptViewState = {
         ...this.scriptViewState,
         showPanel: type,
+      }
+      this.scriptViewState = scriptViewState;
+      if (type === 'progress') {
+        if (EXECUTE_COMPLETE_TYPE.indexOf(this.script.status) === -1 && this.script.history && this.script.steps) {
+          // 当前步骤不是终态，历史步骤是终态
+          let notSync = false;
+          if (this.script.history.length > 0 && this.script.steps.length > 0) {
+            notSync = EXECUTE_COMPLETE_TYPE.indexOf(this.script.history[0].status) !== -1 && this.execute && this.script.history[0].taskID == this.execute.taskID;
+            if (notSync) {
+              // 进度轮询5秒钟一次，如果历史已经更新了则直接查询
+              clearTimeout(this.execute.statusTimeout);
+              this.execute.queryStatus({ isKill: false });
+            } else if(!this.execute) {
+              console.error('no execute')
+            }
+          }
+        }
       }
       if (type === 'log') {
         const taskID = this.work.taskID || (this.script.history[0] && this.script.history[0].taskID)
         // dpms: /#/product/100199/bug/detail/222584
         // dpms: /#/product/100199/bug/detail/398827
-        if (['Succeed', 'Failed', 'Cancelled', 'Timeout'].indexOf(this.script.status) > -1) {
+        if (EXECUTE_COMPLETE_TYPE.indexOf(this.script.status) > -1) {
           if (this.execute && this.execute.resultsetInfo) {
             this.getLogs(this.execute.resultsetInfo)
           } else if(taskID){
@@ -1213,6 +1480,22 @@ export default {
           }
         } else {
           this.localLogShow();
+        }
+      }
+    },
+    updateFromHistory(task) {
+      if (task && this.execute && this.execute.taskID == task.taskID) {
+        let notSync = false;
+        if (task && this.script.steps.length > 0) {
+          // 当前步骤不是终态，历史步骤是终态
+          notSync = EXECUTE_COMPLETE_TYPE.indexOf(task.status) !== -1 && EXECUTE_COMPLETE_TYPE.indexOf(this.script.status) === -1;
+        }
+        if (notSync && this.execute && this.execute.taskID) {
+          // 进度轮询5秒钟一次，如果历史已经更新了则直接查询
+          clearTimeout(this.execute.statusTimeout);
+          this.execute.queryStatus({ isKill: false });
+        } else if(!this.execute) {
+          console.error('no execute')
         }
       }
     },
@@ -1245,91 +1528,45 @@ export default {
     },
     changeResultSet(data, cb) {
       const resultSet = isUndefined(data.currentSet) ? this.script.resultSet : data.currentSet;
-      const findResult = this.script.resultList[resultSet];
-      const resultPath = findResult && findResult.path;
-      const hasResult = Object.prototype.hasOwnProperty.call(this.script.resultList[resultSet], 'result');
-      if (!hasResult) {
-        const pageSize = 5000;
-        const url = '/filesystem/openFile';
-        api.fetch(url, {
-          path: resultPath,
-          pageSize,
-        }, 'get')
-          .then((ret) => {
-            let result = {}
-            if (ret.display_prohibited) {
-              result = {
-                'headRows': [],
-                'bodyRows': [],
-                'total': ret.totalLine,
-                'type': ret.type,
-                'path': resultPath,
-                hugeData: true,
-                tipMsg: localStorage.getItem("locale") === "en" ? ret.en_msg : ret.zh_msg
-              };
-            } else if (ret.metadata && ret.metadata.length >= 500) {
-              result = {
-                'headRows': [],
-                'bodyRows': [],
-                'total': ret.totalLine,
-                'type': ret.type,
-                'path': resultPath,
-                hugeData: true
-              };
-            } else {
-              result = {
-                'headRows': ret.metadata,
-                'bodyRows': ret.fileContent,
-                // 如果totalLine是null，就显示为0
-                'total': ret.totalLine ? ret.totalLine : 0,
-                // 如果内容为null,就显示暂无数据
-                'type': ret.fileContent ? ret.type : 0,
-                'path': resultPath,
-                'current': 1,
-                'size': 20,
-              };
-            }
-            this.script.resultList[resultSet].result = result;
-            this.script.resultSet = resultSet;
-            this.script = {
-              ...this.script
-            };
-            this.updateResult({
-              tabId: this.script.id,
-              resultSet,
-              showPanel: 'result',
-              ...this.script.resultList,
-            });
-            cb();
-          }).catch(() => {
-            cb();
-          });
-      } else {
-        this.script.resultSet = resultSet;
-        this.script = {
-          ...this.script
-        };
-        this.updateResult({
-          tabId: this.script.id,
-          resultSet: resultSet,
-          showPanel: 'result',
-          ...this.script.resultList,
-        });
+      this.script = {
+        ...this.script,
+        resultSet
+      };
+      this.updateResult({
+        tabId: this.script.id,
+        resultSet: resultSet,
+        showPanel: 'result',
+        ...this.script.resultList,
+      });
+      if (cb) {
         cb();
       }
     },
     async initHistory() {
       try {
-        const rst = await api.fetch(`/jobhistory/${this.work.taskID}/get`, 'get');
+        const rst = await api.fetch(`/jobhistory/list`, { taskID: this.work.taskID }, 'get')
         if (rst) {
-          const option = rst.task;
+          const option = rst.tasks[0];
           const supportList = this.getSupportModes();
           const supportedMode = find(supportList, (p) => p.rule.test(this.work.filename));
+          try {
+            if (typeof option.paramsJson === 'string') {
+              option.paramsJson = JSON.parse(option.paramsJson);
+            }
+          } catch (error) {
+            //
+          }
+          if (option.paramsJson && !Array.isArray(option.paramsJson) && typeof option.paramsJson.variable === 'object') {
+            option.paramsJson.variable = util.convertObjectToArray(option.paramsJson.variable)
+          }
+
           this.work.data = this.script = new Script(Object.assign({}, supportedMode, option, {
             fileName: this.work.filename,
             filepath: this.work.filepath,
             id: this.work.id,
+            executionCode: option.executionCode,
             data: option.executionCode,
+            params: option.paramsJson,
             readOnly: true,
             executable: false,
             configurable: false,
@@ -1352,13 +1589,12 @@ export default {
           info: ''
         };
         this.script.logLine = 1;
-        this.script.scriptViewState = this.scriptViewState;
         this.script.status = option.status;
         return;
       }
       let params;
       let url;
-      if (['Succeed', 'Failed', 'Cancelled', 'Timeout'].indexOf(this.script.status) === -1) {
+      if (EXECUTE_COMPLETE_TYPE.indexOf(this.script.status) === -1) {
         url = `/entrance/${this.work.execID}/log`
         params = {
           fromLine: 1,
@@ -1388,8 +1624,6 @@ export default {
           this.script.status = option.status;
           this.script.log = log;
           this.script.logLine = rst.fromLine;
-          // 把新创建的scriptViewState挂到script对象上
-          this.script.scriptViewState = { ...this.scriptViewState };
         }
       } catch (error) {
         console.error(error)
@@ -1418,6 +1652,7 @@ export default {
           if (!currentResultPath) return
           api.fetch(url2, {
             path: currentResultPath,
+            enableLimit: true,
             page: 1,
             pageSize: 5000,
           }, 'get').then((ret) => {
@@ -1432,14 +1667,15 @@ export default {
                 hugeData: true,
                 tipMsg: localStorage.getItem("locale") === "en" ? ret.en_msg : ret.zh_msg
               };
-            } else if (ret.metadata && ret.metadata.length >= 500) {
+            } else if (ret.column_limit_display) {
               tmpResult = {
-                'headRows': [],
-                'bodyRows': [],
+                tipMsg: localStorage.getItem("locale") === "en" ? ret.en_msg : ret.zh_msg,
+                'headRows': ret.metadata,
+                'bodyRows': ret.fileContent,
                 'total': ret.totalLine,
                 'type': ret.type,
+                'totalColumn': ret.totalColumn,
                 'path': currentResultPath,
-                hugeData: true
               };
             } else {
               tmpResult = {
@@ -1447,6 +1683,7 @@ export default {
                 'bodyRows': ret.fileContent,
                 'total': ret.totalLine,
                 'type': ret.type,
+                'totalColumn': ret.totalColumn,
                 'path': currentResultPath,
               };
             }
@@ -1494,12 +1731,103 @@ export default {
     },
     updateResult(params) {
       this.dispatch('IndexedDB:updateResult', params);
-    }
+    },
+    checkAIFix(taskId, code, errCode, errMessage) {
+      const baseinfo = storage.get('baseInfo', 'local')
+      if (this.node) return
+      if (baseinfo && !baseinfo.copilotEnable) return
+      const vm = this
+      const noticeFix = (res) => {
+        vm.$Notice.close('codefixnotice')
+        this.$Notice.warning({
+          name: 'codefixnotice',
+          title: "AI纠错",
+          render: h => {
+            return h("div", [
+              res.message,
+              h("div", {
+                style: {
+                  marginTop: "20px",
+                  display: 'flex',
+                  justifyContent: 'end'
+                },
+              }, [
+              h(
+                "Button",
+                {
+                  style: {
+                    marginRight: "20px",
+                  },
+                  on: {
+                    'click': function () {
+                      vm.$Notice.close('codefixnotice')
+                    }
+                  }
+                },
+                "取消"
+              ),
+              h(
+                "Button",
+                {
+                  props: {
+                    type: "primary",
+                  },
+                  on: {
+                    'click': function () {
+                      const message = `请检查并修改如下代码中的语法错误: ${code}，执行错误信息如下: ${errMessage}`;
+                      plugin.emit('copilot_web_open_change', {
+                        type: 'CodeCorrection',
+                        message,
+                        params: {
+                          type: vm.script ? typeMap[vm.script.ext] || vm.script.application : '',
+                          code,
+                          taskId,
+                          errMessage
+                        }
+                      })
+                      vm.$Notice.close('codefixnotice')
+                    }
+                  }
+                },
+                "确认"
+              )
+
+              ])
+            ]);
+          },
+          duration: 0
+        })
+      }
+      if (this.script.id == this.current) {
+        // 当前激活脚本
+        if (taskId && errCode) {
+          storage.remove(`cache_needfix_${this.script.id}`)
+          api.fetch('/copilot/executeCode', {
+            errCode
+          }, 'get').then(res => {
+            if (res.popup) {
+              noticeFix(res)
+            }
+          })
+        }
+      } else {
+        if (taskId && errCode) {
+          // 缓存错误信息
+          storage.set(`cache_needfix_${this.script.id}`, {
+            taskId, code, errCode, errMessage
+          });
+        }
+      }
+    },
   },
 };
 </script>
 <style lang="scss" scoped>
   @import '@dataspherestudio/shared/common/style/variables.scss';
+  .ellipse-p {
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
   .editor-panel {
     position: relative;
     .script-line {
@@ -1562,20 +1890,6 @@ export default {
           @include bg-color($light-base-color, $dark-base-color);
           width: calc(100% - 45px);
           overflow: hidden;
-          &.work-list-tab {
-            overflow-x: auto;
-            overflow-y: hidden;
-            &::-webkit-scrollbar {
-              width: 0;
-              height: 0;
-              background-color: transparent;
-            }
-            .list-group>span {
-              white-space: nowrap;
-              display: block;
-              height: 0;
-            }
-          }
           .workbench-tab-item {
             text-align: center;
             border-top: none;
@@ -1612,6 +1926,12 @@ export default {
           &:hover {
             @include font-color($primary-color, $dark-primary-color);
           }
+        }
+        .column-pagination {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          padding-right: 8px;
         }
       }
     }

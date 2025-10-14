@@ -23,7 +23,7 @@
     <packaging>pom</packaging>
     <groupId>com.webank.wedatasphere.dss</groupId>
     <artifactId>dss</artifactId>
-    <version>1.1.0.20-SNAPSHOT</version>
+    <version>1.15.0-SNAPSHOT</version>
 
     <modules>
         <module>dss-commons</module>
@@ -37,30 +37,32 @@
         <module>plugins/linkis/dss-gateway-support</module>
         <module>assembly</module>
         <module>plugins/dolphinscheduler</module>
+        <module>dss-git</module>
     </modules>
 
     <properties>
-        <dss.version>1.1.0.20-SNAPSHOT</dss.version>
-        <linkis.version>1.1.19-wds-SNAPSHOT</linkis.version>
+        <dss.version>1.15.0-SNAPSHOT</dss.version>
+        <linkis.version>1.14.2-wds</linkis.version>
         <scala.version>2.11.12</scala.version>
         <jdk.compile.version>1.8</jdk.compile.version>
         <maven.version>3.3.3</maven.version>
-        <gson.version>2.8.5</gson.version>
+        <gson.version>2.8.9</gson.version>
         <fasterxml.jackson.version>2.14.1</fasterxml.jackson.version>
         <math3.version>3.1.1</math3.version>
-        <httpclient.version>4.5.4</httpclient.version>
-        <httpmime.version>4.5.4</httpmime.version>
+        <httpclient.version>4.5.13</httpclient.version>
+        <httpmime.version>4.5.13</httpmime.version>
         <beanutils.version>1.9.4</beanutils.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring.version>5.2.22.RELEASE</spring.version>
+        <spring.version>5.3.34</spring.version>
         <mybatis.spring.boot.version>2.1.2</mybatis.spring.boot.version>
-        <spring.boot.version>2.3.12.RELEASE</spring.boot.version>
-        <spring.cloud.version>2.2.6.RELEASE</spring.cloud.version>
+        <spring.boot.version>2.7.18</spring.boot.version>
+        <spring.cloud.version>2021.0.8</spring.cloud.version>
         <commons.math.version>3.1.1</commons.math.version>
         <commons.lang3.version>3.8.1</commons.lang3.version>
         <commons.lang.version>2.6</commons.lang.version>
         <xstream.version>1.4.20</xstream.version>
         <jersey.version>2.30.1</jersey.version>
+        <druid.version>1.2.4</druid.version>
     </properties>
 
     <dependencyManagement>
@@ -114,6 +116,11 @@
                 <artifactId>xstream</artifactId>
                 <groupId>com.thoughtworks.xstream</groupId>
                 <version>${xstream.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid</artifactId>
+                <version>${druid.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

@@ -1,163 +1,188 @@
 <template>
-  <div class="workflow-wrap">
-    <div class="workflow-nav-tree" :class="{ 'tree-fold': treeFold }">
-      <div class="workflow-nav-tree-switch" @click="handleTreeToggle">
-        <span class="project-nav-tree-top-t-icon">
-          <SvgIcon
-            icon-class="dev_center_flod"
-            style="opacity: 0.65"
-          />
-        </span>
-      </div>
-      <div class="project-nav-tree">
-        <div class="project-nav-tree-top">
-          <div class="project-nav-tree-top-t">
-            <span class="project-nav-tree-top-t-txt">{{ $t('message.workflow.Project') }}</span>
-            <div class="project-nav-tree-top-t-icon">
-              <SvgIcon class="icon sort-icon" icon-class="xinzeng" style="display: inline-flex;margin-top: 4px;" @click="createProject" />
-              <Dropdown class="sort-icon" @on-click="filerSort($event,'sort')">
-                <SvgIcon class="icon" :icon-class="filterBar.sort ==='name' ? 'text-sort' : 'down'" style="display: inline-flex;font-size:14px"/>
-                <DropdownMenu slot="list">
-                  <DropdownItem
-                    v-for="(item) in sortTypeList"
-                    :name="item.value"
-                    :key="item.value"
-                  >{{ item.lable}}</DropdownItem>
-                </DropdownMenu>
-              </Dropdown>
-              <Dropdown class="projcat-icon" @on-click="filerSort($event,'filter')">
-                <Icon :type="{all: 'ios-funnel-outline',owner:'ios-person-add',share:'md-share'}[filterBar.cat] " class="icon" size="16"></Icon>
-                <DropdownMenu slot="list">
-                  <DropdownItem
-                    name="all"
-                    key="all"
-                  >{{ $t('message.workflow.AllProj') }}</DropdownItem>
-                  <DropdownItem
-                    name="owner"
-                    key="owner"
-                  >{{ $t('message.workflow.Individual') }}</DropdownItem>
-                  <DropdownItem
-                    name="share"
-                    key="share"
-                  >{{ $t('message.workflow.ShareProj') }}</DropdownItem>
-                </DropdownMenu>
-              </Dropdown>
+  <div class="workflow-wrap workflow-drag-wrap">
+    <we-panel
+      diretion="horizontal">
+      <we-panel-item
+        :index="1"
+        :width="panelWidth"
+        :min="minPanelWidth"
+        :max="maxPanelWidth"
+        @on-change="handlePanelChange"
+        class="left-panel">
+        <div class="workflow-nav-tree" :class="{ 'tree-fold': treeFold }">
+          <div class="workflow-nav-tree-switch" @click="handleTreeToggle">
+            <span class="project-nav-tree-top-t-icon">
               <SvgIcon
                 icon-class="dev_center_flod"
-                class="icon"
-                style="opacity: 0.65;margin-top: 2px;"
-                @click="handleTreeToggle"
+                style="opacity: 0.65"
               />
-            </div>
+            </span>
           </div>
-        </div>
-        <virtual-tree
-          class="tree-container"
-          keyText="id"
-          :size="32"
-          :list="projectsTree"
-          :render="renderNode"
-          :open="openNode"
-          :height="height - 30"
-          @we-open-node="openNodeChange"
-          @we-click="handleTreeClick" />
-        <Spin v-show="loadingTree" size="large" fix />
-      </div>
-      <WorkflowModal
-        :treeModalShow="treeModalShow"
-        :currentTreeProject="currentTreeProject"
-        :orchestratorModeList="orchestratorModeList"
-        :currentMode="currentMode"
-        :selectOrchestratorList="selectOrchestratorList"
-        :projectNameList="formatProjectNameList"
-        @on-tree-modal-cancel="handleTreeModalCancel"
-        @on-tree-modal-confirm="handleTreeModalConfirm"
-      >
-      </WorkflowModal>
-    </div>
-
-    <WorkflowTabList
-      :class="{ 'tree-fold': treeFold }"
-      :treeFold="treeFold"
-      :loading="loading"
-      :modeOfKey="modeOfKey"
-      :buttonText="selectDevprocess"
-      :bottomTapList="tabList"
-      :modeName="modeName"
-      :currentTab="current"
-      @bandleTapTab="onTabClick"
-      @handleTabRemove="onTabRemove"
-      @handleChangeButton="handleChangeButton"
-    >
-      <template v-if="modeOfKey === DEVPROCESS.DEVELOPMENTCENTER">
-        <div
-          class="workflowListContainer"
-          v-show="(tabList.length < 1 && projectsTree.length > 0)"
-        >
-          <Workflow
-            class="workflowListLeft"
-            ref="workflow"
-            :refreshFlow="refreshFlow"
-            :projectData="currentProjectData"
+          <div class="project-nav-tree">
+            <div class="project-nav-tree-top">
+              <div class="project-nav-tree-top-t">
+                <Input
+                  class="searchbox"
+                  v-model="searchText"
+                  clearable
+                  placeholder="请输入项目名进行搜索"
+                />
+                <div class="project-nav-tree-top-t-icon" style="border-bottom: 1px solid #eee; margin-top: 7px;">
+                  <SvgIcon class="icon sort-icon" icon-class="xinzeng" style="display: inline-flex;margin-top: 4px;" @click="createProject" />
+                  <Dropdown class="sort-icon" @on-click="filerSort($event,'sort')">
+                    <SvgIcon class="icon" :icon-class="filterBar.sort ==='name' ? 'text-sort' : 'down'" style="display: inline-flex;font-size:14px"/>
+                    <DropdownMenu slot="list">
+                      <DropdownItem
+                        v-for="(item) in sortTypeList"
+                        :name="item.value"
+                        :key="item.value"
+                      >{{ item.lable}}</DropdownItem>
+                    </DropdownMenu>
+                  </Dropdown>
+                  <Dropdown class="projcat-icon" @on-click="filerSort($event,'filter')">
+                    <Icon :type="{all: 'ios-funnel-outline',owner:'ios-person-add',share:'md-share'}[filterBar.cat] " class="icon" size="16"></Icon>
+                    <DropdownMenu slot="list">
+                      <DropdownItem
+                        name="all"
+                        key="all"
+                      >{{ $t('message.workflow.AllProj') }}</DropdownItem>
+                      <DropdownItem
+                        name="owner"
+                        key="owner"
+                      >{{ $t('message.workflow.Individual') }}</DropdownItem>
+                      <DropdownItem
+                        name="share"
+                        key="share"
+                      >{{ $t('message.workflow.ShareProj') }}</DropdownItem>
+                    </DropdownMenu>
+                  </Dropdown>
+                  <SvgIcon
+                    icon-class="dev_center_flod"
+                    class="icon"
+                    style="opacity: 0.65;margin-top: 2px;"
+                    @click="handleTreeToggle"
+                  />
+                </div>
+              </div>
+            </div>
+            <virtual-tree
+              ref="leftMenuTree"
+              class="tree-container"
+              keyText="id"
+              :size="32"
+              :list="searchedProjectsTree"
+              :render="renderNode"
+              :open="openNode"
+              :height="height - 30"
+              :computeStyle="computeStyle"
+              @we-open-node="openNodeChange"
+              @we-click="handleTreeClick" />
+            <Spin v-show="loadingTree" size="large" fix />
+          </div>
+          <WorkflowModal
+            :treeModalShow="treeModalShow"
+            :currentTreeProject="currentTreeProject"
             :orchestratorModeList="orchestratorModeList"
             :currentMode="currentMode"
             :selectOrchestratorList="selectOrchestratorList"
-            :projectsTree="projectsTree"
-            :top-tab-list="tabList"
-            :create-project-handler="createProject"
-            @open-workflow="openWorkflow"
-            @delete-workflow="deleteWorkflow"
-            @rollback="onRollBack"
+            :projectNameList="formatProjectNameList"
+            @on-tree-modal-cancel="handleTreeModalCancel"
             @on-tree-modal-confirm="handleTreeModalConfirm"
           >
-          </Workflow>
+          </WorkflowModal>
         </div>
-
-        <template
-          v-for="(item, index) in tabList.filter(
-            (i) => i.type === DEVPROCESS.DEVELOPMENTCENTER
-          )"
+      </we-panel-item>
+      <we-panel-item
+        :index="2"
+        class="center-panel">
+        <WorkflowTabList
+          :class="{ 'tree-fold': treeFold }"
+          :treeFold="treeFold"
+          :loading="loading"
+          :modeOfKey="modeOfKey"
+          :buttonText="selectDevprocess"
+          :bottomTapList="tabList"
+          :modeName="modeName"
+          :currentTab="current"
+          :associateGit="currentProjectData.associateGit"
+          @bandleTapTab="onTabClick"
+          @handleTabRemove="onTabRemove"
+          @handleChangeButton="handleChangeButton"
         >
-          <commonIframe
-            v-if="item.url && item.isIframe"
-            v-show="item.tabId === current.tabId"
-            :key="item.name"
-            :url="current.url"
-          ></commonIframe>
-          <process
-            v-else-if="item.orchestratorMode.startsWith(ORCHESTRATORMODES.WORKFLOW) && item.tabId === current.tabId"
-            :key="item.tabId"
-            :query="item.query"
-            @updateWorkflowList="updateWorkflowList"
-            @isChange="isChange(index, arguments)"
-            @close="onTabRemove(item.tabId, false)"
-            @open="reopen(item)"
-            @release="(p)=>{openItemAction({...p, name: `${item.name}(${$t('message.workflow.historicalVersion')})`})}"
-          ></process>
-          <template v-else>
-            <!-- 其他模式 -->
+          <template v-if="modeOfKey === DEVPROCESS.DEVELOPMENTCENTER">
+            <div
+              class="workflowListContainer"
+              v-show="(tabList.length < 1 && projectsTree.length > 0)"
+            >
+              <Workflow
+                class="workflowListLeft"
+                ref="workflow"
+                :refreshFlow="refreshFlow"
+                :projectData="currentProjectData"
+                :orchestratorModeList="orchestratorModeList"
+                :currentMode="currentMode"
+                :selectOrchestratorList="selectOrchestratorList"
+                :projectsTree="projectsTree"
+                :top-tab-list="tabList"
+                :create-project-handler="createProject"
+                @updateWorkflowInfo="updateWorkflowInfo"
+                @open-workflow="openWorkflow"
+                @delete-workflow="deleteWorkflow"
+                @rollback="onRollBack"
+                @on-tree-modal-confirm="handleTreeModalConfirm"
+              >
+              </Workflow>
+            </div>
+
+            <template
+              v-for="(item, index) in tabList.filter(
+                (i) => i.type === DEVPROCESS.DEVELOPMENTCENTER
+              )"
+            >
+              <commonIframe
+                v-if="item.url && item.isIframe"
+                v-show="item.tabId === current.tabId"
+                :key="item.name"
+                :url="current.url"
+              ></commonIframe>
+              <process
+                v-else-if="item.orchestratorMode.startsWith(ORCHESTRATORMODES.WORKFLOW) && item.tabId === current.tabId"
+                :key="item.tabId"
+                :query="item.query"
+                :associateGit="currentProjectData.associateGit"
+                @updateWorkflowList="updateWorkflowList(item)"
+                @updateFlowStatus="updateFlowStatus(item)"
+                @isChange="isChange(index, arguments)"
+                @close="onTabRemove(item.tabId, false)"
+                @open="reopen(item)"
+                @release="(p)=>{openItemAction({...p, name: `${item.name}(${$t('message.workflow.historicalVersion')})`})}"
+              ></process>
+              <template v-else>
+                <!-- 其他模式 -->
+              </template>
+            </template>
           </template>
-        </template>
-      </template>
-      <template v-if="modeOfKey === 'streamis_prod'">
-        <Streamis class="streamisContainer" :project-name="$route.query.projectName"/>
-      </template>
-      <template v-else>
-        <!-- 其他应用流程 -->
-      </template>
-    </WorkflowTabList>
-    <ProjectForm
-      ref="projectForm"
-      :action-type="actionType"
-      :project-data="currentProjectData"
-      :applicationAreaMap="applicationAreaMap"
-      :classify-list="cacheData"
-      :framework="true"
-      :workspace-users="workspaceUsers"
-      :orchestratorModeList="orchestratorModeList"
-      @getDevProcessData="getDevProcessData"
-      @confirm="ProjectConfirm"
-    ></ProjectForm>
+          <template v-if="modeOfKey === 'streamis_prod'">
+            <Streamis class="streamisContainer" :project-name="$route.query.projectName"/>
+          </template>
+          <template v-else>
+            <!-- 其他应用流程 -->
+          </template>
+        </WorkflowTabList>
+        <ProjectForm
+          ref="projectForm"
+          :action-type="actionType"
+          :project-data="currentProjectData"
+          :applicationAreaMap="applicationAreaMap"
+          :classify-list="cacheData"
+          :framework="true"
+          :workspace-users="workspaceUsers"
+          :orchestratorModeList="orchestratorModeList"
+          @getDevProcessData="getDevProcessData"
+          @confirm="ProjectConfirm"
+        ></ProjectForm>
+      </we-panel-item>
+    </we-panel>
 
     <!-- 删除项目弹窗 -->
     <Modal
@@ -190,17 +215,20 @@
     <CopyModal v-model="showCopyForm" ref="copyForm" @finish="copySended" />
     <!-- 导入工作流 -->
     <ImportFlow v-model="importModal" ref="import" @finish="importSended" />
+    <!-- 查找代码 -->
+    <CodeSearchDrawer v-model="showCodeDrawer" :currentMode="currentMode" @openFlowNode="openFlowNode" @openSubFlowNode="openSubFlowNode"/>
   </div>
 </template>
 <script>
 import qs from 'qs';
-import { debounce } from 'lodash';
+import { debounce, cloneDeep } from 'lodash';
 import Workflow from '@/workflows/module/workflow';
 import WorkflowModal from '@/workflows/module/workflow/module/workflowModal.vue';
 import Process from '@/workflows/module/process';
 import storage from '@dataspherestudio/shared/common/helper/storage';
 import VirtualTree from '@dataspherestudio/shared/components/virtualTree';
 import WorkflowTabList from '@/workflows/module/common/tabList/index.vue';
+import CodeSearchDrawer from './codeSearchDrawer/index.vue';
 import ProjectForm from '@dataspherestudio/shared/components/projectForm/index.js';
 import eventbus from "@dataspherestudio/shared/common/helper/eventbus";
 import api from '@dataspherestudio/shared/common/service/api';
@@ -226,10 +254,12 @@ export default {
     ProjectForm,
     Streamis: Streamis.component,
     CopyModal,
-    ImportFlow
+    ImportFlow,
+    CodeSearchDrawer
   },
   data() {
     return {
+      searchText: "",
       tabList: [],
       current: {},
       modeOfKey: "dev",
@@ -248,6 +278,9 @@ export default {
         devProcessList: [],
         orchestratorModeList: [],
         releaseUsers: [],
+        associateGit: false,
+        gitUser: '',
+        gitToken: ''
       },
       selectOrchestratorList: [],
       devProcessBase: [],
@@ -256,6 +289,7 @@ export default {
       ORCHESTRATORMODES,
       loading: false,
       loadingTree: false,
+      searchedProjectsTree: [],
       projectsTree: [],
       treeFold: false,
       treeModalShow: false,
@@ -301,16 +335,34 @@ export default {
         accessUsers: [],
         releaseUsers: [],
         editUsers: []
-      }
+      },
+      panelWidth: 250,
+      minPanelWidth: 250,
+      maxPanelWidth: 375,
+      currentPanelWidth: 250,
+      showCodeDrawer: false,
+      unLockQueue: [],
     }
   },
   filters,
   watch: {
+    searchText: function(value) {
+      const copiedProjectsTree = _.cloneDeep(this.projectsTree);
+      this.searchedProjectsTree = this.filterTreeByKeyword(copiedProjectsTree, value);
+      // console.log('searchText-searched', this.searchedProjectsTree)
+    },
+    projectsTree:function(value) {
+      const copiedProjectsTree = _.cloneDeep(this.projectsTree);
+      this.searchedProjectsTree = this.filterTreeByKeyword(copiedProjectsTree, this.searchText);
+      // console.log('projectsTree-searched', this.searchedProjectsTree)
+    },
     tabList(val) {
       this.updateTabList(val)
     },
-    "$route.query"(v) {
-      this.tabList = [];
+    "$route.query"(v, oldVal) {
+      if (v.projectID != oldVal.projectID) {
+        this.tabList = []
+      }
       this.getAreaMap();
       this.getProjectData(()=>{
         this.updateBread();
@@ -336,6 +388,7 @@ export default {
     this.getDicSecondList();
   },
   mounted() {
+    this.unLockQueue = [];
     // 获取所有project展示tree
     this.getAllProjects((res) => {
       if (this.$route.query.projectID) {
@@ -379,16 +432,41 @@ export default {
         this.projectsTree.forEach(item => {
           let name = item.name;
           let id = item.id + '';
-          res.push({name, id})
+          res.push({name, id, associateGit: item.associateGit})
         })
       }
       return res;
     }
   },
   methods: {
+    converStatus(item) {
+      if (!item.associateGit) return '';
+      switch (item.status) {
+        case 'save':
+          return '\n状态：工作流有修改，未提交';
+        case 'push':
+          return '\n状态：工作流已提交，未发布';
+        case 'publish':
+          return '\n状态：工作流未修改';
+        default:
+          return '';
+      }
+    },
+    computeStyle(item) {
+      if (!item.associateGit) return {};
+      switch (item.status) {
+        case 'save':
+          return {color: 'red'};
+        case 'push':
+          return {color: 'green'};
+        default:
+          return {};
+      }
+    },
     createProject() {
       this.actionType = "add";
       this.currentProjectData = {
+        devProcessPermission: this.currentProjectData.devProcessList,
         name: "",
         description: "",
         business: "",
@@ -398,11 +476,25 @@ export default {
         accessUsers: [],
         devProcessList: [],
         releaseUsers: [],
+        createBy: this.getUserName(),
+        associateGit: false,
+        gitUser: '',
+        gitToken: ''
       };
       this.$refs.projectForm.showProject(this.currentProjectData, 'add')
     },
+    handlePanelChange(data) {
+      if (data.width >= this.minPanelWidth && data.width <= this.maxPanelWidth) {
+        this.currentPanelWidth = data.width;
+      }
+    },
     handleTreeToggle() {
       this.treeFold = !this.treeFold;
+      if (this.treeFold) {
+        this.panelWidth = 1;
+      } else {
+        this.panelWidth = this.currentPanelWidth;
+      }
       setTimeout(()=>{
         eventbus.emit('workflow.fold.left.tree');
       }, 800)
@@ -416,7 +508,7 @@ export default {
     getSelectDevProcess() {
       this.selectDevprocess = this.devProcessBase
         ? this.devProcessBase.filter((item) =>
-          this.currentProjectData.devProcessList.includes(item.dicValue)
+          (this.currentProjectData.devProcessList || []).includes(item.dicValue)
         )
         : [];
       // 切换项目，若项目没有对应模式，自动切换第一个
@@ -450,11 +542,15 @@ export default {
       });
     },
     // 获取工程的数据
-    async getProjectData(callback) {
-      const data = await this.fetchProjectDataById()
-      this.currentProjectData = data
-      this.getSelectDevProcess();
-      this.getSelectOrchestratorList();
+    async getProjectData(callback, id) {
+      const data = await this.fetchProjectDataById(id)
+      if (data) {
+        this.currentProjectData = data
+        this.getSelectDevProcess();
+        this.getSelectOrchestratorList();
+      } else {
+        // 获取工程数据失败
+      }
       this.loading = false;
       if (callback) {
         callback()
@@ -474,13 +570,15 @@ export default {
           "post"
         )
         .then((res) => {
-          const project = res.projects[0];
-          setVirtualRoles(project, this.getUserName());
-          const data = {
-            ...res.projects[0],
-            canWrite: project.canWrite(),
-          };
-          return data;
+          if (res.projects.length) {
+            const project = res.projects[0];
+            setVirtualRoles(project, this.getUserName());
+            const data = {
+              ...res.projects[0],
+              canWrite: project.canWrite(),
+            };
+            return data;
+          }
         })
     },
     // 获取所有project展示tree
@@ -522,6 +620,7 @@ export default {
               name: f.orchestratorName,
               projectId: param.id || f.projectId,
               projectName: param.name,
+              associateGit: param.associateGit,
               type: "flow",
             };
           });
@@ -529,12 +628,78 @@ export default {
         });
     },
     importSended(target, orchestratorId){
-      this.getFlow({id: target.id, name: target.name}, (flows) => {
+      this.getFlow({id: target.id, name: target.name, associateGit: target.associateGit}, (flows) => {
         this.reFreshTreeData({id: target.id, name: target.name}, flows)
         this.tabList = this.tabList.filter(item => {
           return item.query.orchestratorId !== orchestratorId
-        }) 
+        })
       })
+    },
+    openSubFlowNode(evt, item, code,nodeInfo){
+      let linenum = 0
+      if (code) {
+        linenum = code.number;
+      } else {
+        linenum = item.keyLines[0].number;
+      }
+      if (nodeInfo && nodeInfo.id && nodeInfo.projectName && nodeInfo.orchestratorId && nodeInfo.appId) {
+      this.getFlow(nodeInfo, (flows) => {
+          const node = flows.find(it => it.name == item.flowName);
+          const query = {
+            workspaceId: this.$route.query.workspaceId,
+            projectID: nodeInfo.id,
+            projectName: nodeInfo.projectName,
+            flowId: nodeInfo.orchestratorId,
+            appId: nodeInfo.appId,
+            nodeName: nodeInfo.nodeName,
+            origin: 'gitSearch',
+            tiemstamp: new Date().getTime()
+          }
+          // 子工作流直接开新页面打开
+          storage.set('openflownode', `${node.orchestratorId}_flowidname_${item.nodeName}`);
+          storage.set('revealline', linenum);
+          window.open(`/#/workflow?${qs.stringify(query)}`, '_blank');
+        });
+      }      
+    },
+    openFlowNode(evt, item, code,projectObj){
+      let linenum = 0
+      if (code) {
+        linenum = code.number;
+      } else {
+        linenum = item.keyLines[0].number;
+      }
+      if (projectObj) {
+        this.getFlow(projectObj, (flows) => {
+          const node = flows.find(it => it.name == item.flowName);
+          const query = {
+            workspaceId: this.$route.query.workspaceId,
+            projectID: projectObj.id,
+            projectName: projectObj.projectName,
+            flowId: node.orchestratorId,
+            tiemstamp: new Date().getTime()
+          }
+          if (node) {
+             storage.set('openflownode', `${node.orchestratorId}_flowidname_${item.nodeName}`);
+             storage.set('revealline', linenum);
+             if (node.orchestratorId == this.$route.query.flowId || node.orchestratorId == this.current.id || this.tabList.length < 1) {
+              this.showCodeDrawer = false;
+              if (this.tabList.length < 1) {
+                this.$router.push({
+                  //name: "Workflow",
+                  query,
+                });
+              }
+              // 存储flow
+              storage.set("clickFlowInTree", node);
+              eventbus.emit('workflow.opennode.by.name', { flowId: node.orchestratorId, nodeName: item.nodeName})
+              this.updateBread();
+            } else {
+              window.open(`/#/workflow?${qs.stringify(query)}`, '_blank');
+            }
+          }
+        });
+      }
     },
     handleTreeModal(project) {
       this.treeModalShow = true;
@@ -565,6 +730,7 @@ export default {
               projectId: param.id || f.projectId,
               // 补充projectName，点击工作流切换project时使用
               projectName: param.name || p.name,
+              associateGit: p.associateGit,
               type: "flow",
             };
           });
@@ -577,6 +743,8 @@ export default {
       this.openNode = {...v}
     },
     async handleTreeClick({item}) {
+      storage.remove('revealline');
+      storage.remove('openflownode');
       const node = item
       // 切换到开发模式
       this.modeOfKey =
@@ -675,6 +843,17 @@ export default {
         sure: false,
         ifDelOtherSys: this.ifDelOtherSys,
       };
+      const afterDelete = () => {
+        if (this.deleteProjectItem.id == this.currentProjectData.id) {
+          setTimeout(() => {
+            this.$router.go(-1);
+          }, 1000);
+        } else {
+          this.projectsTree  = this.projectsTree.filter((item) => {
+            return item.id != this.deleteProjectItem.id;
+          })
+        }
+      };
       api
         .fetch(`${this.$API_PATH.PROJECT_PATH}deleteProject`, params, "post")
         .then((res) => {
@@ -700,9 +879,7 @@ export default {
                         "message.workflow.success"
                       )}`
                     );
-                    setTimeout(() => {
-                      this.$router.go(0);
-                    }, 1000);
+                    afterDelete()
                   })
                   .catch(() => {
                     this.loading = false;
@@ -716,9 +893,7 @@ export default {
                 name: this.deleteProjectItem.name,
               })
             );
-            setTimeout(() => {
-              this.$router.go(0);
-            }, 1000);
+            afterDelete()
           }
         })
         .catch(() => {
@@ -731,6 +906,40 @@ export default {
     onDeleteFlow(params) {
       this.$refs.workflow.deleteWorkflow(params);
     },
+    // 仅针对项目做过滤
+     filterTreeByKeyword(tree, keyword) {
+      return tree.filter(node => {
+        if (node.name.includes(keyword)) {
+          return true;
+        }
+        return false;
+      })
+    },
+    // 该过滤逻辑为项目+工作流，如果项目或工作流包含关键字，则保留该节点及其子节点
+    // filterTreeByKeyword(tree, keyword) {
+    //   console.log('filterTreeByKeyword', tree, keyword)
+    //   return tree.filter(node => {
+    //     // 检查当前节点的 name 字段是否包含关键字
+    //     if (node.name.includes(keyword)) {
+    //       // 如果当前节点包含关键字，则递归地过滤其 children
+    //       node.children = node.children ? this.filterTreeByKeyword(node.children, keyword) : [];
+    //       return true;
+    //     }
+
+    //     // 如果当前节点不包含关键字，但有 children，则递归检查 children
+    //     if (node.children && node.children.length > 0) {
+    //       const filteredChildren = this.filterTreeByKeyword(node.children, keyword);
+    //       if (filteredChildren.length > 0) {
+    //         // 如果 children 中有匹配项，则保留当前节点，并更新 children
+    //         node.children = filteredChildren;
+    //         return true;
+    //       }
+    //     }
+
+    //     // 如果当前节点及其 children 都不符合条件，则不保留该节点
+    //     return false;
+    //   })
+    // },
     updateTabList(val = []) {
       let workspaceId = this.$route.query.workspaceId
       let workFlowLists = JSON.parse(sessionStorage.getItem(`work_flow_lists_${workspaceId}`)) || [];
@@ -755,6 +964,11 @@ export default {
       this.$refs.workflow.versionDetail(project.id, project);
     },
     unlockFlow(params, confirmDelete = false) {
+      if (this.unLockQueue.includes(params.orchestratorId)) {
+        this.$Message.warning('解锁中，请稍后');
+        return;
+      }
+      this.unLockQueue.push(params.orchestratorId);
       const workspaceData = storage.get("currentWorkspace");
       api
         .fetch(
@@ -786,6 +1000,8 @@ export default {
           } else {
             this.$t('message.workflow.unlocksuccess')
           }
+        }).finally(() => {
+          this.unLockQueue = this.unLockQueue.filter(id => id !== params.orchestratorId);
         })
     },
     exportWorkflow(node) {
@@ -917,10 +1133,12 @@ export default {
     ProjectConfirm(projectData, callback) {
       const project = projectData;
       setVirtualRoles(project, this.getUserName());
-      this.currentProjectData = {
-        ...projectData,
-        canWrite: project.canWrite(),
-      };
+      // 会触发projectForm里的projectData的watch，有错误处理
+      // this.currentProjectData = {
+      //   ...projectData,
+      //   canWrite: project.canWrite(),
+      // };
+
       this.getSelectDevProcess();
       this.getSelectOrchestratorList();
       projectData.workspaceId = +this.$route.query.workspaceId;
@@ -938,6 +1156,9 @@ export default {
           workspaceId: projectData.workspaceId,
           devProcessList: projectData.devProcessList,
           orchestratorModeList: projectData.orchestratorModeList,
+          associateGit: projectData.associateGit,
+          gitUser: projectData.associateGit ? projectData.gitUser : '',
+          gitToken: projectData.associateGit ? projectData.gitToken : ''
         };
         api
           .fetch(
@@ -974,6 +1195,10 @@ export default {
           workspaceId: projectData.workspaceId,
           devProcessList: projectData.devProcessList,
           orchestratorModeList: projectData.orchestratorModeList,
+          associateGit: projectData.associateGit,
+          dataSourceList: projectData.dataSourceList,
+          gitUser: projectData.associateGit ? projectData.gitUser : '',
+          gitToken: projectData.associateGit ? projectData.gitToken : ''
         };
         api
           .fetch(
@@ -983,12 +1208,28 @@ export default {
           )
           .then(() => {
             typeof callback == "function" && callback(true);
-            this.getProjectData();
+            this.getProjectData(() => {}, projectData.id);
             this.$Message.success(
               this.$t("message.common.projectDetail.eidtorProjectSuccess", {
                 name: projectData.name,
               })
             );
+            // 遍历临时对象，逐个字段地更新 currentProjectData
+            const tempData = {
+              ...projectData,
+              canWrite: project.canWrite(),
+            };
+            for (const key in tempData) {
+              if (tempData.hasOwnProperty(key)) {
+                this.currentProjectData[key] = tempData[key];
+              }
+            }
+            // 修改项目后，左侧tree数据中的描述也需要更新，鼠标悬浮会展示
+            const currentProject = this.searchedProjectsTree.find(item => item.id=== this.currentProjectData.id)
+            if(currentProject) {
+              currentProject.description = this.currentProjectData.description || ''
+            }
+            this.$refs.leftMenuTree.refresData();
           })
           .catch(() => {
             typeof callback == "function" && callback();
@@ -1001,12 +1242,33 @@ export default {
     reopen(it) {
       this.openWorkflow(it.query)
     },
+    updateWorkflowInfo(data) {
+      const projectToUpdateIndex = this.projectsTree.findIndex(project => project.id === Number(data.projectId));
+      if (projectToUpdateIndex !== -1) {
+        const projectToUpdate = this.projectsTree[projectToUpdateIndex];
+        data.flowList.forEach(flow => {
+          const childToUpdate = projectToUpdate.children.find(child => child.id === flow.id);
+          if (childToUpdate) {
+            // 映射关系：只更新修改项目时会填写到的字段，参数模板字段不用更新，打开修改项目时会向接口拉取
+            childToUpdate.name = flow.orchestratorName;
+            childToUpdate.orchestratorName = flow.orchestratorName;
+            childToUpdate.orchestratorMode = flow.orchestratorMode;
+            childToUpdate.orchestratorWays = flow.orchestratorWays;
+            childToUpdate.uses = flow.uses;
+            childToUpdate.orchestratorLevel = flow.orchestratorLevel;
+            childToUpdate.description = flow.description;
+            childToUpdate.isDefaultReference = flow.isDefaultReference;
+          }
+        });
+        const copiedProjectsTree = _.cloneDeep(this.projectsTree);
+        this.searchedProjectsTree = this.filterTreeByKeyword(copiedProjectsTree, '');
+      }
+    },
     /**
      * 打开工作流查看并将工作流信息存入tab列表
      * parama 为打开工作流基本信息
      */
     async openWorkflow(params) {
-
       if (params.lastedNode) {
         const cur = this.projectsTree.filter(item => item.name == params.projectName)[0];
         this.getFlow(cur, (flows) => {
@@ -1044,6 +1306,8 @@ export default {
                 // 编排的版本id
                 params.version = params.orchestratorVersionId =
                   openOrchestrator.OrchestratorVo.dssOrchestratorVersion.id;
+                params.isDefaultReference = openOrchestrator.OrchestratorVo.dssOrchestratorInfo.isDefaultReference;
+                params.flowStatus = openOrchestrator.OrchestratorVo.dssOrchestratorInfo.status;
                 this.openItemAction(params);
               } else {
                 return this.$Message.warning(
@@ -1099,20 +1363,26 @@ export default {
       })
     },
     openItemAction(params) {
-      this.current = {
+      const tabId = `${params.id}${params.version}` // 相同编排的不同版本
+      const hasInIndex = this.tabList.findIndex(it=>it.tabId === tabId)
+      if (hasInIndex !== -1) {
+        this.tabList.splice(hasInIndex, 1);
+      }
+      let current = {
         version: params.version, // 编排版本
         id: params.id, // 编排id
         name: params.name, // 用于tab显示
         query: params,
-        tabId: `${params.id}${params.version}`, // 相同编排的不同版本
+        tabId,
         isChange: false,
         orchestratorMode: params.orchestratorMode, // 后面根据具体的编排模式确认类型字段
-        type: DEVPROCESS.DEVELOPMENTCENTER
+        type: DEVPROCESS.DEVELOPMENTCENTER,
+        isDefaultReference: params.isDefaultReference,
+        flowStatus: params.flowStatus, // 工作流状态
+        associateGit: params.associateGit
       };
-      const hasIn = this.tabList.find(it=>it.tabId === this.current.tabId)
-      if(!hasIn){
-        this.tabList.push(this.current);
-      }
+      this.tabList.push(current);
+      this.current = current;
     },
     onTabRemove(tabId, del) {
       let index = "";
@@ -1157,8 +1427,12 @@ export default {
         removeAction();
       }
     },
-    // 切换开发流程
+    // 切换开发流程 or 点击查找
     handleChangeButton(item) {
+      if (item === 'find') {
+        this.showCodeDrawer = true;
+        return;
+      }
       if ( item.dicValue ==  this.modeOfKey ) {
         return
       }
@@ -1208,8 +1482,42 @@ export default {
       this.currentTreeId = currenTab.id
       this.current = currenTab;
     },
-    updateWorkflowList() {
+    updateCurrentWorkflowStatus(params) {
+      const workspaceData = storage.get("currentWorkspace");
+      api
+        .fetch(
+          `${this.$API_PATH.ORCHESTRATOR_PATH}openOrchestrator`,
+          {
+            orchestratorId: params.query.orchestratorId,
+            labels: { route: this.modeOfKey },
+            workspaceName: workspaceData.name,
+          },
+          "post"
+        )
+        .then((openOrchestrator) => {
+          if (openOrchestrator) {
+            const temp = { ...params.query };
+            temp.flowStatus = openOrchestrator.OrchestratorVo.dssOrchestratorInfo.status;
+            params.query = temp;
+            params.flowStatus = temp.flowStatus;
+            const hasInIndex = this.tabList.findIndex(it=>it.tabId === params.tabId)
+            if(hasInIndex !== -1) {
+              this.tabList.splice(hasInIndex, 1, {...params});
+            }
+          }
+        });
+    },
+    updateWorkflowList(item) {
       this.$refs.workflow.fetchFlowData();
+      this.updateCurrentWorkflowStatus(item);
+    },
+    updateFlowStatus(item) {
+      if(item.associateGit) {
+        const cur = this.projectsTree.filter(e => e.id == item.query.projectId)[0];
+        this.getFlow(cur, (flows) => {
+          this.reFreshTreeData(cur, flows)
+        });
+      }
     },
     isChange(index, val) {
       if (this.tabList[index]) {
@@ -1243,11 +1551,20 @@ export default {
           <div class="tree-info">
             <SvgIcon style="font-size:16px;margin-top: 6px;display: inline-block;" icon-class="more-more" />
           </div>
-          <DropdownMenu slot="list">
+          {
+            item.associateGit ? (<DropdownMenu slot="list">
+            <DropdownItem name="config_project" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'config_project', item)}}>{ this.$t('message.workflow.Configuration') }</DropdownItem>
+            <DropdownItem name="delete_project" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'delete_project', item)}}>{ this.$t('message.workflow.Delete') }</DropdownItem>
+            <DropdownItem name="findin_project" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'findin_project', item)}}>{ this.$t('message.workflow.Find') }</DropdownItem>
+            <DropdownItem name="viewgit" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'viewgit', item)}}>{ this.$t('message.workflow.viewgit') }</DropdownItem>
+            <DropdownItem name="import" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'import', item)}}>{ this.$t('message.workflow.importflow') }</DropdownItem>
+          </DropdownMenu>) : (<DropdownMenu slot="list">
             <DropdownItem name="config_project" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'config_project', item)}}>{ this.$t('message.workflow.Configuration') }</DropdownItem>
             <DropdownItem name="delete_project" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'delete_project', item)}}>{ this.$t('message.workflow.Delete') }</DropdownItem>
             <DropdownItem name="import" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'import', item)}}>{ this.$t('message.workflow.importflow') }</DropdownItem>
           </DropdownMenu>
+          )
+          }
         </Dropdown>
       )
       const projectAdd = (
@@ -1329,7 +1646,7 @@ export default {
               overflow: 'hidden'
             },
             attrs: {
-              title: `名称：${item.name}\n描述：${item.description||''}`
+              title: `名称：${item.name}\n描述：${item.description||''}${this.converStatus(item)}`
             }
           },
           item.name
@@ -1347,6 +1664,20 @@ export default {
             color: isActive ? 'rgb(45, 140, 240)' : ''
           }
         }, [item.name])
+      }
+    },
+    async gotoGit(node) {
+      const workspaceData = storage.get("currentWorkspace");
+      try {
+        let res = await api.fetch(`${this.$API_PATH.ORCHESTRATOR_PATH}gitUrl`, {
+          projectName: node.name,
+          workspaceName: workspaceData.name,
+        }, 'get');
+        if (res && res.gitUrl) {
+          window.open(res.gitUrl, '_blank');
+        }
+      } catch (error) {
+        //
       }
     },
     handleFlowDropDown(e, name, node) {
@@ -1376,6 +1707,12 @@ export default {
         case "import":
           this.importModal = true;
           this.$refs.import.init(node)
+          break;
+        case "findin_project":
+          this.showCodeDrawer = true;
+          break;
+        case "viewgit":
+          this.gotoGit(node);
           break;
         case "export":
           this.exportWorkflow(node);
@@ -1421,7 +1758,8 @@ export default {
             type: "project",
             canWrite: n.canWrite(),
             canPublish: n.canPublish(),
-            children: n.children || []
+            children: n.children || [],
+            associateGit: n.associateGit,
           };
         });
       }
@@ -1430,6 +1768,9 @@ export default {
      * 排序+筛选
      */
     filerSort(name, type) {
+      if (type === 'filter') {
+        this.searchText = ''
+      }
       // 保存已经加载项目下工作流数据
       if (!this.flowData) {
         this.flowData = {}
@@ -1497,7 +1838,7 @@ export default {
      * 轮询进度是否复制完成
      */
     copySended({target, source, copyJobId}) {
-      this.getFlow({id: target.id, name: target.name}, (flows) => {
+      this.getFlow({id: target.id, name: target.name, associateGit: target.associateGit}, (flows) => {
         this.reFreshTreeData({id: target.id, name: target.name}, flows)
         const targetFlow = flows.find(it => it.name === target.orchestratorName) || {}
         const sourceTarget = {
@@ -1570,7 +1911,8 @@ export default {
     next();
   },
   beforeDestroy() {
-    clearTimeout(this.checkStatusTimer)
+    clearTimeout(this.checkStatusTimer);
+    storage.remove('revealline');
     window.removeEventListener('resize', this.resize);
   }
 };
@@ -1579,6 +1921,21 @@ export default {
 @import "../../assets/styles/workflow.scss";
 @import "@dataspherestudio/shared/common/style/variables.scss";
 
+.searchbox{
+   flex: 1;
+   margin-top: 6px;
+   border-bottom: 1px solid #eee;
+   ::v-deep i.ivu-input-icon{
+     color: #808695;
+     font-weight: normal;
+   }
+   ::v-deep .ivu-input{
+     border: none;
+   }
+   ::v-deep .ivu-input:focus{
+     box-shadow: none;
+   }
+  }
 .prop-modal {
   .prop-item {
     padding: 5px;
@@ -1593,9 +1950,28 @@ export default {
   font-size: 12px;
   @include font-color($light-text-color, $dark-text-color);
 }
+
+.workflow-drag-wrap {
+  .workflow-nav-tree {
+    position: unset;
+    width: 100%;
+    &.tree-fold {
+      position: fixed;
+    }
+    .project-nav-tree-top {
+      width: 100%;
+    }
+    .project-nav-tree {
+      width: 100%;
+    }
+  }
+  .workflowTabContainer {
+    margin-left: 0px;
+  }
+}
 </style>
 <style lang="scss">
-.workflow-wrap {
+.workflow-drag-wrap {
   .tree-container {
     .tree-info,.tree-add {
       display: none
@@ -1603,15 +1979,32 @@ export default {
     .node-item {
       height: 32px;
       line-height: 32px;
+      .node-name {
+        max-width: 100%;
+        display: inline-block;
+        vertical-align: top;
+      }
       &:hover {
+        .node-name {
+          max-width: 100%;
+          width: calc(100% - 64px);
+          display: inline-block;
+          vertical-align: top;
+        }
         .tree-info,.tree-add{
           display: block
         }
       }
-      .node-name {
-        max-width: 72%;
-        display: inline-block;
-        vertical-align: top;
+      &:not(.level-1):hover {
+        .node-name {
+          max-width: 100%;
+          width: calc(100% - 36px);
+          display: inline-block;
+          vertical-align: top;
+        }
+        .tree-info,.tree-add{
+          display: block
+        }
       }
     }
   }

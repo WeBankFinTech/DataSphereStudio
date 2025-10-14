@@ -227,8 +227,14 @@ export default {
           "post"
         )
         .then(res => {
-          this.dataList[0].dwsFlowList = res.page;
-          this.cacheData = this.dataList;
+          const obj = {
+            ...params,
+            flowList: res.page
+          }
+          this.$emit('updateWorkflowInfo',obj)
+          // 没有dataList这个数据
+          // this.dataList[0].dwsFlowList = res.page;
+          // this.cacheData = this.dataList;
           this.loading = false;
         })
         .catch(() => {
@@ -332,23 +338,31 @@ export default {
           id,
           description,
           uses,
-          labels
+          labels,
+          isDefaultReference,
+          orchestratorLevel
         } = data;
+        const params = {
+          workspaceId,
+          projectId,
+          orchestratorName,
+          // orchestratorId,
+          orchestratorMode,
+          orchestratorWays,
+          id,
+          description,
+          uses,
+          labels,
+          isDefaultReference,
+          orchestratorLevel
+        }
+        if (!data.templateIds || data.templateIds.length === 0) {
+          delete params.isDefaultReference
+        }
         api
           .fetch(
             `${this.$API_PATH.ORCHESTRATOR_PATH}modifyOrchestrator`,
-            {
-              workspaceId,
-              projectId,
-              orchestratorName,
-              // orchestratorId,
-              orchestratorMode,
-              orchestratorWays,
-              id,
-              description,
-              uses,
-              labels
-            },
+            params,
             "post"
           )
           .then(() => {
@@ -377,9 +391,6 @@ export default {
             if (cb) {
               cb(true)
             }
-            setTimeout(() => {
-              this.$router.go(0);
-            }, 1500);
           })
           .catch(() => {
             this.loading = false;
@@ -436,7 +447,8 @@ export default {
         orchestratorMode: "",
         orchestratorWays: null,
         projectId: this.$route.query.projectID,
-        workspaceId: this.$route.query.workspaceId
+        workspaceId: this.$route.query.workspaceId,
+        isDefaultReference: "0",
       };
     },
     // 修改编排

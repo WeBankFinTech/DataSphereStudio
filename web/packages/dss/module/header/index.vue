@@ -42,14 +42,19 @@
       <DropdownMenu slot="list" class="proj-list">
         <div class="proj-name">{{ $t('message.common.dss.worklist') }}</div>
         <div class="name-bar">
-          <span
-            v-for="p in workspaceList"
-            :key="p.id"
-            :class="{ active: p.id == currentWorkspace.id }"
-            class="proj-item"
-            @click="changeWorkspace(p)"
-          >{{ p.name }}</span
-          >
+          <div v-for="p in workspaceList" class="workspacename-item">
+            <span
+              class="pro-item-star"
+              :class="p.isDefaultWorkspace ? 'favorited' : ''"
+              :title="p.isDefaultWorkspace ? '默认工作空间,点击取消默认': '设为默认工作空间'"
+              @click="setFavorite(p)"
+            ></span>
+            <span
+              :class="{ active: p.id == currentWorkspace.id }"
+              class="proj-item"
+              @click="changeWorkspace(p)"
+            >{{ p.name }}</span>
+          </div>
         </div>
       </DropdownMenu>
     </Dropdown>
@@ -101,6 +106,21 @@
       >
         {{ $t("message.common.home") }}
       </li>
+      <li
+        class="menu-item"
+        @click="goAccount"
+        :class="isAccountPage ? 'header-actived' : '' "
+      >
+        工作流元数据
+      </li>
+      <!-- <li
+        v-if="isAdmin"
+        class="menu-item"
+        @click="goAppConnlist"
+        :class="isConsolePage ? 'header-actived' : '' "
+      >
+        AppConn管理台
+      </li> -->
       <li
         class="menu-item"
         v-if="$route.query.workspaceId"
@@ -160,7 +180,8 @@ import {
   GetFavorites,
   AddFavorite,
   RemoveFavorite,
-  GetCollections
+  GetCollections,
+  setDefaultWorkspace
 } from '@dataspherestudio/shared/common/service/apiCommonMethod.js';
 
 export default {
@@ -189,6 +210,7 @@ export default {
       currentId: -1,
       isHomePage: false,
       isConsolePage: false,
+      isAccountPage: false,
     };
   },
   mixins: [mixin],
@@ -268,6 +290,7 @@ export default {
       if (v.query.menuApplicationId) {
         this.isHomePage = false
         this.isConsolePage = false
+        this.isAccountPage = false
         this.currentId = +v.query.menuApplicationId
       }
     },
@@ -353,6 +376,11 @@ export default {
           });
         });
       }
+    },
+    setFavorite(item) {
+      setDefaultWorkspace(item.id, !item.isDefaultWorkspace).then(() => {
+        this.getWorkspaces()
+      })
     },
     getWorkspaceCollections() {
       if (this.$route.query.workspaceId) {
@@ -525,11 +553,6 @@ export default {
       }
     },
     changeProj(proj, p) {
-      if (
-        p.id == this.currentProject.id &&
-        proj.id == this.$route.query.projectTaxonomyID
-      )
-        return;
       // 得考虑在流程图页面和知画的情况, 在此情况下跳转到工程页
       if (["/process"].includes(this.$route.path)) {
         this.$router.replace({ path: "/project" });
@@ -538,8 +561,6 @@ export default {
           path: this.$route.path,
           query: {
             workspaceId: this.$route.query.workspaceId,
-            ...this.$route.query,
-            projectTaxonomyID: proj.id,
             projectID: p.id,
             projectName: p.name,
             notPublish: p.notPublish,
@@ -550,6 +571,7 @@ export default {
     goHome() {
       this.isHomePage = true;
       this.isConsolePage = false;
+      this.isAccountPage = false;
       if (this.isAdmin) {
         this.$router.push("/newhome");
       } else {
@@ -573,6 +595,7 @@ export default {
     goSpaceHome() {
       this.isHomePage = true;
       this.isConsolePage = false;
+      this.isAccountPage = false;
       let workspaceId = this.$route.query.workspaceId;
       this.currentId = -1;
       if (!workspaceId) {
@@ -586,10 +609,11 @@ export default {
     },
     goConsole() {
       this.isHomePage = false;
+      this.isAccountPage = false;
       this.isConsolePage = true;
       this.currentId = -1;
       const url =
-        location.origin + "/dss/linkis/?noHeader=1&noFooter=1#/console";
+        `${location.origin}/dss/linkis/?noHeader=1&noFooter=1&t=${Date.now()}#/console`;
       this.$router.push({
         path: '/commonIframe/linkis',
         query: {
@@ -598,9 +622,29 @@ export default {
         }
       });
     },
+    goAccount() {
+      this.isHomePage = false;
+      this.isConsolePage = false;
+      this.isAccountPage = true;
+      this.currentId = -1;
+      let workspaceId = this.$route.query.workspaceId;
+      const url =
+        `${location.origin}/next-web/?workspaceId=${workspaceId}&timestamp=${Date.now()}#/accounts`;
+      this.$router.push({
+        path: '/commonIframe/accounts',
+        query: {
+          workspaceId,
+          url
+        }
+      });
+    },
+    goAppConnlist() {
+      location.href = '/next-web/#/appconn'
+    },
     goCollectedUrl(app) {
       this.isHomePage = false;
       this.isConsolePage = false;
+      this.isAccountPage = false;
       this.currentId = app.menuApplicationId || -1;
       this.gotoCommonFunc({app, index: 0}, {
         workspaceId: this.$route.query.workspaceId,

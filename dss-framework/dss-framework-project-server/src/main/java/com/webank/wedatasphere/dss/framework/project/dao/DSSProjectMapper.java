@@ -32,8 +32,6 @@ import java.util.List;
 @Mapper
 public interface DSSProjectMapper extends BaseMapper<DSSProjectDO> {
 
-    void addProject(DSSProjectPo dssProjectPo);
-
     @Select("select id from dss_project where `name` = #{projectName}")
     Long getProjectIdByName(@Param("projectName") String projectName);
 
@@ -57,8 +55,11 @@ public interface DSSProjectMapper extends BaseMapper<DSSProjectDO> {
             "where `project_id` = #{dssProjectId} and `appconn_instance_id` = #{appInstanceId}")
     Long getAppConnProjectId(@Param("appInstanceId")Long appInstanceId, @Param("dssProjectId")Long dssProjectId);
 
-    @Update("update dss_project set `visible` = 0 where `id` = #{projectId}")
+    @Update("update dss_project set `visible` = -1 where `id` = #{projectId}")
     void deleteProject(@Param("projectId")Long projectId);
+
+    @Update("update dss_project set `visible` = 1 where `id` = #{projectId}")
+    void restoreProject(@Param("projectId")Long projectId);
 
     List<QueryProjectVo> getListForAdmin(ProjectQueryRequest projectRequest);
 
@@ -70,4 +71,19 @@ public interface DSSProjectMapper extends BaseMapper<DSSProjectDO> {
      *
      */
     List<QueryProjectVo> getDeletedProjects(ProjectQueryRequest projectRequest);
+
+
+
+    List<QueryProjectVo> queryListByParam(ProjectQueryRequest projectRequest);
+
+
+    List<Integer> getProjectIdByUser(@Param("priv") Integer priv,@Param("userList") List<String> userList);
+
+    List<DSSProjectDO> getProjectByName(List<String> list);
+
+
+    List<String> queryProjectName(@Param("workspaceId") Long workspaceId,@Param("queryUser") String queryUser);
+
+
+    List<QueryProjectVo> queryProjectList(@Param("workspaceId") Long workspaceId,@Param("queryUser") String queryUser);
 }

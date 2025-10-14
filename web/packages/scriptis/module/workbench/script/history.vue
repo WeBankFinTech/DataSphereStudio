@@ -32,7 +32,7 @@ import storage from '@dataspherestudio/shared/common/helper/storage';
 import resizeMixin from './mixin.js';
 import table from '@dataspherestudio/shared/components/virtualTable';
 import mixin from '@dataspherestudio/shared/common/service/mixin';
-const EXECUTE_COMPLETE_TYPE = ['Succeed', 'Failed', 'Cancelled', 'Timeout'];
+import { EXECUTE_COMPLETE_TYPE } from '@dataspherestudio/shared/common/config/const';
 export default {
   components: {
     historyTable: table.historyTable,
@@ -57,46 +57,41 @@ export default {
         size: 10,
         sizeOpts: [10, 20, 30, 50],
       },
-      costTimeout: null
     };
   },
   computed: {
     PageTotal() {
       return this.history.length;
     },
-    firstRecord() {
-      return this.history && this.history[0];
-    },
     list() {
-      return this.history.slice(this.page.start, this.page.end);
+      return this.history.slice(this.page.start, this.page.end).map(item =>{
+        return {
+          ...item,
+          runningTime: EXECUTE_COMPLETE_TYPE.indexOf(item.status) !== -1 ? item.runningTime || 0 : new Date().getTime() - item.createDate
+        }
+      });
     },
     height() {
       return this.scriptViewState.bottomContentHeight - 34 - 35 // 减去tab及分页高度
     }
   },
   watch: {
-    // 时间发生改变的时候去使用超时器，每隔5秒更新历史的时间
-    'firstRecord.runningTime'() {
-      this.setInitCostTime();
-    },
-    // 完成状态时清除定时器，防止最终数据被修改
-    'firstRecord.status'(val) {
-      if (EXECUTE_COMPLETE_TYPE.indexOf(val) !== -1) {
-        clearTimeout(this.costTimeout);
-      }
-    }
+    // history(v) {
+    // }
   },
   mounted() {
     this.initData();
   },
   beforeDestroy() {
-    clearTimeout(this.costTimeout);
-    this.costTimeout = null;
+    if (this.updateTimer) {
+      clearTimeout(this.updateTimer);
+    }
+    this.updateTimer = null;
   },
   methods: {
     initData() {
       this.pageingData();
-      this.setInitCostTime();
+      this.updateHistoryFromLinkis();
       const baseinfo = storage.get('baseInfo', 'local')
       this.column = [
         {
@@ -185,14 +180,49 @@ export default {
       ];
     },
 
-    setInitCostTime() {
-      if (this.history.length) {
-        if (this.history && EXECUTE_COMPLETE_TYPE.indexOf(this.history[0].status) === -1) {
-          clearTimeout(this.costTimeout);
-          this.costTimeout = setTimeout(() => {
-            this.$set(this.history[0], 'runningTime', new Date().getTime() - this.history[0].createDate);
-          }, 5000);
+    updateHistoryFromLinkis() {
+      // 未完成的任务
+      const unCompleteTasks = this.history.map((item, index) => {
+        if (EXECUTE_COMPLETE_TYPE.indexOf(item.status) === -1 && item.taskID) {
+          return item.taskID
         }
+      }).filter(item => item !== undefined);
+      
+      if (unCompleteTasks.length) {
+        // 获取未完成的任务详情, 一个脚本同时正在执行的应该只有一个
+        const promiseArr = [];
+        unCompleteTasks.forEach(taskID => {
+          const fetchReq = api.fetch(`/jobhistory/list`, { taskID }, 'get')
+          promiseArr.push(fetchReq)
+        })
+        Promise.all(promiseArr).then(resArr => {
+          resArr.forEach((it, index) => {
+            const taskID = unCompleteTasks[index];
+            const historyItemidx = this.history.findIndex(it => {
+              return it.taskID === taskID
+            })
+            const task = it && it.tasks[0];
+            if (task) {
+              if (EXECUTE_COMPLETE_TYPE.indexOf(task.status) !== -1) {
+                this.$emit('update-from-history', task);
+              }
+              const item = {
+                ...this.history[historyItemidx], 
+                runningTime: task.costTime, 
+                createDate: task.createdTime,
+                data: task.executionCode,
+                status: task.status,
+              }
+              if (task.errDesc && !item.failedReason) {
+                item.failedReason = (task.errCode || '') + task.errDesc
+              }
+              this.$set(this.history, historyItemidx, item)
+            }
+          })
+        }).finally(() => {
+          clearTimeout(this.updateTimer);
+          this.updateTimer = setTimeout(this.updateHistoryFromLinkis, 5000);
+        })
       }
     },
 

@@ -3,67 +3,86 @@
   body {
     background-color: $dark-base-color !important;
   }
+
   .ivu-tabs-bar {
     border-color: $dark-border-color-base;
   }
+
   .ivu-message-notice-content {
     background: $dark-base-color;
     color: $dark-text-color;
   }
+
   .ivu-notice-notice {
     background: #373f50;
     /*scripts模块desc自定义，color继承*/
     color: $dark-text-color;
   }
+
   div.ivu-notice-notice-err {
     background: #373f50;
   }
+
   .ivu-notice-title {
     color: $dark-workspace-title-color;
   }
+
   .ivu-notice-desc {
     color: $dark-text-color;
   }
+
   .ivu-modal-confirm-head-title {
     color: $dark-text-color;
   }
+
   .ivu-modal-confirm-body {
     color: $dark-text-desc-color;
   }
+
   .ivu-spin-fix {
     background-color: rgba(0, 0, 0, 0.5);
   }
-  .ivu-table-wrapper > .ivu-spin-fix {
+
+  .ivu-table-wrapper>.ivu-spin-fix {
     border: none;
   }
+
   .ivu-alert-info {
     background: $dark-menu-base-color;
     border-color: $dark-border-color;
     color: $dark-text-color;
   }
+
   // modal
   .ivu-modal-mask {
     background-color: rgba(0, 0, 0, 0.5);
   }
+
   .ivu-modal-content {
     background-color: $dark-base-color;
   }
+
   .ivu-modal-header {
     background-color: $dark-base-color !important;
     border-color: $dark-border-color-base;
     color: $dark-workspace-title-color;
+
     p {
       color: $dark-workspace-title-color;
     }
+
     .ivu-modal-header-inner {
       color: $dark-workspace-title-color;
     }
   }
+
   .ivu-modal-footer {
     border-color: $dark-border-color-base;
   }
+
   .ivu-modal-close .ivu-icon-ios-close {
     color: $dark-text-desc-color;
+
     &:hover {
       color: $dark-text-color;
     }
@@ -72,40 +91,51 @@
   .ivu-select-dropdown {
     background-color: $dark-workspace-background;
     box-shadow: -1px 0 6px rgba(255, 255, 255, 0.2);
+
     .ivu-select-dropdown-list {
       background-color: $dark-workspace-background;
     }
   }
+
   .ivu-select-item-focus {
     background: $dark-active-menu-item
   }
+
   .ivu-select-input {
     color: $dark-text-color;
   }
+
   .ivu-select-item {
     color: $dark-text-color;
+
     &:hover {
       background-color: $dark-active-menu-item;
     }
   }
+
   .ivu-select-item-selected,
   .ivu-select-item-selected:hover {
     color: $primary-color;
     background: $dark-active-menu-item;
   }
+
   .ivu-dropdown-item-divided {
     border-color: $dark-border-color-base;
+
     &::before {
       background: $dark-workspace-background;
     }
   }
+
   .ivu-btn-default,
   .ivu-dropdown-item {
     color: $dark-text-color;
+
     &:hover {
       background: $dark-active-menu-item;
     }
   }
+
   .ivu-btn-text {
     &:hover {
       background: $dark-base-color;
@@ -116,15 +146,19 @@
     background: $dark-base-color;
     border-color: $dark-border-color-base;
   }
+
   .ivu-breadcrumb-item-link {
     color: $dark-workspace-title-color;
   }
+
   .el-upload__text {
     color: $dark-text-color;
   }
+
   .el-upload__tip {
     color: $dark-text-desc-color;
   }
+
   .el-upload__path {
     color: $dark-text-color;
   }
@@ -132,6 +166,7 @@
   .ivu-page {
     color: $dark-text-color;
   }
+
   .ivu-page-prev,
   .ivu-page-item,
   .ivu-page-next,
@@ -140,34 +175,43 @@
     color: $dark-text-color;
     border-color: $dark-border-color-base;
   }
+
   .ivu-page-item a {
     color: $dark-text-color;
   }
+
   .ivu-page-item-active {
     background-color: $dark-primary-color;
+
     a {
       color: $dark-text-color;
     }
+
     &:hover {
       a {
         color: $dark-text-color;
       }
     }
   }
+
   .ivu-page-options-elevator {
     color: $dark-text-color;
   }
+
   .ivu-page-options-elevator input {
     background-color: $dark-base-color;
     color: $dark-text-color;
     border-color: $dark-border-color-base;
   }
+
   .we-editor a {
     color: $dark-text-color !important;
   }
+
   .we-editor .monaco-editor .margin {
     background-color: $dark-submenu-color;
   }
+
   .monaco-editor,
   .monaco-editor-background,
   .monaco-editor .inputarea.ime-input {
@@ -177,30 +221,36 @@
   .ivu-table-wrapper {
     border-color: $dark-border-color-base;
   }
+
   .ivu-table {
     background-color: $dark-base-color;
     color: $dark-text-color;
+
     &:before,
     &:after {
       background-color: $dark-border-color-base;
     }
   }
+
   .ivu-table th {
     background-color: $dark-header-bg-color;
     border-color: $dark-border-color-base;
     color: $dark-workspace-title-color;
   }
+
   .ivu-table td {
     background-color: $dark-base-color;
     color: $dark-text-color;
     border-color: $dark-border-color-base;
   }
+
   .ivu-table-row-highlight,
   .ivu-table-row-hover {
     td {
       background-color: $dark-active-menu-item !important;
     }
   }
+
   .ivu-table-fixed::before,
   .ivu-table-fixed-right::before {
     background-color: $dark-border-color-base;
@@ -210,66 +260,93 @@
   fieldset[disabled] .ivu-input {
     background-color: $disabled-bg-color;
   }
+
   .ivu-input {
     background-color: $dark-workspace-body-bg-color;
     border-color: $dark-border-color-base;
     color: $dark-text-color;
   }
+
+  .ivu-drawer-content {
+    background-color: $dark-workspace-body-bg-color;
+  }
+
+  .ivu-drawer-header {
+    .ivu-drawer-header-inner {
+      color: #fff
+    }
+  }
+
   .ivu-checkbox-wrapper {
     color: $dark-text-color;
   }
+
   .ivu-radio-group-item,
   .ivu-checkbox-group-item {
     color: $dark-text-color;
   }
+
   .ivu-radio-inner,
   .ivu-checkbox-inner {
     background: $dark-base-color;
   }
+
   .ivu-btn-text,
   .ivu-btn-default,
   .ivu-btn-dashed {
     border-color: $dark-border-color-base;
     background-color: $dark-base-color;
     color: #fff;
+
     &:hover {
       border-color: $dark-border-color-base;
       background-color: $dark-base-color;
     }
   }
+
   .ivu-tag {
     background-color: $dark-base-color;
     border-color: $dark-border-color-base;
     color: $dark-text-color;
   }
+
   .ivu-tag-text {
     color: $dark-text-color;
   }
+
   .ivu-tag .ivu-icon-ios-close {
     color: $dark-text-desc-color;
+
     &:hover {
       color: $dark-text-color;
     }
   }
+
   .ivu-checkbox-disabled .ivu-checkbox-inner {
     background-color: $dark-disabled-bg-color;
   }
+
   .ivu-checkbox-disabled.ivu-checkbox-checked .ivu-checkbox-inner {
     background-color: $dark-disabled-bg-color;
   }
-  .ivu-tabs.ivu-tabs-card > .ivu-tabs-bar .ivu-tabs-tab-active {
+
+  .ivu-tabs.ivu-tabs-card>.ivu-tabs-bar .ivu-tabs-tab-active {
     background: $dark-menu-base-color;
   }
-  .ivu-tabs.ivu-tabs-card > .ivu-tabs-bar .ivu-tabs-tab {
+
+  .ivu-tabs.ivu-tabs-card>.ivu-tabs-bar .ivu-tabs-tab {
     background: $dark-menu-base-color;
     border-color: rgba(255, 255, 255, 0.2);
   }
+
   .ivu-tabs-nav .ivu-tabs-tab {
     color: $dark-text-color;
   }
+
   .ivu-tabs-nav .ivu-tabs-tab-active {
     color: #2d8cf0;
   }
+
   .monitor-chart .monitor-chart-modal {
     box-shadow: -2px 0 10px 0 $dark-menu-base-color !important;
   }
@@ -279,97 +356,122 @@
     color: $dark-text-color;
     border-color: $dark-border-color-base;
   }
+
   .vue-treeselect__menu {
     background-color: $dark-base-color;
     color: $dark-text-color;
     border-color: $dark-border-color-base;
   }
+
   .vue-treeselect__option--highlight {
     background: #373f50; // hover时的background
   }
+
   .vue-treeselect__option--selected {
     background-color: #2a303c !important;
     border-color: $dark-border-color-base !important;
+
     &:hover {
       background-color: #373f50 !important;
     }
   }
+
   .vue-treeselect__single-value {
     color: #bdbdbd;
     border-color: $dark-border-color-base;
   }
+
   .ivu-card {
     background: $dark-menu-base-color;
   }
+
   .ivu-card-head {
     border-color: $dark-border-color-base;
+
     p {
       color: $dark-workspace-title-color;
     }
   }
+
   .ivu-card-body {
     color: $dark-text-color;
   }
+
   .ivu-cell {
     color: $dark-text-color;
+
     &:hover {
       background: $dark-active-menu-item;
     }
   }
+
   .ivu-input-number-input,
   .ivu-input-number-handler-wrap {
     background-color: $dark-base-color;
     color: $dark-text-color;
     border-color: $dark-border-color-base;
   }
+
   .ivu-input-number,
   .ivu-input-number-default {
     border-color: $dark-border-color-base;
     background: $dark-base-color;
   }
+
   .ivu-divider-vertical {
     background-color: $dark-border-color-base;
   }
+
   .ivu-picker-panel-sidebar {
     background-color: $dark-workspace-background;
     border-color: $dark-border-color-base;
     color: $dark-text-color;
   }
+
   .ivu-picker-panel-shortcut {
     &:hover {
       background-color: $dark-active-menu-item;
     }
   }
+
   .ivu-date-picker-header {
     border-color: $dark-border-color-base;
     color: $input-placeholder-color;
   }
+
   .ivu-date-picker-cells-cell-range {
     &::before {
       background: $dark-active-menu-item;
     }
   }
+
   .ivu-date-picker-cells-cell {
     color: #c5c8ce;
+
     & em {
       color: inherit;
     }
   }
+
   .ivu-date-picker-cells-cell:hover em {
     background: $primary-color;
   }
+
   span.ivu-date-picker-cells-cell-disabled,
   span.ivu-date-picker-cells-cell-disabled:hover {
     background: $dark-base-color;
     color: $dark-disable-color;
   }
+
   span.ivu-date-picker-cells-cell-disabled:hover em {
     background: $dark-base-color;
   }
+
   .ivu-date-picker-cells-cell-prev-month em,
   .ivu-date-picker-cells-cell-next-month em {
     color: $dark-disable-color;
   }
+
   .ivu-date-picker-cells-cell-prev-month:hover em,
   .ivu-date-picker-cells-cell-next-month:hover em {
     background: transparent;
@@ -380,31 +482,39 @@
   .ivu-input-suffix i {
     color: $dark-text-color;
   }
+
   .ivu-menu {
     background-color: $dark-menu-base-color;
     color: $dark-text-color;
   }
+
   .ivu-menu-item {
     color: $dark-text-color;
     border-color: $dark-menu-base-color;
   }
+
   .ivu-menu-item-active,
   .ivu-menu-item-selected {
     background-color: $dark-active-menu-item !important;
   }
+
   .ivu-steps-head-inner {
     background-color: $dark-base-color;
     border-color: $dark-border-color-base;
   }
+
   .ivu-steps-item.ivu-steps-status-finish .ivu-steps-head-inner {
     background-color: $dark-base-color;
   }
+
   .ivu-steps-item.ivu-steps-status-wait .ivu-steps-title {
     color: $dark-workspace-title-color;
   }
+
   .ivu-steps-item.ivu-steps-status-process .ivu-steps-title {
     color: $dark-workspace-title-color;
   }
+
   .ivu-steps-item.ivu-steps-status-wait .ivu-steps-head-inner {
     background-color: $dark-base-color;
     color: $dark-workspace-title-color;
@@ -415,55 +525,68 @@
   .ivu-form-item-content {
     color: $dark-workspace-title-color;
   }
+
   .ivu-input-group-prepend,
   .ivu-input-group-append {
     background: $dark-base-color;
     border-color: $dark-border-color-base;
     color: $dark-text-color;
   }
+
   .ivu-input[disabled],
   fieldset[disabled] .ivu-input {
     background-color: $dark-disabled-bg-color !important;
     color: $dark-text-color;
+
     &:hover {
       border-color: $dark-border-color-base;
     }
   }
+
   .we-table-wrap .we-table .we-table-thead .we-table-thead-cell {
     border-right: none;
   }
+
   .we-table-wrap .we-table .we-table-row .we-table-row-cell {
     border-right: none;
   }
+
   .ivu-poptip-inner {
     background-color: $dark-base-color;
     border: 1px solid $dark-border-color-base;
   }
+
   .ivu-poptip-popper[x-placement^="right"] .ivu-poptip-arrow {
     &:after {
       border-right-color: $dark-base-color;
     }
   }
+
   .ivu-row {
     color: $dark-text-color;
   }
+
   .ivu-tag-color-white {
     color: $dark-workspace-title-color;
   }
+
   .ivu-table-title,
   .ivu-table-footer {
     border-color: $dark-border-color-base;
   }
+
   .ivu-menu-vertical.ivu-menu-light {
     &:after {
       background: $dark-menu-base-color;
     }
   }
+
   .ivu-btn.disabled,
   .ivu-btn[disabled] {
     background-color: $dark-disable-color;
     color: $dark-disable-text-color;
     border: $dark-disable-color;
+
     &:hover {
       background-color: $dark-disable-color;
       color: $dark-disable-text-color;
@@ -474,11 +597,19 @@
   .progress-label {
     color: $dark-text-color !important;
   }
+
+  .designer div.node-disabled {
+    background-color: #515a6e;
+    color: #cfd0d34d;
+    border-radius: 4px;
+  }
+
   .designer div.node-selected {
     background: rgba(222, 232, 244, 0.62);
     box-shadow: 1px 4px 6px 1px rgba(106, 141, 185, 0.65);
     border-radius: 4px;
   }
+
   .bg-img {
     opacity: 0.3;
   }
@@ -486,45 +617,44 @@
   .luban-nav-panel .nav-left {
     background-color: $dark-base-color !important;
   }
+
   .luban-nav-panel .nav-left .nav-all.active,
   .luban-nav-panel .nav-left .nav-all:hover {
     background-color: $dark-menu-base-color !important;
   }
+
   .luban-nav-panel .nav-left .nav-all {
     color: $dark-workspace-title-color !important;
   }
+
   .luban-nav-panel .nav-left .nav-collect .nav-item:hover {
     background-color: $dark-menu-base-color !important;
   }
+
   .luban-nav-panel .nav-left .nav-collect .nav-item .nav-item-title {
     color: $dark-workspace-title-color !important;
   }
+
   .luban-nav-panel .nav-right {
     background-color: $dark-menu-base-color !important;
   }
-  .luban-nav-panel
-    .nav-right
-    .pro-box
-    .pro-list
-    .pro-item
-    .pro-item-inner:hover {
+
+  .luban-nav-panel .nav-right .pro-box .pro-list .pro-item .pro-item-inner:hover {
     background-color: #373f50 !important;
   }
-  .luban-nav-panel
-    .nav-right
-    .pro-box
-    .pro-list
-    .pro-item
-    .pro-item-inner
-    .pro-item-txt {
+
+  .luban-nav-panel .nav-right .pro-box .pro-list .pro-item .pro-item-inner .pro-item-txt {
     color: $dark-workspace-title-color !important;
+
     &:hover {
       color: $dark-primary-color !important;
     }
   }
+
   .luban-nav-panel .nav-right .pro-box .pro-category {
     color: $dark-workspace-title-color !important;
   }
+
   .luban-nav-panel .nav-right .pro-box .pro-category:before {
     background-color: $dark-primary-color !important;
   }
@@ -532,16 +662,20 @@
   .no-data-tip {
     color: $dark-text-color;
   }
+
   .we-import-dialog-content {
     color: $dark-workspace-title-color;
   }
+
   .ivu-split-trigger-vertical {
     background-color: $dark-menu-base-color;
     border-color: $dark-border-color-base;
+
     .ivu-split-trigger-bar {
       background-color: $dark-text-color;
     }
   }
+
   .executor-pending {
     color: $dark-text-color;
     background-color: $dark-menu-base-color;
@@ -551,12 +685,15 @@
   .executor-pending:after {
     border-top-color: $dark-border-color-base;
   }
+
   .executor-pending:before {
     border-top-color: $dark-border-color-base;
   }
+
   .g-err-msg-div {
     color: rgba(255, 255, 255, 0.85)
   }
+
   .scriptis_usage_guide .steps {
     color: #333;
   }

@@ -25,7 +25,7 @@ GATEWAY_INSTALL_IP=127.0.0.1
 GATEWAY_PORT=9001
 
 ### Linkis BML Token
-BML_AUTH=
+BML_AUTH=BML-AUTH
 
 ################### The install Configuration of all Micro-Services start #####################
 #
@@ -50,18 +50,18 @@ DSS_APPS_SERVER_PORT=9044
 
 ############## ############## dss_appconn_instance configuration start ############## ##############
 ####eventchecker表的地址，一般就是dss数据库
-EVENTCHECKER_JDBC_URL=jdbc:mysql://172.0.0.1:3305/linkis_kinghao?characterEncoding=UTF-8
+EVENTCHECKER_JDBC_URL=jdbc:mysql://172.16.16.16:3305/linkis_kinghao?characterEncoding=UTF-8
 EVENTCHECKER_JDBC_USERNAME=linkis
-EVENTCHECKER_JDBC_PASSWORD=***REMOVED***
+EVENTCHECKER_JDBC_PASSWORD=linkis@Wds
 
 #### hive地址
-DATACHECKER_JOB_JDBC_URL=jdbc:mysql://172.0.0.1:3306/hivemeta?useUnicode=true
+DATACHECKER_JOB_JDBC_URL=jdbc:mysql://172.16.16.10:3306/hivemeta?useUnicode=true
 DATACHECKER_JOB_JDBC_USERNAME=hivemeta
-DATACHECKER_JOB_JDBC_PASSWORD=***REMOVED***
+DATACHECKER_JOB_JDBC_PASSWORD=Linkishivemeta@123
 #### 元数据库，可配置成和DATACHECKER_JOB的一致
-DATACHECKER_BDP_JDBC_URL=jdbc:mysql://172.0.0.1:3306/hivemeta?useUnicode=true
+DATACHECKER_BDP_JDBC_URL=jdbc:mysql://172.16.16.10:3306/hivemeta?useUnicode=true
 DATACHECKER_BDP_JDBC_USERNAME=hivemeta
-DATACHECKER_BDP_JDBC_PASSWORD=***REMOVED***
+DATACHECKER_BDP_JDBC_PASSWORD=Linkishivemeta@123
 
 ### 邮件节点配置
 EMAIL_HOST=smtp.163.com

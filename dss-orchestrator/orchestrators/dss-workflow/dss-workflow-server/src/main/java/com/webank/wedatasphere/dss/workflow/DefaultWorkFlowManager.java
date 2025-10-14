@@ -43,10 +43,9 @@ import com.webank.wedatasphere.dss.standard.common.utils.RequestRefUtils;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlowRelation;
 import com.webank.wedatasphere.dss.workflow.common.parser.WorkFlowParser;
-import com.webank.wedatasphere.dss.workflow.common.protocol.RequestSubFlowContextIds;
-import com.webank.wedatasphere.dss.workflow.common.protocol.ResponseSubFlowContextIds;
-import com.webank.wedatasphere.dss.workflow.common.protocol.ResponseUnlockWorkflow;
+import com.webank.wedatasphere.dss.workflow.common.protocol.*;
 import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
+import com.webank.wedatasphere.dss.workflow.dao.FlowMapper;
 import com.webank.wedatasphere.dss.workflow.dao.LockMapper;
 import com.webank.wedatasphere.dss.workflow.entity.DSSFlowEditLock;
 import com.webank.wedatasphere.dss.workflow.entity.DSSFlowImportParam;
@@ -57,6 +56,7 @@ import com.webank.wedatasphere.dss.workflow.lock.DSSFlowEditLockManager;
 import com.webank.wedatasphere.dss.common.service.BMLService;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.linkis.common.exception.ErrorException;
@@ -68,15 +68,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.Cookie;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import static com.webank.wedatasphere.dss.common.utils.IoUtils.FLOW_META_DIRECTORY_NAME;
 import static com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant.DEFAULT_SCHEDULER_APP_CONN;
 
 @Component
@@ -102,6 +106,8 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
     private WorkFlowParser workFlowParser;
     @Autowired
     private LockMapper lockMapper;
+    @Autowired
+    private FlowMapper flowMapper;
 
     @Override
     public DSSFlow createWorkflow(String userName,
@@ -158,9 +164,11 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
     public DSSFlow copyRootFlowWithSubFlows(String userName, Long rootFlowId, Workspace workspace,
                                             String projectName, String contextIdStr, String orcVersion,
                                             String description, List<DSSLabel> dssLabels, String nodeSuffix,
-                                            String newFlowName, Long newProjectId) throws DSSErrorException, IOException {
+                                            String newFlowName, Long newProjectId,List<String> enableNodeList,
+                                            String flowProxyUser,boolean skipThirdAppconn) throws DSSErrorException, IOException {
         return flowService.copyRootFlow(rootFlowId, userName, workspace, projectName,
-                orcVersion, contextIdStr, description, dssLabels, nodeSuffix, newFlowName, newProjectId);
+                orcVersion, contextIdStr, description, dssLabels, nodeSuffix, newFlowName, newProjectId,
+                enableNodeList,flowProxyUser,skipThirdAppconn);
     }
 
     @Override
@@ -190,17 +198,81 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
     }
 
     @Override
-    public ResponseUnlockWorkflow unlockWorkflow(String userName, Long flowId, Boolean confirmDelete) throws DSSErrorException {
+    public ResponseUnlockWorkflow unlockWorkflow(String userName, Long flowId, Boolean confirmDelete, Workspace workspace) throws DSSErrorException {
         DSSFlowEditLock editLock = lockMapper.getFlowEditLockByID(flowId);
         if (editLock == null) {
             return new ResponseUnlockWorkflow(ResponseUnlockWorkflow.NONEED_UNLOCK, null);
         } else if (!Boolean.TRUE.equals(confirmDelete)) {
             return new ResponseUnlockWorkflow(ResponseUnlockWorkflow.NEED_SECOND_CONFIRM, editLock.getUsername());
         }
-        DSSFlowEditLockManager.deleteLock(editLock.getLockContent());
+        DSSFlowEditLockManager.deleteLock(editLock.getLockContent(), workspace);
         return new ResponseUnlockWorkflow(ResponseUnlockWorkflow.UNLOCK_SUCCESS, null);
     }
+    @Override
+    public BmlResource exportWorkflowNew(String userName, Long flowId, Long dssProjectId,
+                                         String projectName, Workspace workspace,
+                                         List<DSSLabel> dssLabels,boolean exportExternalNodeAppConnResource) throws Exception {
+        DSSFlow dssFlow = flowService.getFlowByID(flowId);
+        String projectPath = workFlowExportService.exportFlowInfoNew(dssProjectId, projectName, flowId, userName, workspace, dssLabels,exportExternalNodeAppConnResource);
+        String exportPath = ZipHelper.zip(projectPath);
+        InputStream inputStream = bmlService.readLocalResourceFile(userName, exportPath);
+        BmlResource bmlResource = bmlService.upload(userName, inputStream, dssFlow.getName() + ".export", projectName);
+        logger.info("export workflow success.  flowId:{},bmlResource:{} .",flowId,bmlResource);
+        return  bmlResource;
+    }
 
+    @Override
+    public BmlResource exportWorkflowListNew(String userName, List<Long> flowIdList, Long dssProjectId,
+                                         String projectName, Workspace workspace,
+                                         List<DSSLabel> dssLabels,boolean exportExternalNodeAppConnResource) throws Exception {
+        List<DSSFlow> dssFlowList = flowMapper.selectFlowListByID(flowIdList);
+        String projectPath = workFlowExportService.exportFlowListNew(dssProjectId, projectName, flowIdList, userName, workspace, dssLabels,exportExternalNodeAppConnResource);
+        String exportPath = ZipHelper.zip(projectPath);
+        File file = new File(exportPath);
+        if (file.exists() && file.isFile()) {
+            String limitValue = DSSWorkFlowConstant.DEFAULT_ZIP_FILE_LIMIT.getValue();
+            // GB
+            Long limits = Long.parseLong(limitValue) * 1024 *1024 * 1024;
+            if (file.length() > limits) {
+                throw new DSSErrorException(100098, "工作流导出失败，原因为本次导出总大小超过" + limitValue + "GB");
+            }
+        }
+        InputStream inputStream = bmlService.readLocalResourceFile(userName, exportPath);
+        BmlResource bmlResource = bmlService.upload(userName, inputStream, projectName + ".export", projectName);
+        logger.info("export workflow success.  flowId:{},bmlResource:{} .",flowIdList,bmlResource);
+        return  bmlResource;
+    }
+    @Override
+    public String readWorkflowNew(String userName, Long flowId, Long dssProjectId,
+                                         String projectName, Workspace workspace,
+                                         List<DSSLabel> dssLabels,boolean exportExternalNodeAppConnResource, String filePath) throws Exception {
+        DSSFlow dssFlow = flowService.getFlowByID(flowId);
+        String projectPath = null;
+        String fileContent = null;
+        try {
+            projectPath = workFlowExportService.exportFlowInfoNew(dssProjectId, projectName, flowId, userName, workspace, dssLabels,exportExternalNodeAppConnResource);
+            String fullPath = projectPath + File.separator + filePath;
+            logger.info("export workflow success.  flowId:{},fullPath:{} .",flowId,fullPath);
+            File file = new File(fullPath);
+            if (file.exists()) {
+                fileContent = new String(Files.readAllBytes(Paths.get(fullPath)));
+            }
+        } catch (Exception e) {
+            logger.error("exportFlowInfoNew failed , the reason is:", e);
+            throw new DSSErrorException(100098, "工作流导出失败，原因为" + e.getMessage());
+        } finally {
+            //删掉整个目录
+            if (StringUtils.isNotEmpty(projectPath)) {
+                File file = new File(projectPath);
+                if (ZipHelper.deleteDir(file)){
+                    logger.info("结束删除目录 {} 成功", projectPath);
+                }else{
+                    logger.info("删除目录 {} 失败", projectPath);
+                }
+            }
+        }
+        return fileContent;
+    }
     @Override
     public BmlResource exportWorkflow(String userName, Long flowId, Long dssProjectId,
                                       String projectName, Workspace workspace,
@@ -211,6 +283,59 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
         BmlResource bmlResource = bmlService.upload(userName, inputStream, dssFlow.getName() + ".export", projectName);
         logger.info("export workflow success. flowId:{},bmlResource:{} .",flowId,bmlResource);
         return bmlResource;
+    }
+    @Override
+    public List<DSSFlow> importWorkflowNew(String userName,
+                                           String resourceId,
+                                           String bmlVersion,
+                                           DSSFlowImportParam dssFlowImportParam,
+                                           List<DSSLabel> dssLabels) throws DSSErrorException, IOException {
+
+        //todo download workflow bml file contains flowInfo and flowRelationInfo
+        String projectName = dssFlowImportParam.getProjectName();
+        // /appcom/tmp/dss/yyyyMMddHHmmssSSS/arionliu
+        String tempPath = IoUtils.generateTempIOPath(userName);
+        // /appcom/tmp/dss/yyyyMMddHHmmssSSS/arionliu/projectxxx.zip
+        String inputZipPath = IoUtils.addFileSeparator(tempPath, projectName + ".zip");
+        bmlService.downloadToLocalPath(userName, resourceId, bmlVersion, inputZipPath);
+        try{
+            String  originProjectName=readImportZipProjectName(inputZipPath);
+            if(!projectName.equals(originProjectName)){
+                String msg=String.format("target project name must be same with origin project name.origin project name:%s,target project name:%s(导入的目标工程名必须与导出时源工程名保持一致。源工程名：%s，目标工程名：%s)"
+                        ,originProjectName,projectName,originProjectName,projectName);
+                throw new DSSRuntimeException(msg);
+            }
+        }catch (IOException e){
+            throw new DSSRuntimeException("upload file format error(导入包格式错误)");
+        }
+        String projectPath = ZipHelper.unzip(inputZipPath,true);
+        String flowName = IoUtils.getSubdirectoriesNames(projectPath).stream().filter(name -> !name.startsWith("."))
+                .findFirst().orElseThrow(() -> new DSSRuntimeException("import package has no flow（未导入任何工作流，请检查导入包格式）"));
+        String flowMetaPath=IoUtils.addFileSeparator(projectPath, FLOW_META_DIRECTORY_NAME, flowName);
+        ImmutablePair<List<DSSFlow>,List<DSSFlowRelation>> meta= metaInputService.inputFlowNew(flowMetaPath);
+        //导入工作流数据库信息
+        List<DSSFlow> dssFlows = meta.getKey();
+        //导入工作流关系信息
+        List<DSSFlowRelation> dwsFlowRelations = meta.getValue();
+
+        List<DSSFlow> dwsFlowRelationList = workFlowInputService.persistenceFlow(dssFlowImportParam.getProjectID(),
+                dssFlowImportParam.getUserName(),
+                dssFlows,
+                dwsFlowRelations);
+        //这里其实只会有1个元素
+        List<DSSFlow> rootFlows = dwsFlowRelationList.stream().filter(DSSFlow::getRootFlow).collect(Collectors.toList());
+        for (DSSFlow rootFlow : rootFlows) {
+            String flowCodePath0=IoUtils.addFileSeparator(projectPath,  flowName);
+            String flowMetaPath0=IoUtils.addFileSeparator(projectPath, FLOW_META_DIRECTORY_NAME, flowName);
+            workFlowInputService.inputWorkFlowNew(dssFlowImportParam.getUserName(),
+                    rootFlow,
+                    projectName,
+                    flowCodePath0,
+                    flowMetaPath0,null, dssFlowImportParam.getWorkspace(), dssFlowImportParam.getOrcVersion(),
+                    dssFlowImportParam.getContextId(), dssLabels);
+        }
+        logger.info("import workflow success.orcVersion:{},context Id:{}", dssFlowImportParam.getOrcVersion(), dssFlowImportParam.getContextId());
+        return  rootFlows;
     }
 
     @Override
@@ -358,11 +483,11 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
     }
 
     private String readImportZipProjectName(String zipFilePath) throws IOException {
-        try(ZipFile zipFile =new ZipFile(zipFilePath)){
-            Enumeration<? extends ZipEntry> entries =zipFile.entries();
-            if(entries.hasMoreElements()){
-                String name=entries.nextElement().getName();
-                if(name.endsWith("\\")||name.endsWith("/")){
+        try (ZipFile zipFile = new ZipFile(zipFilePath)) {
+            Enumeration<? extends ZipEntry> entries = zipFile.entries();
+            if (entries.hasMoreElements()) {
+                String name = entries.nextElement().getName();
+                if (name.endsWith("\\") || name.endsWith("/")) {
                     name = name.substring(0, name.length() - 1);
                 }
                 return name;

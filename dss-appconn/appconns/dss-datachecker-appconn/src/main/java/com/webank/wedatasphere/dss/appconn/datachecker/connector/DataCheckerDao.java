@@ -24,8 +24,7 @@ import com.webank.wedatasphere.dss.appconn.datachecker.common.CheckDataObject;
 import com.webank.wedatasphere.dss.appconn.datachecker.common.MaskCheckNotExistException;
 import com.webank.wedatasphere.dss.appconn.datachecker.utils.HttpUtils;
 import com.webank.wedatasphere.dss.appconn.datachecker.utils.QualitisUtil;
-import com.webank.wedatasphere.dss.standard.app.development.listener.common.RefExecutionAction;
-import com.webank.wedatasphere.dss.standard.app.development.listener.common.RefExecutionState;
+import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import okhttp3.FormBody;
 import okhttp3.RequestBody;
 import okhttp3.Response;
@@ -54,13 +53,6 @@ public class DataCheckerDao {
     private static final String SQL_SOURCE_TYPE_JOB_PARTITION =
             "SELECT * FROM DBS d JOIN TBLS t ON t.DB_ID = d.DB_ID JOIN PARTITIONS p ON p.TBL_ID = t.TBL_ID WHERE d.NAME=? AND t.TBL_NAME=? AND p.PART_NAME=?";
 
-    private static final String SQL_SOURCE_TYPE_BDP =
-            "SELECT * FROM desktop_bdapimport WHERE bdap_db_name = ? AND bdap_table_name = ? AND target_partition_name = ? AND status = '1';";
-
-    private static final String SQL_SOURCE_TYPE_BDP_WITH_TIME_CONDITION =
-            "SELECT * FROM desktop_bdapimport WHERE bdap_db_name = ? AND bdap_table_name = ? AND target_partition_name = ? " +
-                    "AND (UNIX_TIMESTAMP() - UNIX_TIMESTAMP(STR_TO_DATE(modify_time, '%Y-%m-%d %H:%i:%s'))) <= ? AND status = '1';";
-
     private static final String SQL_DOPS_CHECK_TABLE =
             "SELECT * FROM dops_clean_task_list WHERE db_name = ? AND tb_name = ? AND part_name is null AND task_state NOT IN (10,13) order by order_id desc limit 1";
     private static final String SQL_DOPS_CHECK_PARTITION =
@@ -72,7 +64,6 @@ public class DataCheckerDao {
     private static final String MASK_SOURCE_TYPE = "maskdb";
 
     private static DataSource jobDS;
-    private static DataSource bdpDS;
 
     private static DataSource dopsDS;
     private static volatile DataCheckerDao instance;
@@ -96,13 +87,6 @@ public class DataCheckerDao {
                 return false;
             }
         }
-        if (bdpDS == null) {
-            bdpDS = DataDruidFactory.getBDPInstance(props, log);
-            if (bdpDS == null) {
-                log.warn("Error getting job Druid DataSource instance");
-                return false;
-            }
-        }
         boolean systemCheck = Boolean.valueOf(props.getProperty(DataChecker.QUALITIS_SWITCH));
         if (systemCheck && dopsDS == null) {
             dopsDS = DataDruidFactory.getDopsInstance(props, log);//通过alibaba的druid数据库连接池获取JOB数据库连接
@@ -121,8 +105,8 @@ public class DataCheckerDao {
 //            action.getExecutionRequestRefContext().appendLog("Database table partition info : " + dataCheckerInfo);
         }
         log.info("(DataChecker info) database table partition info : " + dataCheckerInfo);
-        long waitTime = Long.valueOf(props.getProperty(DataChecker.WAIT_TIME, "1")) * 3600 * 1000;
-        int queryFrequency = Integer.valueOf(props.getProperty(DataChecker.QUERY_FREQUENCY, "30000"));
+        long waitTime = (long) (Double.valueOf(props.getProperty(DataChecker.WAIT_TIME, "1")) * 3600 * 1000);
+        int queryFrequency = Integer.valueOf(props.getProperty(DataChecker.QUERY_FREQUENCY, "60000"));
 //		String timeScape = props.getProperty(DataChecker.TIME_SCAPE, "NULL");
         log.info("(DataChecker info) wait time : " + waitTime);
         log.info("(DataChecker info) query frequency : " + queryFrequency);
@@ -134,13 +118,12 @@ public class DataCheckerDao {
         });
         QualitisUtil qualitisUtil = new QualitisUtil(props);
         try (Connection jobConn = jobDS.getConnection();
-             Connection bdpConn = bdpDS.getConnection();
              Connection dopsConn = dopsDS != null ? dopsDS.getConnection() : null) {
             List<Boolean> allCheckRes = dataObjectList
                     .parallelStream()
                     .map(proObjectMap -> {
                         log.info("Begin to Check dataObject:" + proObjectMap.entrySet().toString());
-                        boolean checkRes = getDataCheckResult(proObjectMap, jobConn, bdpConn, dopsConn, props, log,action,qualitisUtil);
+                        boolean checkRes = getDataCheckResult(proObjectMap, jobConn, dopsConn, props, log,action,qualitisUtil);
                         if (null != action.getExecutionRequestRefContext()) {
                             if (checkRes) {
                                 action.getExecutionRequestRefContext().appendLog("Database table partition info : " + proObjectMap.get(DataChecker.DATA_OBJECT) + " has arrived");
@@ -178,7 +161,6 @@ public class DataCheckerDao {
 
     private boolean getDataCheckResult(Map<String, String> proObjectMap,
                                        Connection jobConn,
-                                       Connection bdpConn,
                                        Connection dopsConn,
                                        Properties props,
                                        Logger log,
@@ -190,12 +172,9 @@ public class DataCheckerDao {
         }
         String objectNum = proObjectMap.get(DataChecker.DATA_OBJECT_NUM);
         CheckDataObject dataObject;
-        try {
+
             dataObject = parseDataObject(dataObjectStr);
-        } catch (SQLException e) {
-            log.error("parse dataObject failed", e);
-            return false;
-        }
+
         Predicate<Map<String, String>> hasDataSource = p -> {
             if (StringUtils.isEmpty(proObjectMap.get(DataChecker.SOURCE_TYPE))) {
                 return false;
@@ -218,7 +197,9 @@ public class DataCheckerDao {
             }
             log.info("start to check hive meta");
             proObjectMap.put(DataChecker.SOURCE_TYPE, HIVE_SOURCE_TYPE);
-            normalCheck= getJobTotalCount(dataObject, jobConn, log) > 0;
+            boolean denyView = Boolean.parseBoolean(
+                    props.getProperty(DataChecker.DENY_VIEW_SWITCH, "false"));
+            normalCheck= getJobTotalCount(dataObject, jobConn, log,denyView) > 0;
             if (null != action.getExecutionRequestRefContext()){
                 action.getExecutionRequestRefContext().appendLog(dataObjectStr+" check hive meta end,check result:"+normalCheck);
             }
@@ -231,7 +212,7 @@ public class DataCheckerDao {
                 }
                 log.info("start to check maskis");
                 proObjectMap.put(DataChecker.SOURCE_TYPE, MASK_SOURCE_TYPE);
-                normalCheck= (getBdpTotalCount(dataObject, bdpConn, log, props) > 0 || "success".equals(fetchMaskCode(dataObject, log, props).get("maskStatus")));
+                normalCheck= "success".equals(fetchMaskCode(dataObject, log, props).get("maskStatus"));
                 if (null != action.getExecutionRequestRefContext()){
                     action.getExecutionRequestRefContext().appendLog(dataObjectStr+" check maskis end,check result:"+normalCheck);
                 }
@@ -265,9 +246,38 @@ public class DataCheckerDao {
     }
 
     private List<Map<String, String>> extractProperties(Properties p) {
-        return p.keySet().stream()
+        List<Map<String, String>> checkList = p.keySet().stream()
                 .map(key -> key2Map(key, p)).filter(x -> x.size() > 0)
                 .collect(Collectors.toList());
+        if (p.containsKey(DataChecker.EXPAND_SECOND_PARTITION) && "true".equalsIgnoreCase(p.getProperty(DataChecker.EXPAND_SECOND_PARTITION).trim())) {
+            List<Map<String, String>> expandCheckList = new ArrayList<>();
+            for (Map<String, String> proObjectMap : checkList) {
+                String dataObjectStr = proObjectMap.get(DataChecker.DATA_OBJECT) ;
+                CheckDataObject dataObject= parseDataObject(dataObjectStr);
+                if(dataObject.getType() == CheckDataObject.Type.PARTITION
+                        && !dataObject.getPartitionName().contains("/")){
+                    for (int i = 0; i < 24; i++) {
+                        Map<String, String> itemMap = new HashMap<>(3);
+                        String formattedValue = String.format("%02d", i);
+                        String stKey = DataChecker.SOURCE_TYPE;
+                        if (proObjectMap.containsKey(stKey)) {
+                            itemMap.put(DataChecker.SOURCE_TYPE, proObjectMap.get(stKey));
+                        }
+                        String secondPartitionName = "ph=" + formattedValue;
+                        String nCheckObject = dataObject.forMat(secondPartitionName);
+                        itemMap.put(DataChecker.DATA_OBJECT,nCheckObject);
+                        String nObjectNum = proObjectMap.get(DataChecker.DATA_OBJECT_NUM) + formattedValue;
+                        itemMap.put(DataChecker.DATA_OBJECT_NUM, nObjectNum);
+                        expandCheckList.add(itemMap);
+                    }
+                }else{
+                    expandCheckList.add(proObjectMap);
+                }
+
+            }
+            checkList = expandCheckList;
+        }
+        return checkList;
     }
 
     private Map<String, String> key2Map(Object key, Properties p) {
@@ -316,25 +326,6 @@ public class DataCheckerDao {
         }
     }
 
-    /**
-     * 构造查询maskis的查询
-     */
-    private PreparedStatement getBdpStatement(Connection conn, CheckDataObject dataObject, String timeScape) throws SQLException {
-        PreparedStatement pstmt = null;
-        if (timeScape.equals("NULL")) {
-            pstmt = conn.prepareCall(SQL_SOURCE_TYPE_BDP);
-        } else {
-            pstmt = conn.prepareCall(SQL_SOURCE_TYPE_BDP_WITH_TIME_CONDITION);
-            pstmt.setInt(4, Integer.valueOf(timeScape) * 3600);
-        }
-        if (dataObject.getPartitionName() == null) {
-            dataObject.setPartitionName("");
-        }
-        pstmt.setString(1, dataObject.getDbName());
-        pstmt.setString(2, dataObject.getTableName());
-        pstmt.setString(3, dataObject.getPartitionName());
-        return pstmt;
-    }
 
     /**
      * 构造查询dops库的查询
@@ -371,10 +362,11 @@ public class DataCheckerDao {
      * @param dataObjectStr 字符串形式的对象
      * @return 发序列化后的对象
      */
-    private CheckDataObject parseDataObject(String dataObjectStr)throws SQLException{
+    private CheckDataObject parseDataObject(String dataObjectStr) {
         CheckDataObject dataObject;
         if(!dataObjectStr.contains(".")){
-            throw new SQLException("Error for  DataObject format!"+dataObjectStr);
+            throw new DSSRuntimeException("check object format error(校验对象配置格式错误，请按照dbname" +
+                    ".tablename{ds=partionname}格式配置)！ error content(错误内容）:"+dataObjectStr);
         }
         String dbName = dataObjectStr.split("\\.")[0];
         String tableName = dataObjectStr.split("\\.")[1];
@@ -396,7 +388,7 @@ public class DataCheckerDao {
     /**
      * 查hive 元数据库
      */
-    private long getJobTotalCount(CheckDataObject dataObject, Connection conn, Logger log) {
+    private long getJobTotalCount(CheckDataObject dataObject, Connection conn, Logger log,boolean denyView) {
         log.info("-------------------------------------- search hive/spark/mr data ");
         log.info("-------------------------------------- dataObject: " + dataObject);
         try (PreparedStatement pstmt = getJobStatement(conn, dataObject)) {
@@ -404,6 +396,12 @@ public class DataCheckerDao {
 //            long ret = rs.last() ? rs.getRow() : 0;
             long ret = 0L;
             while (rs.next()) {
+                String tableType = rs.getString("TBL_TYPE");
+                //如果禁用视图，则检查视图，有则报错
+                if (denyView && "VIRTUAL_VIEW".equals(tableType)) {
+                    log.error("Virtual view table is not allowed to use DataChecker. check object:{}", dataObject);
+                    throw new DSSRuntimeException("Virtual view table is not allowed to use DataChecker. check object:{}" + dataObject);
+                }
                 ret ++;
             }
             log.info("-------------------------------------- hive/spark/mr data result:"+ret);
@@ -414,27 +412,6 @@ public class DataCheckerDao {
         }
     }
 
-    /**
-     * 查mask db
-     */
-    private long getBdpTotalCount(CheckDataObject dataObject, Connection conn, Logger log, Properties props) {
-        String timeScape = props.getOrDefault(DataChecker.TIME_SCAPE, "NULL").toString();
-        log.info("-------------------------------------- search bdp data ");
-        log.info("-------------------------------------- dataObject: " + dataObject.toString());
-        try (PreparedStatement pstmt = getBdpStatement(conn, dataObject, timeScape)) {
-            ResultSet rs = pstmt.executeQuery();
-            long ret = 0L;
-            while (rs.next()) {
-                ret ++;
-            }
-//            long ret=rs.last() ? rs.getRow() : 0;
-            log.info("-------------------------------------- bdp data result:"+ret);
-            return ret;
-        } catch (SQLException e) {
-            log.error("fetch data from bdp error", e);
-            return 0;
-        }
-    }
 
     /**
      * - 返回0表示未找到任何记录 ；
@@ -604,7 +581,7 @@ public class DataCheckerDao {
             Response response = HttpUtils.httpClientHandleBase(maskUrl, requestBody, dataMap);
             handleResponse(response, resultMap, log);
         } catch (IOException e) {
-            log.error("fetch data from BDP MASK failed ");
+            log.error("fetch data from BDP MASK failed ",e);
             resultMap.put("maskStatus", "noPrepare");
         } catch (MaskCheckNotExistException e) {
             String errorMessage = "fetch data from BDP MASK failed" +

@@ -1,6 +1,6 @@
 <template>
   <Form
-    :label-width="100"
+    :label-width="118"
     ref="projectForm"
     :model="workflowDataCurrent"
     :rules="formValid"
@@ -85,7 +85,7 @@
         :placeholder="$t('message.workflow.inputWorkflowDesc')"></Input>
     </FormItem>
     <FormItem
-      :label="$t('message.Project.defaultTemplate')"
+      :label="$t('message.Project.defaultResTemplate')"
       prop="templateIds"
       v-if="!$APP_CONF.open_source"
     >
@@ -94,6 +94,16 @@
           <Option v-for="item in e.child" :value="item.templateId" :key="item.templateId" :disabled="item.disabled">{{ item.templateName }}</Option>
         </OptionGroup>
       </Select>
+    </FormItem>
+    <FormItem
+      :label="$t('message.Project.isQuoteTemplate')"
+      prop="isDefaultReference"
+      v-if="!$APP_CONF.open_source && workflowDataCurrent.templateIds && workflowDataCurrent.templateIds.length > 0"
+    >
+      <RadioGroup v-model="workflowDataCurrent.isDefaultReference">
+        <Radio label="1"><span>是</span></Radio>
+        <Radio label="0"><span>否</span></Radio>
+      </RadioGroup>
     </FormItem>
     <Form-item>
       <Button
@@ -113,6 +123,7 @@
 <script>
 import tag from '@dataspherestudio/shared/components/tag/index.vue';
 import api from '@dataspherestudio/shared/common/service/api';
+import { GetWorkspaceData, GetWorkspaceTemplateData  } from '@dataspherestudio/shared/common/service/apiCommonMethod.js'
 import { useData } from './useData.js';
 const FORMITEMTYPE = {
   RADIO: 'radio',
@@ -155,15 +166,27 @@ export default {
       defaultTemplates: [],
     };
   },
-  mounted() {
+  async mounted() {
     this.fetchLevelData()
     if(this.workflowDataCurrent.projectId) {
-      this.getTemplateDataByProject(this.workflowDataCurrent.projectId)
+      await this.getTemplateDataByProject(this.workflowDataCurrent.projectId)
     }
     if (this.selectOrchestratorList.length === 1) {
       this.workflowDataCurrent.orchestratorMode = this.selectOrchestratorList[0].dicKey
       if (this.orchestratorModeList.mapList[this.workflowDataCurrent.orchestratorMode].length === 1) {
         this.workflowDataCurrent.orchestratorWayString = this.orchestratorModeList.mapList[this.workflowDataCurrent.orchestratorMode][0].dicKey
+      }
+    }
+    const workspaceData  = await GetWorkspaceData(this.$route.query.workspaceId)
+    this.workflowDataCurrent.isDefaultReference = workspaceData.workspace.isDefaultReference
+    if(workspaceData && workspaceData.workspace) {
+      const workspaceTemplateData = await GetWorkspaceTemplateData();
+      if (workspaceTemplateData && workspaceTemplateData.workspaceDefaultTemplates && workspaceTemplateData.workspaceDefaultTemplates.length >0) {
+          const templateList = workspaceTemplateData.workspaceDefaultTemplates.map(item => {
+                  return item.templateId
+          });
+          this.$set(this.workflowDataCurrent, 'templateIds', templateList);
+          this.$forceUpdate();
       }
     }
   },
@@ -178,6 +201,9 @@ export default {
         description: [
           { required: true, message: this.$t('message.workflow.enterDesc'), trigger: 'blur' },
           { message: `${this.$t('message.workflow.descLength')}200`, max: 200 },
+        ],
+        isDefaultReference: [
+          { required: true, message: this.$t('message.enginelist.ruleform.plsselect'), trigger: 'blur' },
         ],
         orchestratorMode: [
           { required: true, trigger: 'blur', message: this.$t('message.workflow.orchestratorMode') }
@@ -207,11 +233,11 @@ export default {
         }
         const res = await getTemplateDatas(params);
         this.initTemplates = res;
-        this.defaultTemplates = JSON.parse(JSON.stringify(this.initTemplates)) 
+        this.defaultTemplates = JSON.parse(JSON.stringify(this.initTemplates))
       }
     },
     handleTemplateIdsChange(vArray) {
-      this.defaultTemplates = JSON.parse(JSON.stringify(this.initTemplates)) 
+      this.defaultTemplates = JSON.parse(JSON.stringify(this.initTemplates))
       vArray.forEach(v => {
         const curType = this.searchValueType(v);
         this.defaultTemplates.forEach((type,index) => {
@@ -253,6 +279,9 @@ export default {
         delete currentData.orchestratorWayArray;
       }
       currentData['projectId'] = currentData['projectId'] + '';
+      if (!workflowDataCurrent.templateIds || workflowDataCurrent.templateIds.length === 0) {
+        delete currentData.isDefaultReference
+      }
       return currentData;
     },
     Ok() {

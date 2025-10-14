@@ -2,4 +2,3 @@
 *.css linguist-language=java
 *.html linguist-language=java
 *.vue linguist-language=java
-*.zip filter=lfs diff=lfs merge=lfs -text

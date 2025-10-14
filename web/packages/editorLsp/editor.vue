@@ -1,5 +1,6 @@
 <template>
   <div
+    ref="weMonacoEditorLsp"
     :class="editorName"
     class="we-editor"/>
 </template>
@@ -9,6 +10,10 @@ import storage from '@dataspherestudio/shared/common/helper/storage';
 import highRiskGrammar from './highRiskGrammar';
 import eventbus from '@dataspherestudio/shared/common/helper/eventbus';
 import { initClient, changeAssociation } from './monaco-lsp';
+import plugin from '@dataspherestudio/shared/common/util/plugin';
+import { sendAccteptRequest } from '@dataspherestudio/shared/common/helper/aicompletion';
+
+const typeMap = {'.py': 'pyspark','.hql': 'hive sql', '.sql': 'spark sql', '.scala': 'spark scala', '.txt': '文本'}
 
 const types = {
   code: {
@@ -48,18 +53,18 @@ export default {
       default: true,
     },
     scriptType: String,
+    ext: String,
+    isScriptis: Boolean,
     application: String,
     filePath: String,
   },
   data() {
-    const closeSuggest = storage.get('close_db_table_suggest')
     const autobreak = storage.get('editor_auto_breakline', 'local')
     return {
       editor: null,
       editorModel: null,
       decorations: null,
       isParserClose: true, // 默认关闭语法验证
-      dbtbsuggest: closeSuggest, // 默认打开库表联想
       autobreak: autobreak, // 默认关闭自动换行
       closeParser: null,
       openParser: null,
@@ -140,10 +145,11 @@ export default {
     }
   },
   mounted() {
+    this.baseInfo = storage.get('baseInfo', 'local') || {}
     const {monaco, editor} = initClient({
       el: this.$el,
       value: this.value,
-      service: this.$APP_CONF && this.$APP_CONF.lsp_service || {}
+      service: this.$APP_CONF || {}
     }, {
       ...this.currentConfig
     }, this.filePath, (data) => {
@@ -199,22 +205,40 @@ export default {
       }
       this.$emit('onload');
       this.editor.onDidChangeModelContent(debounce(() => {
-        this.$emit('input', this.getValue());
+        const conent = this.getValue()
+        const p = this.editor.getPosition()
+        let c = ''
+        if (window.inlineCompletions && window.inlineCompletions[0] && this.baseInfo.copilotEnable) {
+          c = window.inlineCompletions[0].text
+        }
+        if (c) {
+          const s = window.inlineCompletions[0] ? window.inlineCompletions[0].position : undefined;
+          if (s) {
+            const range = new this.monaco.Range(s.lineNumber, s.column, p.lineNumber, p.column);
+            const t = this.editor.getModel().getValueInRange(range)
+            if (t == c) {
+              sendAccteptRequest(window.inlineCompletions[0])
+              window.inlineCompletions = undefined
+            }
+          }
+        }
+        this.$emit('input', conent);
       }), 100);
       this.editor.onContextMenu(debounce(() => {
         // 需要调换文字的右键菜单功能
         const selectList = [{label: 'Change All Occurrences', text: '改变所有出现'}, {label: 'Format Document', text: '格式化'}, {label: 'Command Palette', text: '命令面板'}, {label: 'Cut', text: this.$t('message.common.Cut')}, {label: 'Copy', text: this.$t('message.common.copy')}];
         if (localStorage.getItem('locale') === 'zh-CN') {
-          selectList.forEach((item) => {
-            let elmentList = document.querySelectorAll(`.actions-container .action-label[aria-label="${item.label}"]`);
-            this.changeInnerText(elmentList, item.text);
-          })
+            selectList.forEach((item) => {
+              const shadowHost = this.$refs.weMonacoEditorLsp.querySelector('.shadow-root-host');
+              const shadowRoot = shadowHost.shadowRoot;
+              let elmentList = shadowRoot.querySelectorAll(`.actions-container .action-label[aria-label="${item.label}"]`);
+              this.changeInnerText(elmentList, item.text);
+            })
         }
         if (this.openDbTbSuggest && this.closeDbTbSuggest) {
           const closeSuggest = storage.get('close_db_table_suggest')
-          this.dbtbsuggest = !closeSuggest
-          this.openDbTbSuggest.set(closeSuggest);
           this.closeDbTbSuggest.set(!closeSuggest);
+          this.openDbTbSuggest.set(closeSuggest);
         }
       }), 100)
     },
@@ -282,7 +306,7 @@ export default {
     },
     addCommands() {
       // 保存当前脚本
-      this.editor.addCommand(this.monaco.KeyMod.CtrlCmd + this.monaco.KeyCode.KEY_S, () => {
+      this.editor.addCommand(this.monaco.KeyMod.CtrlCmd + this.monaco.KeyCode.KeyS, () => {
         this.$emit('on-save');
       });
       // 运行当前脚本
@@ -293,11 +317,11 @@ export default {
       }
       // 调用浏览器本身的转换小写动作
       this.editor.addCommand(this.monaco.KeyMod.CtrlCmd + this.monaco.KeyMod.Shift
-                    + this.monaco.KeyCode.KEY_U, () => {
+                    + this.monaco.KeyCode.KeyU, () => {
         this.editor.trigger('toLowerCase', 'editor.action.transformToLowercase');
       });
       // 调用浏览器本身的转换大写动作
-      this.editor.addCommand(this.monaco.KeyMod.CtrlCmd + this.monaco.KeyCode.KEY_U, () => {
+      this.editor.addCommand(this.monaco.KeyMod.CtrlCmd + this.monaco.KeyCode.KeyU, () => {
         this.editor.trigger('toUpperCase', 'editor.action.transformToUppercase');
       });
     },
@@ -319,7 +343,7 @@ export default {
       const action_1 = this.editor.addAction({
         id: 'find',
         label: this.$t('message.common.monacoMenu.CZ'),
-        keybindings: [this.monaco.KeyMod.CtrlCmd | this.monaco.KeyCode.KEY_F],
+        keybindings: [this.monaco.KeyMod.CtrlCmd + this.monaco.KeyCode.KeyF],
         keybindingContext: null,
         contextMenuGroupId: 'control',
         contextMenuOrder: 1.6,
@@ -331,7 +355,7 @@ export default {
       const action_2 = this.editor.addAction({
         id: 'replace',
         label: this.$t('message.common.monacoMenu.TH'),
-        keybindings: [this.monaco.KeyMod.CtrlCmd | this.monaco.KeyCode.KEY_H],
+        keybindings: [this.monaco.KeyMod.CtrlCmd + this.monaco.KeyCode.KeyH],
         keybindingContext: null,
         contextMenuGroupId: 'control',
         contextMenuOrder: 1.7,
@@ -343,7 +367,7 @@ export default {
       const action_3 = this.editor.addAction({
         id: 'commentLine',
         label: this.$t('message.common.monacoMenu.HZS'),
-        keybindings: [this.monaco.KeyMod.CtrlCmd | this.monaco.KeyCode.US_SLASH],
+        keybindings: [this.monaco.KeyMod.CtrlCmd + this.monaco.KeyCode.Slash],
         keybindingContext: null,
         contextMenuGroupId: 'control',
         contextMenuOrder: 1.8,
@@ -362,7 +386,7 @@ export default {
         run() {
           const copyString = storage.get('copyString');
           if (!copyString || copyString.length < 0) {
-            vm.$Message.warning(this.$t('message.common.monacoMenu.HBQWJCFZWB'));
+            vm.$Message.warning(vm.$t('message.common.monacoMenu.HBQWJCFZWB'));
           } else {
             vm.insertValueIntoEditor(copyString);
           }
@@ -373,7 +397,7 @@ export default {
       const action_5 = this.editor.addAction({
         id: 'gotoLine',
         label: this.$t('message.common.monacoMenu.TDZDH'),
-        keybindings: [this.monaco.KeyMod.CtrlCmd | this.monaco.KeyCode.KEY_G],
+        keybindings: [this.monaco.KeyMod.CtrlCmd + this.monaco.KeyCode.KeyG],
         keybindingContext: null,
         contextMenuGroupId: 'control',
         contextMenuOrder: 1.9,
@@ -381,10 +405,10 @@ export default {
           editor.trigger('gotoLine', 'editor.action.gotoLine');
         },
       });
-
+      const closeSuggest = storage.get('close_db_table_suggest');
       // 打开、关闭库表联想
-      this.closeDbTbSuggest = this.editor.createContextKey('closeDbTbSuggest', !this.dbtbsuggest);
-      this.openDbTbSuggest = this.editor.createContextKey('openDbTbSuggest', this.dbtbsuggest);
+      this.closeDbTbSuggest = this.editor.createContextKey('closeDbTbSuggest', !closeSuggest);
+      this.openDbTbSuggest = this.editor.createContextKey('openDbTbSuggest', closeSuggest);
       const action_6 = this.editor.addAction({
         id: 'closeDbTbSuggest',
         label: this.$t('message.common.monacoMenu.GBKBTS'),
@@ -395,7 +419,6 @@ export default {
         contextMenuGroupId: 'control',
         contextMenuOrder: 2.2,
         run() {
-          vm.dbtbsuggest = false;
           // 控制右键菜单的显示
           vm.openDbTbSuggest.set(true);
           vm.closeDbTbSuggest.set(false);
@@ -413,7 +436,6 @@ export default {
         contextMenuGroupId: 'control',
         contextMenuOrder: 2.3,
         run() {
-          vm.dbtbsuggest = true;
           vm.openDbTbSuggest.set(false);
           vm.closeDbTbSuggest.set(true);
           changeAssociation(vm.currentConfig.language, true)
@@ -511,6 +533,126 @@ export default {
         });
         this.actions.push(action_11);
         this.actions.push(action_12);
+      }
+      if (this.baseInfo.copilotEnable && this.isScriptis) {
+        // 代码解释
+        const action_13 = this.editor.addAction({
+          id: 'codeExplain',
+          label: 'AI代码解释',
+          keybindings: [],
+          keybindingContext: null,
+          contextMenuGroupId: 'control',
+          contextMenuOrder: 2.6,
+          run() {
+            const code = vm.getValueInRange() || vm.getValue();
+            const message = `请解释以下${typeMap[vm.ext]||vm.application}代码：\n\`\`\`\n${code}\n\`\`\``;
+            plugin.emit('copilot_web_open_change', { 
+              type: 'codeExplain', 
+              message,
+              params: {
+                code,
+                type: typeMap[vm.ext] || vm.application,
+              }
+            })
+          },
+        });
+        
+        const showConvertModal = () => {
+          const options = ["hive", "spark", "starrocks"]
+            .filter(it => {
+              if (vm.application === 'jdbc') {
+                return it !== 'starrocks'
+              }
+              return it !== vm.application
+            })
+          let type = options[0]
+          this.$Modal.confirm({
+            title: '代码转换',
+            render: (h) => {
+              return h('div', {
+                style: {
+                    marginTop: '10px',
+                  }
+               }, [
+                h('span', '转换脚本为：'),
+                h("Select", {
+                  size: "small",
+                  autofocus: true,
+                  props: {
+                    value: type
+                  },
+                  placeholder: '请选择转换类型',
+                  on: {
+                    'on-change'(value) {
+                      type = value;
+                    }
+                  },
+                  style: {
+                    width: '200px'
+                  }
+                }, options.map(it => {
+                  return h("Option", {
+                    props: {
+                        value: it,
+                        label: it
+                    }
+                  })
+                })),
+                h('div', {
+                  style: {
+                    marginTop: '10px',
+                    display: vm.application === 'jdbc' ? 'block' : 'none',
+                  }
+                }, '请注意：类型转换jdbc脚本只支持StarRocks类型的转换')
+              ])
+            },
+            onOk: () => {
+              const code = vm.getValueInRange() || vm.getValue();
+              const message = `请将以下${typeMap[vm.ext]||vm.application}代码转换为${type}类型：\n\`\`\`\n${code}\n\`\`\``;
+              plugin.emit('copilot_web_open_change', { 
+                type: 'codeConvert', 
+                message , 
+                params: {
+                  code,
+                  origin: typeMap[vm.ext]||vm.application,
+                  target: type
+                }
+              })
+            }
+          });
+        }
+       
+        this.actions.push(action_13);
+        if (['.hql', '.sql', '.jdbc'].includes(vm.ext)) {
+          // 代码转换
+          const action_14 = this.editor.addAction({
+            id: 'codeConvert',
+            label: 'AI代码类型转换',
+            keybindings: [],
+            keybindingContext: null,
+            contextMenuGroupId: 'control',
+            contextMenuOrder: 2.7,
+            run() {
+              showConvertModal()
+            },
+          });
+          this.actions.push(action_14);
+        }
+      }
+      if (this.baseInfo.copilotEnable) {
+        const action_15 = this.editor.addAction({
+          id: "aisuggestion",
+          label: "AI补全",
+          keybindings: [
+            this.monaco.KeyMod.Alt + this.monaco.KeyCode.Slash
+          ],
+          run() {
+            window.$APP_CONF.aisuggestion = true;
+            window.__scirpt_language = typeMap[vm.ext] || vm.application;
+            vm.editor.trigger('editor.action.triggerSuggest', 'editor.action.inlineSuggest.trigger', {});
+          }
+        });
+        this.actions.push(action_15);
       }
     },
     deltaDecorations: debounce(function(value, cb) {

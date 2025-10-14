@@ -39,7 +39,7 @@
         :max-size="400"
         class="left-panel">
         <workSidebar v-if="leftModule.key === 2"/>
-        <hiveSidebar v-if="leftModule.key === 3"/>
+        <hiveSidebar :type="dataSourcetype" v-if="leftModule.key === 3"/>
         <fnSidebar
           v-if="leftModule.key === 4"
           type="udf"
@@ -58,7 +58,7 @@
             ref="workbenchContainer"
             :width="props.width"
             v-if="props.width"
-            @get-dbtable-length="showTip" />
+            @active-tab-change="changeScriptTab"/>
         </template>
       </we-panel-item>
     </we-panel>
@@ -102,7 +102,8 @@ export default {
       navHeight: 0,
       showSetting: false,
       proxyUserName: '',
-      copilotEntryComponent: copilotWebComponent ? copilotWebComponent.copilotEntryComponent : null
+      copilotEntryComponent: null,
+      dataSourcetype: 'Hive',
     };
   },
   //组建内的守卫
@@ -155,9 +156,17 @@ export default {
   async created() {
     let baseInfo = storage.get('baseInfo', 'local') || {}
     const globalRes = await this.getGlobalLimit()
+    let copilotEnable = false
+    try {
+      const res = await this.getCopilotEnabled()
+      copilotEnable = !!res.inWhitelist
+    } catch (error) {
+      //
+    }
     baseInfo = {
       ...baseInfo,
-      ...globalRes.globalLimits
+      ...globalRes.globalLimits,
+      copilotEnable
     }
     storage.set('baseInfo', baseInfo, 'local')
     // languageServerDefaultEnable = true 默认启用language server
@@ -190,23 +199,32 @@ export default {
         this.proxyUserName = baseInfo.proxyUserName
       }
       this.showSetting = !!baseInfo.proxyEnable;
-    }, 1500)
-    plugin.on('copilot_web_listener_createAndInster', (regs) => {
-      if (this.leftModule.key !== 2) {
-        this.chooseLeftModule(this.leftSideNavList[0])
+      this.copilotEntryComponent = null;
+      plugin.emitHook('copilot_web_listener_event_remove')
+      if (baseInfo.copilotEnable) {
+        this.copilotEntryComponent = copilotWebComponent ? copilotWebComponent.copilotEntryComponent : null;
+        if (this.copilotEntryComponent) {
+          plugin.on('copilot_web_listener_createAndInster', (regs) => {
+            if (this.leftModule.key !== 2) {
+              this.chooseLeftModule(this.leftSideNavList[0])
+            }
+            this.$nextTick(() => {
+              plugin.emit('copilot_web_listener_create', regs)
+            })
+          })
+        }
       }
-      this.$nextTick(() => {
-        plugin.emit('copilot_web_listener_create', regs)
-      })
-    })
+    }, 1500)
   },
   beforeDestroy() {
-    // 监听窗口变化，获取浏览器宽高
-    this.$Notice.close('show-db-table-many-tip')
     window.removeEventListener('resize', this.getHeight);
     plugin.emitHook('copilot_web_listener_event_remove')
   },
   methods: {
+    changeScriptTab({ type }) {
+      // console.log('changeScriptTab', type)
+      // this.dataSourcetype = type
+    },
     getGlobalLimit() {
       return api.fetch(`/dss/scriptis/globalLimits`, {}, {
         method: 'get',
@@ -215,17 +233,6 @@ export default {
     },
     getHeight() {
       this.resize(window.innerHeight);
-    },
-    showTip(length) {
-      if (length > 30000) {
-        this.$Notice.close('show-db-table-many-tip')
-        this.$Notice.warning({
-          duration: 0,
-          name: 'show-db-table-many-tip',
-          title: this.$t('message.scripts.propmpt'),
-          desc: this.$t('message.scripts.largedatatip')
-        })
-      }
     },
     init() {
       this.chooseLeftModule(this.leftSideNavList[0]);

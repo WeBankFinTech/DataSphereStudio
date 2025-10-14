@@ -1,5 +1,5 @@
 <template>
-  <div class="editor">
+  <div class="editor" ref="editorId">
     <div style="height: 32px;">
       <div class="workbench-body-navbar">
         <div
@@ -52,6 +52,34 @@
             <Icon type="ios-build" />
             <span class="navbar-item-name">{{ $t('message.scripts.editorDetail.navBar.config') }}</span>
           </div>
+          <!-- 数据源按钮 -->
+          <div
+            class="workbench-body-navbar-item"
+            v-if="
+              $route.name == 'Home' &&
+              !script.readOnly &&
+                !isHdfs &&
+                isSupport &&
+                (script.application == 'jdbc' || script.application == 'ck')
+            "
+          >
+            <Select
+              placeholder="切换数据源"
+              @on-change="dataSetSelect"
+              class="dataSetSelect"
+              clearable
+              filterable
+              v-model="dataSetValue"
+              style="width: 250px; margin-left: 3px"
+            >
+              <Option
+                v-for="item in dataSetList"
+                :value="item.dataSourceName"
+                :key="item.id"
+              >{{ item.dataSourceName }}</Option
+              >
+            </Select>
+          </div>
           <div
             class="workbench-body-navbar-item"
             @click="topFullScreen">
@@ -80,12 +108,15 @@
           :id="script.id"
           :read-only="script.readOnly"
           :script-type="scriptType"
+          :ext="script.ext"
           :file-path="work.filepath || script.id + work.filename"
           :application="script.application"
+          :is-scriptis="$route.name == 'Home'"
           type="code"
           @on-operator="heartBeat"
           @on-run="run"
           @on-save="save"
+          @open-db-table-suggest="openDbTableSuggest"
           @is-parse-success="changeParseSuccess"/>
       </we-panel-item>
       <we-panel-item
@@ -94,7 +125,7 @@
         class="setting-panel"
         v-show="showConfig"
         :min="showConfig ? 100 : 8"
-        :width="showConfig ? 200 : 8"
+        :width="showConfig ? showConfigWidth : 8"
       >
         <setting
           ref="setting"
@@ -106,11 +137,14 @@
   </div>
 </template>
 <script>
+import { debounce } from 'lodash';
 import setting from './setting.vue';
 import api from '@dataspherestudio/shared/common/service/api';
 import plugin from '@dataspherestudio/shared/common/util/plugin'
 import { throttle } from 'lodash';
+import eventbus from '@dataspherestudio/shared/common/helper/eventbus';
 import elementResizeEvent from '@dataspherestudio/shared/common/helper/elementResizeEvent';
+import storage from '@dataspherestudio/shared/common/helper/storage';
 
 const extComponents = plugin.emitHook('script_editor_top_tools') || []
 
@@ -143,9 +177,15 @@ export default {
   },
   data() {
     return {
+      curTipKey: '',
       showConfig: false,
+      showConfigWidth:8,
       loading: false,
       isParseSuccess: true,
+      dataSetValue: this.work.dataSetValue,
+      scriptUnsave: false,
+      oldDataSetValue: null,
+      dataSetList: this.work.dataSetList || [],
       extComponents
     };
   },
@@ -155,7 +195,7 @@ export default {
     },
     isSupport() {
       return this.script.executable;
-    }
+    },
   },
   watch: {
     'work.unsave'(val) {
@@ -170,8 +210,152 @@ export default {
   },
   mounted() {
     elementResizeEvent.bind(this.$el, this.layout);
+    if (this.work.dataSetList) {
+      this.dataSetList = this.work.dataSetList
+    }
+    if (
+      this.work.data &&
+      this.work.data.params &&
+      this.work.data.params.configuration &&
+      this.work.data.params.configuration.runtime &&
+      this.work.data.params.configuration.runtime[
+        'wds.linkis.engine.runtime.datasource'
+      ]
+    ) {
+      this.dataSetValue =
+        this.work.data.params.configuration.runtime[
+          'wds.linkis.engine.runtime.datasource'
+        ]
+
+      this.oldDataSetValue = this.dataSetValue
+    }
+    setTimeout(() => {
+      let linenum = storage.get("revealline") || 0
+      if (linenum && this.$refs.editor && this.$refs.editor.editor) {
+        this.$refs.editor.editor.setPosition({lineNumber: linenum, column: 1});
+        this.$refs.editor.editor.focus();
+        this.$refs.editor.editor.revealLine(linenum);
+        storage.remove("revealline")
+      }
+      this.handleConfigTip()
+    },50)
+    this.handleResize = debounce(this.handleResize, 200);
+    window.addEventListener('resize', this.handleResize);
   },
   methods: {
+    handleResize() {
+      this.showConfigWidth = this.getMaxKeyOrValueLength(this.script.params.variable)
+    },
+
+  getTextWidth(str = '') {
+      if (!window.textWidthCache) {
+        window.textWidthCache = document.createElement('span');
+        window.textWidthCache.style.position = 'absolute';
+        window.textWidthCache.style.visibility = 'hidden';
+        window.textWidthCache.style.whiteSpace = 'nowrap'; // 防止换行影响宽度
+        document.body.appendChild(window.textWidthCache);
+      }
+      const dom = window.textWidthCache;
+      dom.textContent = str;
+      const width = dom.offsetWidth;
+      return width;
+    },
+    getMaxKeyOrValueLength(arr) {
+      let maxLength = 0;
+      arr.forEach(obj => {
+        Object.keys(obj).forEach(key => {
+          const keyLength = this.getTextWidth(key);
+          const valueLength = this.getTextWidth(obj[key]);
+          maxLength = Math.max(maxLength, keyLength, valueLength);
+        });
+      });
+      const clientWidth = this.$refs.editorId.clientWidth || 1681;
+      if (maxLength <= 40) {
+        return Math.min(200, clientWidth * 0.8)
+      }
+      return Math.min(60 + maxLength*3.5, clientWidth * 0.8)
+// 6    });
+    },
+    openDbTableSuggest() {
+      let len = storage.get('all-db-tables-length', 'local')
+      if (len && len > 30000) {
+        this.$Notice.close('show-db-table-many-tip')
+        this.$Notice.warning({
+          duration: 0,
+          name: 'show-db-table-many-tip',
+          title: this.$t('message.scripts.propmpt'),
+          desc: this.$t('message.scripts.largedatatip')
+        })
+      }
+      eventbus.emit('open-db-table-suggest')
+    },
+    handleConfigTip () {
+      if (this.script.params && this.script.params.variable && this.script.params.variable.length > 0) {
+        let curName = this.script.fileName
+        if (this.script.params.configuration && this.script.params.configuration.runtime && this.script.params.configuration.runtime.nodeName) {
+          curName = this.script.params.configuration.runtime.nodeName
+        }
+        // console.log('this.script.params.variable', this.script.params.variable)
+        this.showConfigWidth = this.getMaxKeyOrValueLength(this.script.params.variable)
+        this.showConfig = true;
+      }
+    },
+    // handleConfigTip () {
+    //   if (this.script.params && this.script.params.variable && this.script.params.variable.length > 0) {
+    //     let curName = this.script.fileName
+    //     if (this.script.params.configuration && this.script.params.configuration.runtime && this.script.params.configuration.runtime.nodeName) {
+    //       curName = this.script.params.configuration.runtime.nodeName
+    //     }
+    //     this.showConfig = true;
+    //     this.curTipKey =  'showConfigTip_' + curName + '_'+ this.script.id
+    //     let curTipData = null
+    //     if(sessionStorage.getItem(this.curTipKey)) {
+    //         curTipData = JSON.parse(sessionStorage.getItem(this.curTipKey))
+    //     }
+    //     let curTipNames = [];
+    //     if(sessionStorage.getItem('showConfigName')) {
+    //         curTipNames = JSON.parse(sessionStorage.getItem('showConfigName'))
+    //     }
+    //     // 当前展示提示数等于3条后，不再追加提示
+    //     // 初次打开，缓存数据为空，提示
+    //     // 没有关闭提示，关闭脚本后再次打开，不重复提示
+    //     // 关闭提示，再次打开，不提示
+    //     if (curTipNames.length <=2 && (curTipData === null ||  (curTipData.curShowStatus !== '1' && curTipData.showable === '1'))) {
+    //       const tipData = {
+    //         curShowStatus: '1',  // 1：当前正在展示，0：当前未展示
+    //         showable: '1', // 1：可以展示，0：不能展示
+    //       }
+    //       sessionStorage.setItem(this.curTipKey, JSON.stringify(tipData));
+    //       curTipNames.push(this.curTipKey);
+    //       sessionStorage.setItem('showConfigName', JSON.stringify(curTipNames));
+    //       this.$Notice.open({
+    //           desc: `${curName}脚本存在已配置的自定义参数，请知悉`,
+    //           duration: 0,
+    //           name: this.curTipKey,
+    //           onClose: (v) => {
+    //             tipData.curShowStatus = '0';
+    //             tipData.showable = '0';
+    //             sessionStorage.setItem(this.curTipKey, JSON.stringify(tipData));
+    //             curTipNames = JSON.parse(sessionStorage.getItem('showConfigName'))
+    //             const newArray = curTipNames.filter(item => item !== this.curTipKey);
+    //             sessionStorage.setItem('showConfigName', JSON.stringify(newArray));
+    //           }
+    //       });
+    //     }
+    //   }
+    // },
+    dataSetSelect(v) {
+      // 模拟未保存状态 旧数据源为初始化时的或保存后的数据源，新数据源双向绑定的dataSetValue
+      // 当新旧数据源不同时，用scriptUnsave暂存此时保存状态（可能为true或false），然后切换保存状态为未保存
+      // 当切换新旧数据源相同时，切换保存状态为scriptUnsave
+      this.work.dataSetValue = v
+      if (this.dataSetValue === this.oldDataSetValue) {
+        this.work.unsave = this.scriptUnsave
+      } else {
+        this.scriptUnsave = this.work.unsave
+        this.work.unsave = true
+      }
+    },
     'Workbench:insertValue'(args) {
       if (args.id === this.script.id) {
         this.$refs.editor.insertValueIntoEditor(args.value);
@@ -196,19 +380,31 @@ export default {
       this.$refs.editor.redo();
     },
     async run() {
+      if (this.loading || this.killing) return this.$Message.warning(this.$t('message.scripts.constants.warning.api'));
       if (this.script.running) return this.$Message.warning(this.$t('message.scripts.editorDetail.warning.running'));
       let selectCode = this.$refs.editor.getValueInRange() || this.script.data;
-      let validRepeat = await this.validateRepeat();
-      this.$refs.editor.deltaDecorations(selectCode, () => {
-        if (!validRepeat) return this.$Message.warning(this.$t('message.scripts.editorDetail.warning.invalidArgs'));
-        if (this.loading) return this.$Message.warning(this.$t('message.scripts.constants.warning.api'));
-        if (!selectCode) {
-          return this.$Message.warning(this.$t('message.scripts.editorDetail.warning.emptyCode'));
+      if (!selectCode) {
+        return this.$Message.warning(this.$t('message.scripts.editorDetail.warning.emptyCode'));
+      }
+      try {
+        this.loading = true;
+        let validRepeat = await this.validateRepeat();
+        if (!validRepeat) {
+          this.loading = false;
+          return this.$Message.warning(this.$t('message.scripts.editorDetail.warning.invalidArgs'));
         }
+      } catch (error) {
+      }
+      clearTimeout(this.timer);
+      this.timer = setTimeout(() => {
+        this.loading = false;
+      }, 5000);
+      this.$refs.editor.deltaDecorations(selectCode, () => {
         this.loading = true;
         this.$emit('on-run', {
           code: selectCode,
           id: this.script.id,
+          dataSetValue: this.dataSetValue,
         }, (status) => {
           // status是start表示已经开始执行
           let list = ['execute', 'error', 'start', 'downgrade'];
@@ -219,23 +415,26 @@ export default {
       });
     },
     stop() {
-      if (this.loading) return this.$Message.warning(this.$t('message.scripts.constants.warning.api'));
-      this.loading = true;
+      if (this.killing) return this.$Message.warning(this.$t('message.scripts.constants.warning.api'));
+      this.killing = true;
       this.$emit('on-stop', () => {
-        this.loading = false;
+        this.killing = false;
       });
     },
-    async save() {
+    save: debounce(async function() {
       if (this.work && this.work.unsave) {
         let valid = await this.validateRepeat();
         if (!valid) return this.$Message.warning(this.$t('message.scripts.editorDetail.warning.invalidArgs'));
         this.$refs.editor.save();
-        this.$emit('on-save');
+        this.$emit('on-save', '', this.dataSetValue)
+        this.oldDataSetValue = this.dataSetValue
+        this.scriptUnsave = this.work.unsave
       } else {
         this.$Message.warning(this.$t('message.scripts.editorDetail.warning.unchange'));
       }
-    },
+    }, 500),
     config() {
+      this.showConfigWidth = this.getMaxKeyOrValueLength(this.script.params.variable)
       this.showConfig = !this.showConfig;
     },
     settingClose() {
@@ -283,7 +482,20 @@ export default {
     }
   },
   beforeDestroy: function() {
+    // const curTipNames = JSON.parse(sessionStorage.getItem('showConfigName'))
+    // const curTipData = JSON.parse(sessionStorage.getItem(this.curTipKey))
+    // if(this.$Notice && this.curTipKey && curTipData && curTipData['curShowStatus'] === '1') {
+    //     this.$Notice.close(this.curTipKey);
+    //     const tipData = {
+    //       curShowStatus: '0',
+    //       showable: '1',
+    //     }
+    //     sessionStorage.setItem(this.curTipKey, JSON.stringify(tipData));
+    //     const newArray = curTipNames.filter(item => item !== this.curTipKey);
+    //     sessionStorage.setItem('showConfigName', JSON.stringify(newArray));
+    // }
     elementResizeEvent.unbind(this.$el);
+    window.removeEventListener('resize', this.handleResize)
   },
 };
 </script>

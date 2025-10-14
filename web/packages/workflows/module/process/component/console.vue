@@ -28,17 +28,26 @@
             <span>{{ $t('message.workflow.tabs.log') }}</span>
           </div>
         </div>
-        <div
-          class="workbench-tab-button">
-          <span class="workbench-tab-full-btn" @click="toggleFull">
-            <Icon :type="scriptViewState.bottomPanelFull?'md-contract':'md-expand'" />
-            {{ scriptViewState.bottomPanelFull ? $t('message.scripts.constants.logPanelList.releaseFullScreen') : $t('message.scripts.constants.logPanelList.fullScreen') }}
-          </span>
-          <Icon
-            type="ios-close"
-            size="20"
-            @click="closeConsole"></Icon>
+        <div v-if="scriptViewState.showPanel == 'result' && scriptResult.totalColumn <= 10000 && scriptResult.totalColumn > 500" class="column-pagination">
+          <span>列分页：500列 / 页，共{{ scriptResult.totalColumn }}列</span>
+          <Page
+            :total="scriptResult.totalColumn"
+            :current="scriptViewState.columnPageNow || 1"
+            :page-size="500"
+            :simple="true"
+            size="small"
+            @on-change="onChangeColPage"
+          />
         </div>
+        <span class="workbench-tab-full-btn" @click="toggleFull">
+          <Icon :type="scriptViewState.bottomPanelFull?'md-contract':'md-expand'" />
+          {{ scriptViewState.bottomPanelFull ? $t('message.scripts.constants.logPanelList.releaseFullScreen') : $t('message.scripts.constants.logPanelList.fullScreen') }}
+        </span>
+        <Icon
+          style="cursor:pointer;padding-top: 4px;margin-right: 4px;"
+          type="ios-close"
+          size="20"
+          @click="closeConsole"></Icon>
       </div>
       <div
         class="workbench-container">
@@ -77,6 +86,8 @@ import log from '@dataspherestudio/shared/components/consoleComponent/log.vue';
 import weProgress from '@dataspherestudio/shared/components/consoleComponent/progress.vue';
 import Execute from '@dataspherestudio/shared/common/service/execute';
 import mixin from '@dataspherestudio/shared/common/service/mixin';
+import { EXECUTE_COMPLETE_TYPE } from '@dataspherestudio/shared/common/config/const';
+
 export default {
   components: {
     result,
@@ -100,7 +111,8 @@ export default {
         showPanel: 'progress',
         cacheLogScroll: 0,
         bottomContentHeight: this.height || '250',
-        bottomPanelFull: false
+        bottomPanelFull: false,
+        columnPageNow: 1,
       },
       isBottomPanelFull: false,
       isLogShow: false,
@@ -123,6 +135,23 @@ export default {
       this.killExecute();
     }
   },
+  computed: {
+    scriptResult() {
+      let res = {
+        headRows: [],
+        bodyRows: [],
+        type: 'EMPTY',
+        total: 0,
+        totalColumn: 0,
+        columnPageNow: 1,
+        path: ''
+      };
+      if (this.script.resultList && this.script.resultList.length) {
+        res = this.script.resultList[this.script.resultSet || 0].result || res
+      }
+      return res
+    },
+  },
   watch: {
     stop(val, oldval) {
       if (oldval && this.execute) {
@@ -136,6 +165,9 @@ export default {
   mounted() {
   },
   methods: {
+    onChangeColPage(v) {
+      this.scriptViewState = {...this.scriptViewState, columnPageNow: v}
+    },
     killExecute() {
       this.execute.trigger('stop');
       this.execute.trigger('kill');
@@ -144,6 +176,7 @@ export default {
       const node = this.node;
       this.script = new Script({
         nodeId: node.key,
+        runType: this.node.runType,
         title: node.title,
         scriptViewState: this.scriptViewState,
       });
@@ -202,12 +235,14 @@ export default {
         this.updateNodeCache(['log']);
       });
       this.execute.on('result', (ret) => {
+        if (!this.execute) return
         this.showPanelTab('result');
         const storeResult = {
           'headRows': ret.metadata,
           'bodyRows': ret.fileContent,
           'total': ret.totalLine,
           'type': ret.type,
+          'totalColumn': ret.totalColumn,
           'cache': {
             offsetX: 0,
             offsetY: 0,
@@ -393,72 +428,12 @@ export default {
 
     changeResultSet(data, cb) {
       const resultSet = isUndefined(data.currentSet) ? this.script.resultSet : data.currentSet;
-      const findResult = this.script.resultList[resultSet];
-      const resultPath = findResult && findResult.path;
-      const hasResult = Object.prototype.hasOwnProperty.call(this.script.resultList[resultSet], 'result');
-      if (!hasResult) {
-        const pageSize = 5000;
-        const url = '/filesystem/openFile';
-        api.fetch(url, {
-          path: resultPath,
-          pageSize,
-        }, 'get')
-          .then((ret) => {
-            let result =  {}
-            if (ret.display_prohibited) {
-              result = {
-                'headRows': [],
-                'bodyRows': [],
-                'total': ret.totalLine,
-                'type': ret.type,
-                'path': resultPath,
-                hugeData: true,
-                tipMsg: localStorage.getItem("locale") === "en" ? ret.en_msg : ret.zh_msg
-              };
-            } else if (ret.metadata && ret.metadata.length >= 500) {
-              result = {
-                'headRows': [],
-                'bodyRows': [],
-                'total': ret.totalLine,
-                'type': ret.type,
-                'path': resultPath,
-                hugeData: true
-              }
-            } else {
-              result = {
-                'headRows': ret.metadata,
-                'bodyRows': ret.fileContent,
-                // 如果totalLine是null，就显示为0
-                'total': ret.totalLine ? ret.totalLine : 0,
-                // 如果内容为null,就显示暂无数据
-                'type': ret.fileContent ? ret.type : 0,
-                'cache': {
-                  offsetX: 0,
-                  offsetY: 0,
-                },
-                'path': resultPath,
-                'current': 1,
-                'size': 20,
-              };
-            }
-            this.script.showPanel = 'result';
-            this.script.resultList[resultSet].result = result;
-            this.script.resultSet = resultSet;
-            this.script = {
-              ...this.script
-            };
-            this.updateNodeCache(['result', 'resultList', 'resultSet', 'showPanel']);
-            cb();
-          }).catch(() => {
-            cb();
-          });
-      } else {
-        this.script.showPanel = 'result';
-        this.script.resultSet = resultSet;
-        this.script = {
-          ...this.script
-        };
-        this.updateNodeCache(['result', 'resultList', 'resultSet', 'showPanel']);
+      this.script = {
+        ...this.script,
+        resultSet
+      };
+      this.updateNodeCache(['result', 'resultList', 'resultSet', 'showPanel']);
+      if(cb) {
         cb();
       }
     },
@@ -487,6 +462,7 @@ export default {
           if (cache) {
             this.script = Object.assign({}, new Script({
               nodeId,
+              runType: this.node.runType,
               title: this.node.title,
               scriptViewState: this.scriptViewState,
             }), cache);
@@ -495,7 +471,7 @@ export default {
               log: cache.log,
               logLine: cache.logLine,
             };
-            if (['Succeed', 'Failed', 'Cancelled', 'Timeout'].indexOf(this.script.status) === -1) {
+            if (EXECUTE_COMPLETE_TYPE.indexOf(this.script.status) === -1) {
               if (!cache.log.all) {
                 this.getLogs();
               }
@@ -615,20 +591,6 @@ export default {
           @include bg-color($light-base-color, $dark-base-color);
           width: calc(100% - 45px);
           overflow: hidden;
-          &.work-list-tab {
-            overflow-x: auto;
-            overflow-y: hidden;
-            &::-webkit-scrollbar {
-              width: 0;
-              height: 0;
-              background-color: transparent;
-            }
-            .list-group>span {
-              white-space: nowrap;
-              display: block;
-              height: 0;
-            }
-          }
           .workbench-tab-item {
             text-align: center;
             border-top: none;
@@ -658,15 +620,6 @@ export default {
             }
           }
         }
-        .workbench-tab-button {
-          flex: 0 0 120px;
-          text-align: center;
-          @include bg-color($light-base-color, $dark-base-color);
-          .ivu-icon {
-              font-size: $font-size-base;
-              cursor: pointer;
-          }
-        }
       }
       .workbench-container {
         height: calc(100% - 36px);
@@ -693,6 +646,12 @@ export default {
       &:hover {
         @include font-color($primary-color, $dark-primary-color);
       }
+    }
+    .column-pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding-right: 8px;
     }
   }
 </style>

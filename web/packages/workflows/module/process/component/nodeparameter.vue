@@ -22,6 +22,7 @@
           <Select
             v-model="currentNode[item.key]"
             :placeholder="item.desc"
+            clearable
             :multiple="item.uiType === 'MultiSelect'">
             <Option v-for="subItem in JSON.parse(item.value)" :value="subItem" :key="subItem">{{subItem}}</Option>
           </Select>
@@ -30,6 +31,7 @@
           <Select
             v-model="currentNode[item.key]"
             :placeholder="item.desc"
+            clearable
             multiple>
             <Option v-for="(subItem,index) in conditionBindList(item)" :value="subItem.key" :key="index">{{ subItem.name }}</Option>
           </Select>
@@ -41,7 +43,7 @@
     </div>
     <Form v-if="curNodeParamsList.length > 0 && currentNode.jobParams" label-position="top"
       ref="parameterForm"  class="node-parameter-bar" :model="currentNode" :rules="ruleValidate">
-      <FormItem label="是否引用参数模板">
+      <FormItem label="是否引用资源参数模板">
         <Select
           v-model="isRefTemplate" @on-change="handleRefTemplateChange">
           <Option value="1">是</Option>
@@ -49,22 +51,27 @@
         </Select>
       </FormItem>
       <template v-if="isRefTemplate === '1'">
-        <FormItem label="参数模板名称" prop="ecConfTemplateName">
-          <Input v-model="currentNode.ecConfTemplateName" placeholder="请选择参数模板名称" readonly @on-focus="openTemplateDrawer"></Input>
+        <FormItem label="资源参数模板名称" prop="ecConfTemplateName">
+          <Input v-model="currentNode.ecConfTemplateName" placeholder="请选择资源参数模板名称" readonly @on-focus="openTemplateDrawer"></Input>
         </FormItem>
       </template>
       <template>
         <template v-for="item in curNodeParamsList">
-          <template v-if="checkShow(item) && (item.position === 'runtime' || item.position === 'startup')">
-            <FormItem v-if="['Input', 'Text', 'Disable'].includes(item.uiType)" :rules="paramsValid(item)" :key="poinToLink(item.key)" :label="item.lableName" :prop="'jobParams.'+ poinToLink(item.key)">
-              <Input v-model="currentNode.jobParams[poinToLink(item.key)]" :type="filterFormType(item.uiType)" :rows="6"
-                :placeholder="item.desc" :disabled="item.uiType === 'Disable'"
-              />
+          <template v-if="checkShow(item) && ['runtime', 'startup', 'special'].includes(item.position)">
+            <FormItem v-if="['Input', 'Text', 'Disable'].includes(item.uiType)" style="position: relative;" :rules="paramsValid(item)" :key="poinToLink(item.key)" :label="item.lableName" :prop="'jobParams.'+ poinToLink(item.key)">
+              <template slot="label">
+                {{ item.lableName }}
+              </template>
+              <Poptip popper-class="node-item-popper" :disabled="!['check.object', 'job.desc'].includes(item.lableName)" word-wrap width="270" trigger="focus" :content="item.desc" placement="top-start">
+                <Input v-model="currentNode.jobParams[poinToLink(item.key)]" :type="filterFormType(item.uiType)" :rows="6"
+                :placeholder="item.desc" :disabled="item.uiType === 'Disable'"/>
+              </Poptip>
             </FormItem>
             <FormItem v-if="item.uiType === 'Select' || item.uiType === 'MultiSelect'" :rules="paramsValid(item)" :key="poinToLink(item.key)" :label="item.lableName" :prop="'jobParams.'+ poinToLink(item.key)">
               <Select
                 v-model="currentNode.jobParams[poinToLink(item.key)]"
                 :placeholder="item.desc"
+                clearable
                 :multiple="item.uiType === 'MultiSelect'">
                 <Option v-for="subItem in JSON.parse(item.value)" :value="subItem" :key="subItem">{{subItem}}</Option>
               </Select>
@@ -73,6 +80,7 @@
               <Select
                 v-model="currentNode.jobParams[poinToLink(item.key)]"
                 :placeholder="item.desc"
+                clearable
                 multiple>
                 <Option v-for="(subItem,index) in conditionBindList(item)" :value="subItem.key" :key="index">{{ subItem.name }}</Option>
               </Select>
@@ -87,11 +95,6 @@
         </template>
       </template>
     </Form>
-    <div class="save-button" v-if="isShowSaveButton">
-      <Button @click="save"
-        :disabled="isNodeMap">{{$t('message.workflow.process.nodeParameter.BC')}}
-      </Button>
-    </div>
     <templateSelectDrawer ref="templateSelectDrawer" v-show="isTemplateDrawerShow" @isShow="handleTemplateShow"
       :nodeInfo="nodeData" :templateList="templateList" @submit="handleTemplateSelect"
       :defaultTemplateId="currentNode.ecConfTemplateId"></templateSelectDrawer>
@@ -100,9 +103,11 @@
 <script>
 import resource from './resource.vue';
 import weTag from '@dataspherestudio/shared/components/tag/index.vue'
-import { isEmpty } from 'lodash';
+import api from '@dataspherestudio/shared/common/service/api'
+import { isEmpty, cloneDeep } from 'lodash';
 import templateSelectDrawer from './templateSelectDrawer.vue'
 import { useData } from './useData.js';
+
 const {
   getTemplateDatas,
 } = useData();
@@ -126,26 +131,21 @@ export default {
       type: Boolean,
       default: false,
     },
-    isShowSaveButton: {
-      type: Boolean,
-      default: true,
-    },
     nodes: {
       type: Array,
       default: () => [],
     },
-    isNodeMap: {
-      type: Boolean,
-      default: false
-    },
     consoleParams: {
       type: Array,
       default: () => []
-    }
+    },
+    tabs: {
+      type: Array,
+      default: () => [],
+    },
   },
   data() {
     return {
-      test: [],
       currentNode: {
       },
       resources: [],
@@ -156,7 +156,9 @@ export default {
         ecConfTemplateName: [
           { required: true, message: '请选择参数模板', trigger: 'change' }
         ],
-      }
+      },
+      valueSemicolonValidReg: /^(\s*(check\.object|source\.type)\.\w+?=[^;\s]+?[ \t]*?;)+$/, // 校验分号分割
+      valueWordwrapValidReg: /^(\s*(check\.object|source\.type)\.\w+?=[^;\s]+?[ \t]*?\n+)+$/, // 校验换行符分割
     };
   },
   watch: {
@@ -172,13 +174,14 @@ export default {
           }
         })
       }
+      this.resources = []
       // 在节点没有保存参数时，需要设置默认值的值,先判断保存的值应该存在哪里starup或者runtime或者是node下
       let jobParams = {};
       this.curNodeParamsList.map((item) => {
         // 多选框是数组值
         const defaultValue = ['MultiBinding'].includes(item.uiType) ? JSON.parse(item.defaultValue) : this.consoleParamsDefault(item.defaultValue, item.key, this.consoleParams);
-        if ((item.position === 'runtime' || item.position === 'startup') && this.currentNode.params) {
-          const value = this.currentNode.params.configuration[item.position][item.key] ? this.currentNode.params.configuration[item.position][item.key] : defaultValue;
+        if (['runtime', 'startup', 'special'].includes(item.position) && this.currentNode.params) {
+          let value = this.currentNode.params.configuration[item.position][item.key] ? this.currentNode.params.configuration[item.position][item.key] : defaultValue;
           jobParams[this.poinToLink(item.key)] = value;
         } else if (item.uiType === 'Upload') {
           if (this.currentNode.resources && this.currentNode.resources.length) {
@@ -193,7 +196,12 @@ export default {
           }
         }
       })
-      this.isRefTemplate = this.currentNode.ecConfTemplateId ? '1':'0'
+      // eslint-disable-next-line no-extra-boolean-cast
+      if(!!this.currentNode.ecConfTemplateId) {
+        this.isRefTemplate = '1'
+      } else {
+        this.isRefTemplate = '0'
+      }
       jobParams['ec-conf-templateId'] = this.currentNode.ecConfTemplateId
       this.$set(this.currentNode, 'jobParams', jobParams);
     }
@@ -276,9 +284,6 @@ export default {
             });
           }
         })
-        if (rst[1].fullTree[0] && key === 'wds.linkis.rm.yarnqueue') {
-          value = rst[1].fullTree[0].settings[0].configValue || rst[1].fullTree[0].settings[0].defaultValue;
-        }
         rst[2].fullTree.forEach(item =>{
           if (item && item.settings.length > 0) {
             item.settings.forEach((it) => {
@@ -298,6 +303,25 @@ export default {
     //降点装换成短横杠
     poinToLink(key) {
       return key.replace(/\./g, '-');
+    },
+    getJobDescDivide(value) {
+      let valid = false;
+      let divide = '';
+      if (
+        this.valueSemicolonValidReg.test(value) ||
+        this.valueSemicolonValidReg.test(value + ';')
+      ) {
+        valid = true;
+        divide = ';';
+      } else if (
+        this.valueWordwrapValidReg.test(value) ||
+        this.valueWordwrapValidReg.test(value + '\n')
+      ) {
+        valid = true;
+        divide = '\n';
+      }
+
+      return { valid, divide };
     },
     // 各参数的校验规则
     paramsValid(param) {
@@ -328,19 +352,51 @@ export default {
       };
       // eslint-disable-next-line no-unused-vars
       const validateJobDesc = (rule, value, callback) => {
+        let errMsg = '';
+        const trimVal = (value || '').trim();
+        if (trimVal) {
+          const matches = trimVal.split(/[\n;]+\s*/);
+          matches.some((item) => {
+            const trimItem = item.trim(); // 去除首尾的空格
+            if (!/^(check\.object|source\.type)\.[^\=]+?.*?$/.test(trimItem)) {
+              errMsg = '每行请以check.object.xx或source.type.xx开头，xx为编号，从01开始';
+              return true;
+            } else if (/\s+/.test(trimItem)) {
+              const temp = trimItem.split(/[\s\=]+/);
+              errMsg = `${temp[0]}行内包含空格字符`;
+              return true;
+            }
+          })
+          if (!errMsg && !this.getJobDescDivide(trimVal).valid) {
+            errMsg = '请正确填写多源配置';
+          }
+        }
+        if (errMsg) {
+          callback(new Error(errMsg));
+        } else {
+          callback()
+        }
+      }
+
+      // eslint-disable-next-line no-unused-vars
+      const validateJobDescDuplication = (rule, value, callback) => {
         let tmp = {}
-        let hasDuplicate = false
+        let duplicationKey = false;
+        const trimVal = (value || '').trim();
         if (value) {
-          value.split('\n').filter(it => it).map(it => it.trim().split('=')[0]).forEach(it => {
-            if (tmp[it]) {
-              hasDuplicate = true
+          const matches = trimVal.split(/[\n;]+\s*/);
+          matches.some(it => {
+            const key = it.trim().split('=')[0]
+            if (tmp[key]) {
+              duplicationKey = key;
+              return true;
             } else {
-              tmp[it] = 1
+              tmp[key] = 1;
             }
           })
         }
-        if (hasDuplicate) {
-          callback(new Error(rule.message));
+        if (duplicationKey) {
+          callback(new Error(`${duplicationKey}重复,请检查`));
         } else {
           callback();
         }
@@ -354,6 +410,23 @@ export default {
           callback();
         } else {
           callback(new Error())
+        }
+      };
+
+      const validateCheckObject = (rule, value, callback) => {
+        let errMsg = '';
+        const trimVal = (value || '').trim();
+        if (trimVal) {
+          if (trimVal.includes('check.object')) {
+            errMsg = '输入参数不能包含check.object字符串';
+          } else if (trimVal.match(/\s+/g)) {
+            errMsg = '输入参数中间不能包含空格字符';
+          }
+        }
+        if (errMsg) {
+          callback(new Error(errMsg));
+        } else {
+          callback()
         }
       };
       let temRule = [];
@@ -378,8 +451,8 @@ export default {
           } else if (item.validateType === 'Function') {
             temRule.push({
               // 只有和上面定义的函数名相同才让执行
-              validator: ['validatorTitle', 'validateJson', 'validateJobDesc'].includes(item.validateRange) ? eval(item.validateRange) : () => {},
-              message: item.message,
+              validator: ['validatorTitle', 'validateJson', 'validateJobDesc', 'validateJobDescDuplication', 'validateCheckObject'].includes(item.validateRange) ? eval(item.validateRange) : (rule, value, callback) => { callback() },
+              message: ['validateJobDesc', 'validateCheckObject', 'validateJobDescDuplication'].includes(item.validateRange) ? undefined : item.message,
               trigger: item.trigger || 'blur'
             })
           } else if (item.validateType === 'NumInterval') {
@@ -449,8 +522,15 @@ export default {
         // 没有值降默认值回填
         if (this.currentNode.jobParams && this.currentNode.params.configuration) {
           this.curNodeParamsList.map((item) => {
-            if ((item.position === 'runtime' || item.position === 'startup') && this.currentNode.params) {
-              const value = this.currentNode.jobParams[this.poinToLink(item.key)] ? this.currentNode.jobParams[this.poinToLink(item.key)] : item.defaultValue;
+            if (['runtime', 'startup', 'special'].includes(item.position) && this.currentNode.params) {
+              let value = this.currentNode.jobParams[this.poinToLink(item.key)] ? this.currentNode.jobParams[this.poinToLink(item.key)] : item.defaultValue;
+              if (item.key && ['job.desc', 'check.object'].includes(item.key)) {
+                value = (value || '').trim();
+                if (item.key === 'job.desc') {
+                  const { divide } = this.getJobDescDivide(value);
+                  value = value.split(/[\n;]+\s*/).map(item => item.trim()).join(divide);
+                }  
+              }
               this.currentNode.params.configuration[item.position][item.key] = value;
             }
           })
@@ -467,26 +547,83 @@ export default {
         }
       });
     },
-    validFrom(cb) {
+    getCurrentNode() {
+      const param = cloneDeep(this.currentNode);
+      if (param.jobParams && param.params.configuration) {
+        this.curNodeParamsList.map((item) => {
+          if (['runtime', 'startup', 'special'].includes(item.position) && param.params) {
+            let value = param.jobParams[this.poinToLink(item.key)] ? param.jobParams[this.poinToLink(item.key)] : item.defaultValue;
+            if (item.key && ['job.desc', 'check.object'].includes(item.key)) {
+                value = (value || '').trim();
+                if (item.key === 'job.desc') {
+                  const { divide } = this.getJobDescDivide(value);
+                  param.params.configuration[item.position][item.key] = value.split(/[\n;]+\s*/).map(item => item.trim()).join(divide);
+                } else {
+                  param.params.configuration[item.position][item.key] = value;
+                } 
+              }
+          }
+        })
+      }
+      return param;
+    },
+    async validFrom(cb) {
+      const hasView = await this.checkIsView(this.currentNode.jobParams['check-object'], this.currentNode.jobParams['job-desc'])
+      if (hasView) {
+        return
+      }
       this.$refs.baseInfoForm.validate((baseInfoValid) => {
         if (baseInfoValid) {
           if (this.$refs.parameterForm) {
             this.$refs.parameterForm.validate((valid) => {
               if (valid) {
                 cb()
-                this.$emit('saveNode', this.currentNode);
+                const tempNode = this.getCurrentNode();
+                this.$emit('saveNode', tempNode);
               } else {
                 this.$Message.warning(this.$t('message.workflow.process.nodeParameter.BCSB'));
               }
             });
           } else {
             cb()
-            this.$emit('saveNode', this.currentNode);
+            const tempNode = this.getCurrentNode();
+            this.$emit('saveNode', tempNode);
           }
         } else {
           this.$Message.warning(this.$t('message.workflow.process.nodeParameter.JDBDXTXBHF'));
         }
       });
+    },
+    async checkIsView(checkObject, jobDesc) {
+      if (!checkObject && !jobDesc) {
+        return false;
+      }
+      let hasView = []
+      this.$emit('saveButtonStatus', true);
+      try {
+        const res = await api.fetch('/dss/datapipe/datasource/validateDataCheckerHasView', {
+          checkObject,
+          jobDesc
+        }, 'post')
+        hasView = res && res.result && res.result.filter(it => it.view)
+        if (hasView.length) {
+          let strs = jobDesc.split('\n')
+          const tbs = [checkObject, ...strs].filter((str) => {
+            return hasView.some(it => new RegExp(`${it.db}\\.${it.table}\\b`).test(str))
+          }).join('<br/>')
+          const msg = `check.objeck或job.desc存在视图表:<br/><p>${tbs}</p><br/>请先删除视图表！`
+          this.$Modal.warning({
+            title: '提示',
+            content: `<div style="word-break: break-all;max-height: 470px;overflow-y:auto">${msg}</div>`,
+            closable: true,
+            width: 650
+          });
+        }
+      } catch (error) {
+        //
+      }
+      this.$emit('saveButtonStatus', false);
+      return hasView.length > 0
     },
     resourcesAction() {
       let resources = [];
@@ -515,7 +652,8 @@ export default {
         };
       });
       this.resourcesAction();
-      this.$emit('saveNode', this.currentNode);
+      const tempNode = this.getCurrentNode();
+      this.$emit('saveNode', tempNode);
     },
     filterFormType(val) {
       switch (val) {
@@ -533,9 +671,9 @@ export default {
      * @param {*} condition
      * @returns
      */
-    checkShow(item) {
-      const data = this.currentNode
-      if (item.condition) {
+    checkShow(item, nodeData) {
+      let data = nodeData || this.currentNode
+      if (typeof item.condition === 'string' && item.condition) {
         let condition = item.condition
         // condition 示例：
         // ${params.configuration.runtime['only.receive.today']}
@@ -544,10 +682,16 @@ export default {
         // 前端编辑参数存在jobParams，需要转换，以上示例转换如下
         // ${jobParams['only-receive-today']}
         // !${jobParams['ec-conf-templateId']}
-        if (condition.indexOf('params.configuration') > 0) {
-          condition = condition.replaceAll('params.configuration.runtime','jobParams').replaceAll('params.configuration.startup','jobParams')
-          condition = this.poinToLink(condition)
+        if (nodeData) {
+          // module.vue click 触发，条件检查使用params.configuration.runtime这种路径
+        } else {
+          // 参数面板点击触发，条件检查使用jobParams这种路径
+          if (condition.indexOf('params.configuration') > 0) {
+            condition = condition.replace(/params\.configuration\.runtime/g,'jobParams').replace(/params\.configuration\.startup/g,'jobParams')
+            condition = this.poinToLink(condition)
+          }
         }
+
         let Fn = Function
         let fn = condition.replace(/\${([^}]+)}/g, function (a, b) {
           return `__node__data.${b}`
@@ -558,6 +702,9 @@ export default {
           console.log(e)
           //
         }
+      }
+      if (typeof item.condition === 'boolean') {
+        return item.condition
       }
       return true
     }
@@ -570,5 +717,14 @@ export default {
   text-align: left;
   line-height: 14px;
   padding-bottom: 6px;
+}
+.node-parameter-bar .ivu-form-item {
+  margin-bottom: 30px;
+}
+.node-parameter-bar .ivu-poptip {
+  width: 100%;
+}
+.node-parameter-bar .ivu-poptip .ivu-poptip-rel {
+  width: 100%;
 }
 </style>

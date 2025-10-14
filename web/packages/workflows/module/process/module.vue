@@ -19,7 +19,7 @@
       @on-ctx-menu="onContextMenu"
       @search-node-path="showSearchPath"
       @link-delete="linkDelete"
-      @changeViewMode="handleClickToolbar"
+      @changeViewMode="handleSwitchViewMode"
       @link-add="linkAdd">
       <DesignToolbar
         viewMode="vueprocess"
@@ -27,10 +27,15 @@
         :workflowIsExecutor="workflowIsExecutor"
         :needReRun="needReRun"
         :isFlowPubulish="isFlowPubulish"
+        :isFlowSubmit="isFlowSubmit"
         :isLatest="isLatest"
         :publish="publish"
         :product="product"
         :flowId="flowId"
+        :flowStatus="flowStatus"
+        :associateGit="associateGit"
+        :isFlowSubmited="isFlowSubmited"
+        :isMainFlow="isMainFlow"
         :type="type"
         @click-itembar="handleClickToolbar"
       />
@@ -43,10 +48,15 @@
           :workflowIsExecutor="workflowIsExecutor"
           :needReRun="needReRun"
           :isFlowPubulish="isFlowPubulish"
+          :isFlowSubmit="isFlowSubmit"
           :isLatest="isLatest"
           :publish="publish"
           :product="product"
           :flowId="flowId"
+          :flowStatus="flowStatus"
+          :associateGit="associateGit"
+          :isFlowSubmited="isFlowSubmited"
+          :isMainFlow="isMainFlow"
           :type="type"
           @click-itembar="handleClickToolbar"
         />
@@ -71,7 +81,7 @@
         @on-ctx-menu="onContextMenu"
         @link-add="linkAdd"
         @search-node-path="showSearchPath"
-        @changeViewMode="handleClickToolbar"
+        @changeViewMode="handleSwitchViewMode"
       />
       <template v-if="viewMode === 'table'">
         <iframe class="iframeClass" id="iframe" ref="ifr" style="padding-top:36px" :src="tableViewUrl" frameborder="0" width="100%" height="100%" />
@@ -107,7 +117,7 @@
       <div class="process-module-param-modal-header">
         <h5>{{$t('message.workflow.process.baseInfo')}}</h5>
         <div class="save-button">
-          <Button  v-if="!myReadonly" size="small" @click.stop="saveNodeParameter"
+          <Button  v-if="!myReadonly" size="small" @click.stop="saveNodeParameter" :loading="saveLoading"
             :disabled="false">{{$t('message.workflow.process.nodeParameter.BC')}}
           </Button>
         </div>
@@ -118,11 +128,12 @@
           ref="nodeParameter"
           :node-data="clickCurrentNode"
           :name="name"
-          :isShowSaveButton="false"
           :readonly="myReadonly"
           :nodes="json && json.nodes"
           :consoleParams="consoleParams"
+          :tabs="tabs"
           @saveNode="saveNode"
+          @saveButtonStatus="saveButtonStatus"
         ></nodeParameter>
       </div>
     </div>
@@ -173,6 +184,7 @@
     <associate-script
       ref="associateScript"
       @click="associateScript"/>
+    <generate-datachecker ref="datachecker" @confirm="addDatachecker"/>
     <!-- 创建节点弹窗 -->
     <Modal
       :title="addNodeTitle"
@@ -221,12 +233,14 @@
       </div>
     </Modal>
     <!-- 发布弹窗 -->
-    <Modal
-      :title="$t('message.workflow.publishingWorkflow')"
-      v-model="pubulishShow">
+    <FlowDiffPublish
+      :visible.sync="pubulishShow"
+      :projectName="$route.query.projectName" 
+      :orchestratorId="orchestratorId"
+      :associateGit="associateGit"
+    >
       <Form
-        :label-width="100"
-        label-position="left">
+        label-position="top">
         <FormItem
           :label="$t('message.workflow.desc')">
           <Input
@@ -235,18 +249,44 @@
             v-model="pubulishFlowComment"
             :placeholder="$root.$t('message.workflow.publish.inputDesc')"></Input>
         </FormItem>
+        <FormItem
+          v-if="associateGit"
+          label="提交记录">
+          <Table border :columns="publishFlowColumns" :data="publishFlowData" :height="300"></Table>
+        </FormItem>
       </Form>
-      <div slot="footer">
-        <Button
-          v-if="$APP_CONF && $APP_CONF.showVersionDiff !== false"
-          @click="showDiff">{{$t('message.workflow.showVersionDiff')}}</Button>
+      <template slot="footer">
         <Button
           type="primary"
           :loading="saveingComment"
           :disabled="saveingComment"
-          @click="workflowPublish">{{$t('message.workflow.ok')}}</Button>
-      </div>
-    </Modal>
+          @click="handleWorkflowPublish">{{$t('message.workflow.ok')}}</Button>
+        <Button
+          @click="showDiff">{{$t('message.workflow.showVersionDiff')}}</Button>
+        <Button
+          @click="pubulishShow = false">{{$t('message.workflow.cancel')}}</Button>
+      </template>
+    </FlowDiffPublish>
+    <!-- 提交弹窗 -->
+    <FlowDiffSubmit
+      :visible.sync="showSubmit"
+      :projectName="$route.query.projectName" 
+      :orchestratorId="orchestratorId" 
+    >
+      <Input
+        :rows="2"
+        type="textarea"
+        v-model="submitDesc"
+        :placeholder="$root.$t('message.workflow.publish.submitDesc')"></Input>
+      <template slot="footer">
+        <Button
+          type="primary"
+          :disabled="!submitDesc"
+          @click="submitGit">{{$t('message.workflow.ok')}}</Button>
+        <Button
+          @click="showSubmit = false">{{$t('message.workflow.cancel')}}</Button>
+      </template>
+    </FlowDiffSubmit>
     <!-- 导出弹窗 -->
     <Modal
       v-model="workflowExportShow"
@@ -341,6 +381,7 @@ import console from './component/console.vue';
 import api from '@dataspherestudio/shared/common/service/api';
 import clickoutside from '@dataspherestudio/shared/common/helper/clickoutside';
 import associateScript from './component/associateScript.vue';
+import generateDatachecker from './component/generateDatachecker.vue';
 import { throttle, debounce  } from 'lodash';
 import { NODETYPE, ext } from '@/workflows/service/nodeType';
 import storage from '@dataspherestudio/shared/common/helper/storage';
@@ -352,9 +393,16 @@ import module from './index';
 import nodeIcons from './nodeicon';
 import BottomTab from './component/bottomTab.vue';
 import NodePath from './component/nodePath.vue';
+import FlowDiffSubmit from './component/flowDiffSubmit.vue';
+import FlowDiffPublish from './component/flowDiffPublish.vue';
 import cyeditor from './cyeditor/index.vue'
 import DesignToolbar from './component/designtoolbar.vue';
 import { hasCycle } from './utils';
+import { useData } from './component/useData.js';
+
+const {
+  getTemplateDatas,
+} = useData();
 
 export default {
   components: {
@@ -363,11 +411,14 @@ export default {
     resource,
     nodeParameter,
     associateScript,
+    generateDatachecker,
     console,
     BottomTab,
     NodePath,
     cyeditor,
-    DesignToolbar
+    DesignToolbar,
+    FlowDiffSubmit,
+    FlowDiffPublish
   },
   mixins: [mixin],
   directives: {
@@ -428,11 +479,26 @@ export default {
     newTipVisible: {
       type: Boolean,
       default: false
+    },
+    flowStatus: {
+      type: String,
+      default: ''
+    },
+    associateGit: {
+      type: Boolean,
+      default: false
+    },
+    isMainFlow: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
-    const username = this.getUserName()
     return {
+      // 提交
+      showSubmit: false,
+      submitDesc: '',
+      isFlowSubmit: false,
       // 发布前保存
       saveingComment: false,
       // 是否为父工作流
@@ -445,8 +511,9 @@ export default {
       json: null,
       // 工作流级别的参数
       props: [
-        {'user.to.proxy': username}
+        {'user.to.proxy': ''}
       ],
+      flowProxyUser: '',
       // 调度设置参数
       scheduleParams: {},
       // 工作流级别的资源
@@ -496,6 +563,29 @@ export default {
       contextID: '',
       pubulishFlowComment: '',
       pubulishShow: false,
+      publishFlowColumns:  [
+          {
+              title: '提交ID',
+              key: 'commitId',
+              minWidth: 220
+          },
+          {
+              title: '提交时间',
+              key: 'commitTime',
+              minWidth: 160
+          },
+          {
+              title: '提交人',
+              key: 'commitUser',
+              minWidth: 120
+          },
+          {
+              title: '注释',
+              key: 'comment',
+              minWidth: 260
+          }
+      ],
+      publishFlowData: [],
       flowVersion: '',
       isFlowPubulish: false,
       workflowExportShow: false,
@@ -508,6 +598,7 @@ export default {
       showNodePathPanel: false,
       iframeloading: false,
       isfullScreen: false,
+      saveLoading: false, // 节点参数面板保存按钮
       viewMode: 'vueprocess' //  vueprocess, cyeditor or table
     };
   },
@@ -562,7 +653,7 @@ export default {
           }
           if (!this.workflowIsExecutor&& !this.myReadonly) {
             if (type === 'node') {
-              if ([NODETYPE.SPARKSQL, NODETYPE.HQL, NODETYPE.SPARKPY, NODETYPE.SCALA, NODETYPE.PYTHON].includes(node.type)) {
+              if ([NODETYPE.SPARKSQL, NODETYPE.HQL, NODETYPE.SPARKPY, NODETYPE.SCALA, NODETYPE.NEBULA].includes(node.type)) {
                 arr.push({
                   text: this.$t('message.workflow.process.associate'),
                   value: 'associate',
@@ -605,6 +696,13 @@ export default {
                 text: '批量关联节点',
                 icon: 'addLink'
               })
+              if ([NODETYPE.SPARKSQL, NODETYPE.HQL].includes(node.type)) {
+                arr.push({
+                  value: 'addDatachecker',
+                  text: '生成Datachecker',
+                  icon: 'icon-datacheck'
+                })
+              }
             }
           }
           if (type === 'view'&& !this.myReadonly) {
@@ -625,6 +723,9 @@ export default {
     },
     tableViewUrl() {
       return `/next-web/#/workspace/workflow?workspaceId=${this.$route.query.workspaceId}&projectId=${this.$route.query.projectID}&flowId=${this.flowId}&labels=${this.getCurrentDsslabels()}`
+    },
+    isFlowSubmited() {
+      return (this.associateGit && ['push', 'publish'].includes(this.flowStatus)) || !this.associateGit;
     }
   },
   created() {
@@ -655,10 +756,12 @@ export default {
     this.shapeWidth = this.$refs.process && this.$refs.process.state.shapeOptions.viewWidth; // 自适应控制台宽度
     this.getConsoleParams();
     document.addEventListener('keyup', this.onKeyUp)
+    eventbus.on('workflow.opennode.by.name', this.openNodeByName);
     eventbus.on('workflow.fold.left.tree', this.foldHandler);
     eventbus.on('workflow.copying', this.onCopying);
     window.addEventListener('message', this.msgEvent, false);
     window.addEventListener('resize', this.resizeConsole, false);
+    this.checkSubmitStatus('init');
   },
   beforeDestroy() {
     if (this.timer) {
@@ -680,6 +783,22 @@ export default {
     window.removeEventListener('resize', this.resizeConsole, false);
   },
   methods: {
+    // 获取当前节点对应的模板信息
+    async getTemplateDataByProject(jobType) {
+      const params = {
+        projectId: this.$route.query.projectID,
+        orchestratorId: this.$route.query.flowId,
+        jobType,
+      }
+      const res = await getTemplateDatas(params);
+      let templateList = [];
+      res.forEach(e=> {
+        e.child.forEach(d => {
+          templateList.push(Object.assign(d))
+        })
+      });
+      return templateList;
+    },
     resizeConsole: debounce(function() {
       this.consoleHeight = this.$el ? this.$el.clientHeight / 2 : 250
     }, 300),
@@ -723,6 +842,9 @@ export default {
     // 保存node参数修改
     saveNodeParameter() {
       this.$refs.nodeParameter.save();
+    },
+    saveButtonStatus(loading) {
+      this.saveLoading = loading
     },
     // 右键判断是否支持复制
     nodeCopy(node) {
@@ -843,30 +965,146 @@ export default {
         this.autoSave(this.$t('message.workflow.Save'), false);
       }
     },
+    urlContainsParams(paramsToCheck) {
+      // 获取当前URL
+      let url = new URL(window.location.href);
+      // window.console.log('Current URL:', url.toString());
+
+      // 检查查询字符串部分
+      let searchParams = new URLSearchParams(url.search);
+
+      // 将要检查的参数转换为数组
+      if (typeof paramsToCheck === 'string') {
+          paramsToCheck = [paramsToCheck];
+      }
+
+      // 用于存储哪些参数被找到
+      let foundParams = [];
+
+      // 遍历需要检查的参数列表
+      paramsToCheck.forEach(param => {
+          if (searchParams.has(param)) {
+              foundParams.push(param);
+              // window.console.log(`Parameter "${param}" found in query string.`);
+          }
+      });
+
+      // 获取并解析哈希部分
+      let hash = window.location.hash.slice(1); // 去掉开头的 #
+      if (hash) {
+          // 使用占位符来创建一个有效的URL以解析哈希部分
+          let hashUrl = new URL(`http://placeholder.com/?${hash}`);
+          let hashSearchParams = new URLSearchParams(hashUrl.search);
+
+          // 再次遍历需要检查的参数列表，这次是针对哈希部分
+          paramsToCheck.forEach(param => {
+              if (!foundParams.includes(param) && hashSearchParams.has(param)) {
+                  foundParams.push(param);
+                  // window.console.log(`Parameter "${param}" found in hash.`);
+              }
+          });
+      }
+
+      // 如果所有要检查的参数都被找到了
+      if (foundParams.length === paramsToCheck.length) {
+          // window.console.log('All specified parameters are present.');
+          return true;
+      } else {
+          window.console.log('Some or none of the specified parameters are present.');
+          return false;
+      }
+    },
     getBaseInfo() {
       this.loading = true;
       this.clickCurrentNode = {};
       this.nodebaseinfoShow = false;
       this.getOriginJson();
+      // 自动打开子工作流
+      let containsParams = this.urlContainsParams(['appId']);
+      if(containsParams && this.$route.query.appId && this.flowId !== Number(this.$route.query.appId)) {
+        api.fetch(`/dss/workflow/get`, {
+          flowId: Number(this.$route.query.appId),
+          labels: this.getCurrentDsslabels()
+        },'get').then((res) => {
+          const arg = {
+          appId: Number(this.$route.query.appId),     // (跳转节点所属)直接工作流id
+          flowId: Number(this.$route.query.flowId),  // 顶层工作流id
+          flowName: res.flow.name || '', // 直接工作流名称
+          flowNodeId: res.flow.resourceId || '', // 直接工作流节点id
+          jumpNodeName: this.$route.query.jumpNodeName, // 跳转节点名称
+        }
+        this.$emit('open-subFlow', arg);
+        }).catch((err) => {
+          window.console.error(err);
+        })
+      }
     },
     initAction(json) {
       // 创建工作流之后就有值
       this.contextID = json.contextID;
       // 保存节点才有的值
       this.schedulerAppConnName = json.schedulerAppConnName
-      if (json && json.nodes) {
-        this.originalData = this.json = JSON.parse(JSON.stringify(json));
-        this.resources = json.resources;
-        this.props = json.props;
-        this.scheduleParams = json.scheduleParams || {};
+      if (json) {
+        if (json.nodes) {
+          this.originalData = this.json = JSON.parse(JSON.stringify(json));
+          this.resources = json.resources;
+        }
+        if (json.props) {
+          this.props = json.props;
+          this.flowProxyUser = (json.props[0] || {})['user.to.proxy'];
+          this.scheduleParams = json.scheduleParams || {};
+        }
       }
       if (json.config && json.config.type != 'table') {
         this.viewMode = json.config.type
       }
+      this.pollUpdateLock();
       this.$nextTick(() => {
         this.loading = false;
-      });
-      this.pollUpdateLock();
+        let containsParams = this.urlContainsParams(['appId', 'nodeName']);
+        if (containsParams &&  this.$route.query.origin === 'gitSearch') {
+          this.openSubNodeByName()
+        } else {
+          this.openNodeByName()
+        }
+      })
+    },
+    openSubNodeByName() {
+      if (!this.originalData) return
+      let nodeName = this.$route.query.nodeName;
+      const node = this.originalData.nodes.find(node => {
+        return node.title === nodeName
+      })
+      if (node) {
+        this.dblclick(node)
+      }
+      setTimeout(() => {
+        storage.remove('openflownode');
+      }, 2500)
+    },
+    openNodeByName(params) {
+      if (!this.originalData) return
+      const openflownode = storage.get('openflownode');
+      let nodeName;
+      let flowId;
+      if (params) {
+        flowId = params.flowId
+        nodeName = params.nodeName
+      } else if (openflownode && !params) {
+        // 查找工作流内容新窗口打开节点的情况
+        params = openflownode.split('_flowidname_')
+        flowId = params[0] 
+        nodeName = params[1] 
+      }
+      const node = this.originalData.nodes.find(node => {
+        return node.title === nodeName
+      })
+      if (flowId == this.$route.query.flowId && node) {
+        this.dblclick(node)
+      }
+      setTimeout(() => {
+        storage.remove('openflownode');
+      }, 2500)
     },
     getOriginJson() {
       return api.fetch(`/dss/workflow/get`, {
@@ -878,8 +1116,13 @@ export default {
         if (flowEditLock && !this.myReadonly) {
           this.setFlowEditLock(flowEditLock);
         }
-        this.initAction(json);
-      }).catch(() => {
+        if (json) {
+          this.initAction(json);
+        } else {
+          this.loading = false;
+        }
+      }).catch((err) => {
+        window.console.error(err);
         this.loading = false;
         this.locked = true;
         if (this.updateLockTimer) {
@@ -899,12 +1142,28 @@ export default {
         json = JSON.parse(json);
         if (json.nodes && Array.isArray(json.nodes)) {
           json.nodes = json.nodes.map((node) => {
+            node.disabled = false;
+            if (node.params && node.params.configuration && node.params.configuration.special) {
+              node.disabled = node.params.configuration.special['auto.disabled'] === 'true';
+            }
             node.type = node.jobType;
             delete node.jobType;
             return node;
           });
         }
         this.orcVersion = json.orcVersion
+        // 代理用户有默认值做默认赋值
+        if(flow.defaultProxyUser) {
+          if(!json.scheduleParams) {
+            json.scheduleParams = {}
+            json.scheduleParams.proxyuser = flow.defaultProxyUser
+          }
+          if(!json.props) {
+            json.props= [{
+              'user.to.proxy': flow.defaultProxyUser,
+            }]
+          }
+        }
       }
       return json;
     },
@@ -955,12 +1214,16 @@ export default {
       clearTimeout(this.timerClick);
       this.timerClick = setTimeout(() => {
         if (this.workflowIsExecutor) return;
-        this.initNode(arg);
         this.nodebaseinfoShow = true;
+        this.initNode(arg);
         this.$emit('node-click', arg);
       }, 200);
     },
     dblclick(...arg) {
+      if (this.lastDblClickTime && Date.now() - this.lastDblClickTime < 600) {
+        return; // 防止双击事件触发多次
+      }
+      this.lastDblClickTime = Date.now();
       arg[0] = this.bindNodeBasicInfo(arg[0]);
       arg[0].contextID = this.contextID;
       // 由后台控制是否支持跳转
@@ -974,6 +1237,23 @@ export default {
       } else {
         // 为node信息添加modelType字段方便脚本格式判断
         arg[0].modelType = ext[arg[0].type];
+        // dpms  /product/100199/story/detail/365928 配置了模板则传递参数时根据配置过滤
+        if (arg[0].params && arg[0].params.configuration && arg[0].params.configuration.startup["ec.conf.templateId"]) {
+          arg[0].nodeUiVOS.forEach((item) => {
+            let show = this.$refs.nodeParameter.checkShow(item, arg[0]);
+            if (show === false) {
+              if (typeof item.condition === 'string' && item.condition && item.condition.indexOf('configuration.startup') > -1) {
+                delete arg[0].params.configuration.startup[item.key];
+              }
+              if (typeof item.condition === 'string' && item.condition && item.condition.indexOf('configuration.runtime') > -1) {
+                delete arg[0].params.configuration.runtime[item.key];
+              }
+            }
+          })
+        }
+        if (arg[0].params && arg[0].params.configuration && arg[0].params.configuration.startup) {
+          delete arg[0].params.configuration.startup['wds.linkis.rm.yarnqueue']
+        }
         this.$emit('node-dblclick', arg);
       }
     },
@@ -989,6 +1269,11 @@ export default {
       });
     },
     async saveNodeBaseInfo(arg) {
+      if (this.lastSaveTime && new Date().getTime() - this.lastSaveTime < 2000) {
+        return
+      } else {
+        this.lastSaveTime = new Date().getTime();
+      }
       this.$emit('saveBaseInfo', arg);
       // 如果是可编辑脚本得改变打开的脚本得名称
       this.dispatch('Workbench:updateFlowsNodeName', arg);
@@ -1060,6 +1345,10 @@ export default {
           item.businessTag = node.businessTag;
           item.modifyUser = this.getUserName();
           item.modifyTime = Date.now();
+          item.disabled = false;
+          if (item.params && node.params.configuration && node.params.configuration.special) {
+            item.disabled = node.params.configuration.special['auto.disabled'] === 'true';
+          }
         }
         item.selected = item.key === node.key
         return item;
@@ -1240,11 +1529,18 @@ export default {
             desc: this.$t('message.workflow.process.autoSaveWorkflow'),
           });
         }
-        this.jsonChange = false;
+        this.jsonChange = false; 
+        if(this.props && this.props.length > 0) {
+          this.flowProxyUser = this.props[0]['user.to.proxy'];
+        }
         // 保存成功后去更新tab的工作流数据
         this.$emit('updateWorkflowList');
+        if(!this.isFlowSubmit && !this.isFlowPubulish) {
+          this.$emit('updateFlowStatus');
+        }
         return res;
-      }).catch(() => {
+      }).catch((e) => {
+        window.console.error('saveRequest',e)
         this.loading = false;
       });
     },
@@ -1375,8 +1671,20 @@ export default {
       }
       return true;
     },
-    onPropsChange(value) {
-      this.props = value;
+    onPropsChange(value, proxyUser, proxyUserChange) {
+      if (proxyUserChange) {
+        api.fetch('/dss/framework/workspace/isDismissed', {usernames: [proxyUser]}, 'post').then(rst => {
+          if (rst && (rst.isDismissed || []).some(item => Object.values(item)[0])) {
+            this.$Message.warning('代理用户已离职或不存在的用户');
+          } else {
+            this.jsonChange = true;
+            this.props = value;
+          }
+        })
+      } else {
+        this.jsonChange = true;
+        this.props = value;
+      }
     },
     onScheduleChange(value) {
       this.scheduleParams = value;
@@ -1408,8 +1716,13 @@ export default {
         };
       });
       this.jsonChange = true;
+      this.autoSave('更新资源文件', false)
     },
     async nodeDelete(node) {
+      // 正在执行中的节点不能被删除
+      if (node && node.runState && node.runState.status === 1) {
+        return;
+      }
       node = this.bindNodeBasicInfo(node);
       if (node.type === NODETYPE.FLOW && node.jobContent && node.jobContent.embeddedFlowId) {
         const params = {
@@ -1492,6 +1805,20 @@ export default {
     },
     // 单击节点出来的右边的弹框的保存事件
     saveNode(node) { // 保存节点参数配置
+      const nodeItem = this.json.nodes.find(item => {
+        return item.id === node.id
+      })
+      if (nodeItem && nodeItem.params && nodeItem.params.configuration && nodeItem.params.configuration.startup && node.params && node.params.configuration && node.params.configuration.startup) {
+        let hasChange = false;
+        for (let key in nodeItem.params.configuration.startup) {
+          if (key !== 'wds.linkis.rm.yarnqueue' && node.params.configuration.startup[key] !== nodeItem.params.configuration.startup[key]) {
+            hasChange = true;
+          }
+        }
+        if (hasChange) {
+          this.$Modal.confirm({ title: '提示', content: '请注意引擎参数有修改，若节点已打开，请关闭后重新打开，同时Kill引擎方才生效！' });
+        }
+      }
       if (this.myReadonly) return this.$Message.warning(this.$t('message.workflow.process.readonly'));
       this.saveNodeBaseInfo(node);
     },
@@ -1524,6 +1851,9 @@ export default {
         case 'relySelectDown':
           this.relySelect(data, 'down');
           break;
+        case 'addDatachecker':
+          this.addDatachecker(data);
+          break;
         case 'delete':
           if (this.viewMode === 'cyeditor') {
             if (type ==='node') {
@@ -1544,6 +1874,57 @@ export default {
       const ids = [ id, ...upstreamIds, ...downstreamIds ];
       const results = this.json.nodes.filter(item => !ids.includes(item.id || item.key));
       return results;
+    },
+    addDatachecker(node, data){
+      if (data && data.length) {
+        // 第一行库表放到check.object，其余行放到job.desc
+        let checkObject = `${data[0].db}.${data[0].table}`;
+        if(data[0].partition) {
+          checkObject += `{${data[0].partition}}`;
+        }
+        const jobDesc = data.slice(1).map((item,idx) => {
+          return item.partition ? `check.object.${idx+1}=${item.db}.${item.table}{${item.partition}}` : `check.object.${idx+1}=${item.db}.${item.table}`;
+        }).join('\n')
+        // 添加datacheck节点及连线
+        const checkerNode = {
+          "type": "linkis.appconn.datachecker",
+          "title": `datachecker_${Math.floor(Math.random()*10000)}`,
+          "desc": "",
+          "image": "/api/rest_j/v1/dss/workflow/nodeIcon/linkis.appconn.datachecker",
+          "key": Date.now(),
+          "layout": {
+            "width": 150,
+            "height": 40,
+            "x": node.x - Math.random() * 50 - 150 > 100 ? node.x - Math.random() * 50 - 150 : 100,
+            "y": node.y - Math.random() * 30 - 60 > 100 ? node.y - Math.random() * 30 - 60 : 100,
+          },
+          params:{ 
+            configuration:  {
+              special: {},
+              runtime: {
+                'check.object': checkObject,
+                'job.desc': jobDesc
+              },
+              startup: {}
+            }
+          },
+          "selected": true,
+          "createTime": Date.now()
+        }
+        const edge = {
+          linkType: "straight",
+          target: node.key,
+          source: checkerNode.key,
+          sourceLocation: "bottom",
+          targetLocation: "top"
+        }
+        this.json.edges.push(edge);
+        this.json.nodes.push(checkerNode);
+        this.originalData = { ...this.json };
+        this.jsonChange = true;
+      } else {
+        this.$refs.datachecker.open(node);
+      }
     },
     beforeAddEdges(node) {
       this.addEdgesShow = true;
@@ -1607,7 +1988,7 @@ export default {
     },
     checkAssociated(node) {
       if (this.myReadonly) return this.$Message.warning(this.$t('message.workflow.process.readonlyNoAssociated'));
-      if ([NODETYPE.SPARKSQL, NODETYPE.HQL, NODETYPE.SPARKPY, NODETYPE.SCALA, NODETYPE.PYTHON].indexOf(node.type) === -1) {
+      if ([NODETYPE.SPARKSQL, NODETYPE.HQL, NODETYPE.SPARKPY, NODETYPE.SCALA, NODETYPE.PYTHON, NODETYPE.NEBULA].indexOf(node.type) === -1) {
         return this.$Notice.warning({
           desc: this.$t('message.workflow.process.noAssociated'),
         });
@@ -1647,6 +2028,9 @@ export default {
           metadata: rst.metadata,
           projectName: this.$route.query.projectName || ''
         };
+        if (node.resources && node.resources[0]) {
+          params.resourceId = node.resources[0].resourceId;
+        }
         if (params.metadata && params.metadata.configuration) delete params.metadata.configuration.startup;
         api.fetch('/filesystem/saveScriptToBML', params, 'post')
           .then((res) => {
@@ -1684,11 +2068,12 @@ export default {
         cb(false);
       });
     },
-    addNode(node) {
+    async addNode(node) {
       // 关闭右侧弹窗
       this.nodebaseinfoShow = false;
       // 新拖入的节点，自动生成新的不重复名称,给名称后面加四位随机数
       node = this.bindNodeBasicInfo(node);
+      const templateList = await this.getTemplateDataByProject(node.type);
       this.clickCurrentNode = JSON.parse(JSON.stringify(node));
       this.clickCurrentNode.title = this.clickCurrentNode.title + '_' + Math.round(Math.random()*10000);
       // 弹窗提示由后台控制
@@ -1702,6 +2087,24 @@ export default {
             subItem.title = this.clickCurrentNode.title;
             subItem.modifyUser = this.getUserName();
             subItem.modifyTime = Date.now();
+            // 对于新增节点根据默认值情况做赋值
+            if (this.tabs[0].data.isDefaultReference === '1') {
+              templateList.forEach((v) => {
+                if(v.workflowDefault) {
+                  subItem.ecConfTemplateId = v.templateId;
+                  subItem.ecConfTemplateName = v.templateName;
+                  subItem.params = {
+                    configuration: {
+                      special: {},
+                      runtime: {},
+                      startup: {
+                        'ec.conf.templateId': v.templateId,
+                      }
+                    }
+                  }
+                }
+              });
+            }
           }
           return subItem;
         });
@@ -1840,6 +2243,7 @@ export default {
       });
       this.json.nodes.push(JSON.parse(JSON.stringify(this.cacheNode)));
       this.originalData = { ...this.json };
+      this.autoSave(this.$t('message.workflow.Saving'), false);
       this.click(this.cacheNode)
     },
     // 由于插件的selected不是响应式，所以得手动改变
@@ -1911,16 +2315,20 @@ export default {
      * 右键菜单点击打开管理台
      */
     async openConsole(node) {
+      if (this.$refs.bottomTab) this.$refs.bottomTab.closePanel()
+      this.openningNode = null;
       this.nodeSelectedFalse(node); // 改变节点的选择状态
       // 将数据结构适配全局console组件
       node.runType = 'node'; // 新增运行类型字段
       node.taskID = node.runState.taskID; // 新增任务id
       node.execID = node.runState.execID; // 新增执行id
-      this.openningNode = node; // 传给控制台的参数
       this.consoleHeight = this.$el ? this.$el.clientHeight / 2 : 250
       this.shapeWidth = this.$refs.process && this.$refs.process.state.shapeOptions.viewWidth; // 自适应控制台宽度
       this.$nextTick(() => {
-        this.$refs.currentConsole.checkFromCache();
+        this.openningNode = node; // 传给控制台的参数
+        setTimeout(() => {
+          this.$refs.currentConsole.checkFromCache();
+        }, 50)
       })
     },
     closeConsole() {
@@ -2056,6 +2464,8 @@ export default {
       this.workflowRun('rerun')
     },
     async workflowRun(runFlag) {
+      if (this.$refs.bottomTab) this.$refs.bottomTab.closePanel()
+      this.retryTimes = 0
       let selectNodes = this.$refs.process.getSelectedNodes();
       this.dispatch('workflowIndexedDB:clearNodeCache');
       // 重新执行清掉上次的计时器
@@ -2122,6 +2532,7 @@ export default {
       this.workflowIsExecutor = true;
     },
     workflowStop() {
+      this.retryTimes = 0
       clearTimeout(this.excuteTimer);
       clearTimeout(this.executorStatusTimer);
       // 清掉当前工作流执行的缓存
@@ -2148,7 +2559,6 @@ export default {
           taskID,
           labels: this.getCurrentDsslabels()
         }, 'get').then((res) => {
-        this.retryTimes = 0
         this.flowExecutorNode(execID);
         // 根据执行状态判断是否轮询
         const status = res.status;
@@ -2182,6 +2592,7 @@ export default {
           if (status === 'Failed') {
             this.$Notice.error({desc: this.$t('message.common.projectDetail.workflowRunFail')})
             this.flowExecutorNode(execID, true);
+            this.$refs.bottomTab.showPanel('execHistory', res.logPath);
           }
           if (status === 'Cancelled') {
             this.$Notice.error({desc: this.$t('message.common.projectDetail.workflowRunCanceled')})
@@ -2307,30 +2718,84 @@ export default {
       this.pubulishShow = true;
       this.saveingComment = false;
       this.pubulishFlowComment = ''
+      this.publishFlowData = [];
+      // 未关联Git的不用查询
+      if (this.associateGit) {
+        api.fetch('/dss/framework/orchestrator/publish/history',
+          {
+            projectName: this.$route.query.projectName,
+            orchestratorId: this.orchestratorId,
+            workspaceId: this.$route.query.workspaceId
+          }, 
+          'get').then((rst) => {
+              this.publishFlowData = rst.history.responses || [];
+          });
+        }
     },
     showDiff() {
       this.pubulishShow = false;
       this.$refs.bottomTab.showPanel('version');
     },
+    async handleWorkflowPublish() {
+      const params = {
+        orchestratorId: this.orchestratorId,
+        projectId: this.$route.query.projectID,
+      }
+      const rst = await api.fetch('/dss/framework/orchestrator/publishFlowCheck', params, 'get');
+      if(rst && rst.data && rst.data.notContainsKeywordsNodeList && rst.data.notContainsKeywordsNodeList.length>0){
+        const content = `<p class="ellipse-p">工作流${rst.data.orchestratorName}中节点：${rst.data.notContainsKeywordsNodeList.join(',')}</p><p>不包含关键字insert或create table</p>`;
+        this.$Modal.confirm({
+            title: '节点关键字检查',
+            content: content,
+            okText: '继续发布',
+            cancelText:'返回修改',
+            onOk: () => {
+              this.workflowPublish();
+            },
+        });
+      }else {
+        this.workflowPublish()
+      }
+    },
     async workflowPublish() {
-      if (this.saveingComment) {
-        return
+      // 只有未接入Git的项目发布前需求保存
+      if (!this.associateGit) {
+        if (this.saveingComment) {
+            return
+        }
+        this.saveingComment = true
+        // 发布之前先保存
+        let a
+        try {
+          a = await this.autoSave(this.$t('message.workflow.Publishwork'), false);
+        } catch (e) {
+          this.pubulishShow = false;
+          this.isFlowPubulish = false;
+        }
+        if (!a) {
+          this.pubulishShow = false;
+          this.isFlowPubulish = false;
+          this.saveingComment = false;
+          return;
+        }  
       }
-      this.saveingComment = true
-      // 发布之前先保存
-      let a
-      try {
-        a = await this.autoSave(this.$t('message.workflow.Publishwork'), false);
-      } catch (e) {
-        this.pubulishShow = false;
-        this.isFlowPubulish = false;
+      if (this.flowProxyUser) {
+        let isPassed = true;
+        try {
+          const rst = await api.fetch('/dss/framework/workspace/isDismissed', {usernames: [this.flowProxyUser]}, 'post');
+          if (rst && (rst.isDismissed || []).some(item => Object.values(item)[0])) {
+            this.$Message.warning(`${this.name}工作流的代理用户已离职或不存在，请确认是否修改代理用户`);
+            isPassed = false;
+          }
+        } catch (e) {
+          isPassed = false;
+        }
+        if (!isPassed) {
+          this.saveingComment = false;
+          return;
+        }
       }
-      if (!a) {
-        this.pubulishShow = false;
-        this.isFlowPubulish = false;
-        this.saveingComment = false;
-        return;
-      }      // 调用发布接口
+      // 调用发布接口
       const params = {
         orchestratorId: this.orchestratorId,
         orchestratorVersionId: this.orchestratorVersionId,
@@ -2363,7 +2828,7 @@ export default {
       }
       this.timer = setTimeout(() => {
         timeoutValue += 2000;
-        getPublishStatus(id, this.getCurrentDsslabels()).then((res) => {
+        getPublishStatus(+id, this.getCurrentDsslabels()).then((res) => {
           if (timeoutValue <= (10 * 60 * 1000)) {
             if (res.status === 'init' || res.status === 'running') {
               clearTimeout(this.timer);
@@ -2371,6 +2836,7 @@ export default {
             } else if (res.status === 'success') {
               clearTimeout(this.timer);
               this.isFlowPubulish = false;
+              this.$emit('updateFlowStatus');
               // 如果是导出成功需要下载文件
               if (type === 'export' && res.msg) {
                 const url = module.data.API_PATH + 'dss/downloadFile/' + res.msg;
@@ -2413,6 +2879,58 @@ export default {
           this.refreshOpen()
         });
       }, 2000);
+    },
+    // 提交
+    submitGit() {
+      if (this.isFlowSubmit) return
+      const params = {
+        orchestratorId: this.orchestratorId,
+        flowId: Number(this.flowId),
+        labels: {route: this.getCurrentDsslabels()},
+        projectName: this.$route.query.projectName,	
+        comment: this.submitDesc,
+      };
+      this.showSubmit = false;
+      this.isFlowSubmit = true;
+      this.setTaskId(this.orchestratorId, 'submit');
+      api.fetch('/dss/framework/orchestrator/submitFlow', params, 'post').then(res => {
+        this.submitDesc = '';
+        this.checkSubmitStatus('submit');
+      }).catch(() => {
+        this.isFlowSubmit = false;
+        this.removeTaskId('submit');
+      });
+    },
+    // 检查提交状态
+    checkSubmitStatus(flag) {
+      const typeName = this.$t('message.workflow.process.submitgit');
+      const publishTaskId = this.getTaskId('submit')
+      if (publishTaskId && this.orchestratorId == publishTaskId) {
+        api.fetch('/dss/framework/orchestrator/submitFlow/status', {orchestratorId: this.orchestratorId,}, 'get').then(res => {
+          if (res.status == 'running') {
+            this.isFlowSubmit = true;
+            setTimeout(() => {
+              this.checkSubmitStatus(flag);
+            }, 2000)
+          } else if (res.status == 'success') {
+            this.removeTaskId('submit');
+            this.isFlowSubmit = false;
+            this.$emit('updateWorkflowList');
+            this.$emit('updateFlowStatus');
+            if (flag === 'submit') {
+              this.$Message.success(this.$t('message.workflow.workflowSuccess', { name: typeName }));
+            }
+          } else if(res.status == 'failed') {
+            this.removeTaskId('submit');
+            this.isFlowSubmit = false;
+            if (flag === 'submit') {
+              this.$Message.warning(this.$t('message.workflow.workflowFail', { name: typeName }));
+            }
+          }
+        }).catch(() => {
+          this.isFlowSubmit = false;
+        });
+      }
     },
     refreshOpen() {
       this.$emit('close')
@@ -2494,21 +3012,21 @@ export default {
       const workspaceData = storage.get("currentWorkspace");
       return workspaceData ? workspaceData.name : ''
     },
-    getTaskKey(){
+    getTaskKey(type = 'taskId'){
       const username = this.getUserName();
-      const key = `${username}-workflow-${this.orchestratorId}-taskId`;
+      const key = `${username}-workflow-${this.orchestratorId}-${type}`;
       return key
     },
-    setTaskId(taskId) {
-      const key = this.getTaskKey();
+    setTaskId(taskId, type) {
+      const key = this.getTaskKey(type);
       storage.set(key, taskId);
     },
-    getTaskId(){
-      const key = this.getTaskKey();
+    getTaskId(type){
+      const key = this.getTaskKey(type);
       return storage.get(key);
     },
-    removeTaskId() {
-      const key = this.getTaskKey();
+    removeTaskId(type) {
+      const key = this.getTaskKey(type);
       storage.remove(key);
     },
     onKeyUp(e) {
@@ -2549,7 +3067,7 @@ export default {
     showSearchPath() {
       this.showNodePathPanel = true
     },
-    changeViewMode(mode) {
+    changeViewMode(mode, isSave = false) {
       if (this.viewMode === mode) return
       if (this.jsonChange) {
         return this.message({
@@ -2574,6 +3092,7 @@ export default {
           }
         })
       } else if(mode || this.preDragViewMode) {
+
         this.viewMode = mode || this.preDragViewMode
         if (this.viewMode !== 'table') {
           this.preDragViewMode = this.viewMode
@@ -2596,16 +3115,25 @@ export default {
               element.layout.y = element.layout.y + y * -1
             });
           }
-          // 新模式切换旧模式，连线类型修改
-          this.json.edges.forEach(element => {
-            element.linkType = 'curve'
-          });
         }
         this.originalData = this.json;
+        // 切换模式后保存数据，确保模式也被更新
+		    if (isSave && !this.product) {
+          this.autoSave(this.$t('message.workflow.Save'), false);
+        }
       }
     },
     screenSizeChange(fullScreen) {
       this.isfullScreen = fullScreen
+    },
+    showSubmitGit() {
+      if (this.jsonChange) {
+        this.autoSave(this.$t('message.workflow.Save'), false);
+      }
+      this.showSubmit = true;
+    },
+    handleSwitchViewMode(action, arg) {
+      this[action](arg, true)
     },
     handleClickToolbar(action, arg) {
       this[action](arg)
@@ -2613,4 +3141,9 @@ export default {
   }
 }
 </script>
-<style src="./index.scss" lang="scss"></style>
+<style src="./index.scss" lang="scss">
+.ellipse-p {
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+</style>

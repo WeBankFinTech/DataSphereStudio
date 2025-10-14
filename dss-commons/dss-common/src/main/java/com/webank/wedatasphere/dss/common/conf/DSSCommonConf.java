@@ -31,7 +31,7 @@ public class DSSCommonConf {
       */
     public static final CommonVars<String> DSS_TOKEN_TICKET_KEY = CommonVars.apply("wds.dss.user.ticket.key", "linkis_user_session_ticket_id_v1");
 
-    public static final String[] SUPER_ADMIN_LIST = CommonVars.apply("wds.dss.super.admin", "").getValue().split(",");
+    public static final String[] SUPER_ADMIN_LIST = CommonVars.apply("wds.dss.super.admin", "hadoop").getValue().split(",");
 
     public static final CommonVars<String> ALL_GLOBAL_LIMITS_PREFIX = CommonVars.apply("wds.dss.global.limits.prefix", "wds.dss.global.limits.");
 
@@ -51,4 +51,9 @@ public class DSSCommonConf {
     public static final CommonVars<Integer> DSS_EC_KILL_PERIOD = CommonVars.apply("wds.dss.ec.kill.period", 60);
     public static final CommonVars<String> ALTER_CLASS = CommonVars.apply("wds.dss.alter.class", "com.webank.wedatasphere.dss.common.server.alter.ImsAlterServiceImpl");
     public static final CommonVars<String> ALTER_RECEIVER = CommonVars.apply("wds.dss.alter.receiver", "burdezhang,mouhonghao");
+
+    public static final CommonVars<Boolean> LINKIE_USERNAME_SUFFIX_ENABLE = CommonVars.apply("linkis.username.suffix.enable",false);
+
+    public static final CommonVars<String>  DSS_USER_NAME_SUFFIX = CommonVars.apply("wds.dss.username.suffix.name","_cfor_f");
+
 }

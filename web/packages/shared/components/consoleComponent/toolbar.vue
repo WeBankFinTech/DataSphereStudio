@@ -14,7 +14,7 @@
         >
       </li>
       <li
-        v-if="activeTool === 'table'"
+        v-if="activeTool === 'table' && toolbarShow.filter"
         @click="openPopup('filter')"
         :title="$t('message.common.toolbar.resultGroupLineFilter')"
       >
@@ -132,7 +132,7 @@
                 $t('message.common.toolbar.autoformat')
               }}</Checkbox>
             </Row>
-            <div v-if="isAll || +download.format === 1">
+            <div v-if="isApiAll || isNotApiAll || +download.format === 1">
               <Row class="row-item">
                 {{ $t('message.common.toolbar.downloadMode') }}
               </Row>
@@ -283,26 +283,32 @@ export default {
     }
   },
   computed: {
-    isAll() {
+    isNotApiAll() {
       return (
-        ['hql', 'sql'].includes(this.script.runType) &&
+        ['hql', 'sql', 'tsql', 'jdbc', 'node'].includes(this.script.runType) &&
         this.download.format === '2' && this.getResultUrl !== 'dss/apiservice'
       )
+    },
+    isApiAll() {
+      return this.download.format === '2' && this.getResultUrl === 'dss/apiservice'
     },
     toolbarShow() {
       let isScriptis =
         this.$route.name === 'Home' ||
         (this.$route.name === 'results' && this.$route.query.from === 'Home')
       let canDownload = true
+      let canFilter = true
       try {
-        // display_prohibited 的结果集不支持下载
+        // display_prohibited、column_limit_display的结果集不支持下载
         if (this.script.resultList[this.script.resultSet].result.tipMsg) {
           canDownload = false
+          canFilter = false
         }
       } catch (error) {
         //
       }
       return {
+        filter: canFilter,
         export:
           this.baseinfo.exportResEnable !== false &&
           isScriptis &&
@@ -322,7 +328,7 @@ export default {
     elementResizeEvent.bind(this.$el, this.resize)
   },
   methods: {
-    openPopup(type) {
+    async openPopup(type) {
       if (type === 'download') {
         this.download = {
           format: '1',
@@ -333,6 +339,10 @@ export default {
         }
       }
       if (type === 'export') {
+        const checkResultSensitive = await this.$parent.checkResult(this.currentPath)
+        if (checkResultSensitive) {
+          return
+        }
         this.$refs.exportToShare.open()
       } else if (type === 'rowView') {
         this.$refs.tableRow.open()
@@ -363,99 +373,116 @@ export default {
         this.downloadAll(list, cb)
       }
     },
-    downloadConfirm() {
-      this.$Modal.confirm({
-        title: this.$t('message.common.Prompt'),
-        content: this.$t('message.common.safetips'),
-        onOk: async () => {
-          const splitor = this.download.format === '1' ? 'csv' : 'xlsx'
-          const charset = this.download.coding === '1' ? 'utf-8' : 'gbk'
-          const nullValue = this.download.nullValue === '1' ? 'NULL' : 'BLANK'
-          const keepNewline =
-            this.download.keepNewline === '1' ? 'true' : 'false'
-          const timestamp = moment.unix(moment().unix()).format('MMDDHHmm')
-          let fileName = ''
-          if (this.script.fileName && this.script.fileName !== 'undefined') {
-            fileName = this.script.fileName
-          } else if (this.script.title && this.script.title !== 'undefined') {
-            fileName = this.script.title
-          }
-          const filename = `Result_${fileName}_${timestamp}`
-          let temPath = this.currentPath
-          let querys = `&charset=${charset}&outputFileType=${splitor}&nullValue=${nullValue}&autoFormat=${this.autoFormat}&keepNewline=${keepNewline}`
-          // 如果是api执行页获取结果集，需要带上taskId
-          if (this.getResultUrl !== 'filesystem') {
-            querys += `&taskId=${this.work.taskID}`
-          } else {
-            const res = await api.fetch('/dss/scriptis/userLimits', 'get')
-            if (res && res.userLimits && res.userLimits.downloadCount) {
-              querys += `&limit=${res.userLimits.downloadCount}`
+    async downloadConfirm() {
+      const checkResultSensitive = await this.$parent.checkResult(this.currentPath)
+      if (checkResultSensitive) {
+        return
+      }
+      setTimeout(() => {
+        this.$Modal.confirm({
+          title: this.$t('message.common.Prompt'),
+          content: this.$t('message.common.safetips'),
+          onOk: async () => {
+            const splitor = this.download.format === '1' ? 'csv' : 'xlsx'
+            const charset = this.download.coding === '1' ? 'utf-8' : 'gbk'
+            const nullValue = this.download.nullValue === '1' ? 'NULL' : 'BLANK'
+            const keepNewline =
+              this.download.keepNewline === '1' ? 'true' : 'false'
+            const timestamp = moment.unix(moment().unix()).format('MMDDHHmm')
+            let fileName = ''
+            if (this.script.fileName && this.script.fileName !== 'undefined') {
+              fileName = this.script.fileName
+            } else if (this.script.title && this.script.title !== 'undefined') {
+              fileName = this.script.title
             }
-          }
-          const splitChar =
-            [',', ';', '\t', ' ', '|'][this.download.splitChar - 1] || ','
-          if (this.download.format == 1) {
-            querys += `&csvSeparator=${encodeURIComponent(splitChar)}`
-          }
-          // 下载之前条用心跳接口确认是否登录
-          await api.fetch('/user/heartbeat', 'get')
-          // 全量下载和下载当前结果集
-          let apiPath = `${this.getResultUrl}/resultsetToExcel`
-          let flag = false
-          if (this.allDownload && +this.download.format == 1) {
-            const eventList = []
-            this.downloadAll(this.resultList, (items) => {
-              for (let index = 0; index < items.length; index++) {
-                const item = items[index]
-                // 数据服务的文件path序号从1开始，script的文件path序号从0开始 无法统一，命名序号直接写死，从1开始递增
-                // const name = `ResultSet${
-                //   Number(
-                //     item.path
-                //       .substring(temPath.lastIndexOf('/'))
-                //       .split('.')[0]
-                //       .split('_')[1]
-                //   )+1
-                // }`
-                const name = `ResultSet${index + 1}`
-                const queryStr = `${querys}&outputFileName=${name}&path=${item.path}`
-                let url =
-                  `${window.location.protocol}//${window.location.host}/api/rest_j/v1/${apiPath}?` +
-                  queryStr
-                eventList.push(this.downloadFile(url, item.path))
+            const filename = `Result_${fileName}_${timestamp}`
+            let temPath = this.currentPath
+            let querys = `&charset=${charset}&outputFileType=${splitor}&nullValue=${nullValue}&autoFormat=${this.autoFormat}&keepNewline=${keepNewline}`
+            // 如果是api执行页获取结果集，需要带上taskId
+            if (this.getResultUrl !== 'filesystem') {
+              querys += `&taskId=${this.work.taskID}`
+            } else {
+              const res = await api.fetch('/dss/scriptis/userLimits', 'get')
+              if (res && res.userLimits && res.userLimits.downloadCount) {
+                querys += `&limit=${res.userLimits.downloadCount}`
+              }
+            }
+            const splitChar =
+              [',', ';', '\t', ' ', '|'][this.download.splitChar - 1] || ','
+            if (this.download.format == 1) {
+              querys += `&csvSeparator=${encodeURIComponent(splitChar)}`
+            }
+            // 下载之前条用心跳接口确认是否登录
+            await api.fetch('/user/heartbeat', 'get')
+            // 全量下载和下载当前结果集
+            let apiPath = `${this.getResultUrl}/resultsetToExcel`
+            let flag = false
+            if (this.allDownload && +this.download.format == 1) {
+              const eventList = []
+              this.downloadAll(this.resultList, (items) => {
+                for (let index = 0; index < items.length; index++) {
+                  const item = items[index]
+                  // 数据服务的文件path序号从1开始，script的文件path序号从0开始 无法统一，命名序号直接写死，从1开始递增
+                  // const name = `ResultSet${
+                  //   Number(
+                  //     item.path
+                  //       .substring(temPath.lastIndexOf('/'))
+                  //       .split('.')[0]
+                  //       .split('_')[1]
+                  //   )+1
+                  // }`
+                  const name = `ResultSet${index + 1}`
+                  const queryStr = `${querys}&outputFileName=${name}&path=${item.path}`
+                  let url =
+                    `${window.location.protocol}//${window.location.host}/api/rest_j/v1/${apiPath}?` +
+                    queryStr
+                  eventList.push(this.downloadFile(url, item.path))
+                }
+              })
+              if (eventList.filter(Boolean).length === this.resultList.length) {
+                flag = true
+              }
+            } else if (
+              this.isNotApiAll &&
+              this.allDownload &&
+              +this.download.format == 2
+            ) {
+              // 只有script中支持excel的全量下载，数据服务不支持
+              temPath = temPath.substring(0, temPath.lastIndexOf('/'))
+              apiPath = `${this.getResultUrl}/resultsetsToExcel`
+              querys += `&outputFileName=${filename}&path=${temPath}`
+              let url =
+                `${window.location.protocol}//${window.location.host}/api/rest_j/v1/${apiPath}?` +
+                querys
+              flag = this.downloadFile(url, temPath)
+            } else if (
+              this.isApiAll &&
+              this.allDownload && 
+              +this.download.format == 2
+            ) {
+              temPath = temPath.substring(0, temPath.lastIndexOf('/'))
+              querys += `&outputFileName=${filename}&path=${temPath}&isFullExcel=true`
+              let url =
+                `${window.location.protocol}//${window.location.host}/api/rest_j/v1/${apiPath}?` +
+                querys
+              flag = this.downloadFile(url, temPath)
+            } else {
+              querys += `&outputFileName=${filename}&path=${temPath}`
+              let url =
+                `${window.location.protocol}//${window.location.host}/api/rest_j/v1/${apiPath}?` +
+                querys
+              flag = this.downloadFile(url, temPath)
+            }
+            this.$nextTick(() => {
+              if (flag) {
+                this.$Message.success(
+                  this.$t('message.common.toolbar.success.download')
+                )
               }
             })
-            if (eventList.filter(Boolean).length === this.resultList.length) {
-              flag = true
-            }
-          } else if (
-            this.isAll &&
-            this.allDownload &&
-            +this.download.format == 2
-          ) {
-            // 只有script中支持excel的全量下载，数据服务不支持
-            temPath = temPath.substring(0, temPath.lastIndexOf('/'))
-            apiPath = `${this.getResultUrl}/resultsetsToExcel`
-            querys += `&outputFileName=${filename}&path=${temPath}`
-            let url =
-              `${window.location.protocol}//${window.location.host}/api/rest_j/v1/${apiPath}?` +
-              querys
-            flag = this.downloadFile(url, temPath)
-          } else {
-            querys += `&outputFileName=${filename}&path=${temPath}`
-            let url =
-              `${window.location.protocol}//${window.location.host}/api/rest_j/v1/${apiPath}?` +
-              querys
-            flag = this.downloadFile(url, temPath)
-          }
-          this.$nextTick(() => {
-            if (flag) {
-              this.$Message.success(
-                this.$t('message.common.toolbar.success.download')
-              )
-            }
-          })
-        },
-      })
+          },
+        })
+      }, 500)
     },
     downloadFile(url, temPath) {
       // 下载记录日志
@@ -535,7 +562,7 @@ export default {
   .we-toolbar {
     width: 100%;
     height: 100%;
-    border-right: 1px solid #dcdee2;
+    // border-right: 1px solid #dcdee2;
     @include border-color($border-color-base, $dark-menu-base-color);
     padding-top: 10px;
     li {

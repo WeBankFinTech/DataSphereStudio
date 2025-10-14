@@ -35,6 +35,7 @@
         <workSidebar v-if="leftModule.key === 'workSpace'"/>
         <hiveSidebar
           v-if="leftModule.key === 'database'"
+          :type="dataSourcetype"
           :node="node"
           :model="model"/>
         <fnSidebar
@@ -60,6 +61,7 @@
             :parameters="parameters"
             :node="node"
             :readonly="readonly"
+            @active-tab-change="changeScriptTab"
             v-if="props.width"/>
         </template>
       </we-panel-item>
@@ -98,11 +100,13 @@ export default {
     },
   },
   data() {
+    const dataSourcetype = this.node.modelType == 'nebula' ? 'NebulaGraph': 'Hive' 
     return {
       leftSideNavList: [],
       leftModule: null,
       level: 0,
       navHeight: 0,
+      dataSourcetype
     };
   },
   computed: {
@@ -123,10 +127,17 @@ export default {
     window.removeEventListener('resize', this.resize);
   },
   methods: {
+    changeScriptTab({ type }) {
+      // console.log('changeScriptTab-ide', type)
+      // this.dataSourcetype = type
+    },
     init() {
       this.leftSideNavList = this.setLeftSideNavList();
       if (!this.node || this.node.type !== NODETYPE.SHELL) {
         this.chooseLeftModule(this.leftSideNavList[0]);
+      }
+      if (this.node) {
+        this.dataSourcetype = this.node.modelType == 'nebula' ? 'NebulaGraph': 'Hive' 
       }
       this.resize();
     },

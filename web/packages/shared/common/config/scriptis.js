@@ -353,7 +353,8 @@ export default Object.freeze([{
   color: '#3573A6',
   isCanBeNew: true,
   label: 'Nebula',
-  isCanBeOpen: true
+  isCanBeOpen: true,
+  flowType: 'nebula',
 },
 {
   rule: /(表详情)|(Table\sdetails)/,
@@ -368,6 +369,12 @@ export default Object.freeze([{
 {
   rule: /(库详情)|(Db\sdetails)/,
   executable: false,
+  isCanBeOpen: true
+},
+{
+  rule: /(图空间信息)|(边类型信息)|(标签信息)/,
+  executable: false,
+  scriptType: 'Nebula',
   isCanBeOpen: true
 },
 ])

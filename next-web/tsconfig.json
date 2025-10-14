@@ -1,0 +1,46 @@
+{
+  "extends": "@vue/tsconfig/tsconfig.dom.json",
+  "compilerOptions": {
+    "target": "ES2020",
+
+    "typeRoots": ["./node_modules/@types", "./types"],
+    "paths": {
+      "@/*": ["./*"],
+      "@dataspherestudio/*": ["./packages/*"]
+    },
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "preserve",
+
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": false,
+    "noFallthroughCasesInSwitch": true
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.d.ts",
+    "src/**/*.tsx",
+    "src/**/*.vue",
+    "packages/**/*.ts",
+    "packages/**/*.d.ts",
+    "packages/**/*.tsx",
+    "packages/**/*.vue",
+    "exts/**/*.ts",
+    "exts/**/*.d.ts",
+    "exts/**/*.tsx",
+    "exts/**/*.vue",
+    "types/**/*.d.ts"
+  ],
+  "references": [
+    {
+      "path": "./tsconfig.node.json"
+    }
+  ]
+}

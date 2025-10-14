@@ -21,7 +21,7 @@
     <parent>
         <artifactId>dss</artifactId>
         <groupId>com.webank.wedatasphere.dss</groupId>
-        <version>1.1.0.20-SNAPSHOT</version>
+        <version>1.15.0-SNAPSHOT</version>
         <relativePath>../../../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -61,7 +61,22 @@
             <artifactId>dss-development-process-standard-execution</artifactId>
             <version>${dss.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>4.2.2</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.jetbrains</groupId>
+                    <artifactId>annotations</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+            <version>5.8.21</version>
+        </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
@@ -71,12 +86,11 @@
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>druid</artifactId>
-            <version>1.0.28</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.linkis</groupId>
-            <artifactId>linkis-cs-client</artifactId>
+            <artifactId>linkis-pes-client</artifactId>
             <version>${linkis.version}</version>
             <scope>provided</scope>
             <exclusions>

@@ -29,10 +29,16 @@
         <div class="button-container">
           <Icon type="md-alert" size="14"/>
           <span style="padding-left: 10px; flex:1">{{codePreCheckInfo.checkData[0].errorMessage}} </span>
-          <Button type="warning" size="small" @click="handleCompareDetail">{{ $t('message.common.progress.showCompareDetail') }}</Button>
+          <Button type="warning" size="small" @click="handleCompareDetail">{{$t('message.common.progress.showCompareDetail')}}</Button>
           <!-- <Button type="warning" size="small" @click="handleSolution">{{ $t('message.common.progress.showSolution') }}</Button> -->
         </div>
-
+    </div>
+    <!-- 自定义参数配置提醒 -->
+    <div v-if="paramsInfo && paramsInfo.isShow && paramsInfo.content" class="warn-color alert-tips-code">
+       <div class="button-container">
+          <Icon type="md-alert" size="14"/>
+          <span class="params-info-span">{{paramsInfo.content}} </span>
+        </div>
     </div>
     <Row
       class="total-progress"
@@ -60,7 +66,6 @@
 import steps from './steps.vue';
 import weToolbar from './toolbar_progress.vue';
 import api from '@dataspherestudio/shared/common/service/api';
-import log from '../../../editor/languages/log';
 /**
  * 脚本执行进度tab面板
  * ! 1. 与工作流节点执行console.vue 共用
@@ -139,7 +144,8 @@ export default {
         },
       ],
       taskInfo: {},
-      codePreCheckInfo: {}
+      codePreCheckInfo: {},
+      paramsInfo: {},
     };
   },
   computed: {
@@ -207,6 +213,9 @@ export default {
     }
     if (this.script.codePrecheckRes) {
       this.codePreCheckInfo = this.script.codePrecheckRes
+    }
+    if (this.script.validParamsInfoRes) {
+      this.paramsInfo = this.script.validParamsInfoRes
     }
   },
   methods: {
@@ -295,7 +304,10 @@ export default {
     },
     updateCodePreCheck(data) {
       this.codePreCheckInfo = data;
-      console.log('updateCodePreCheck', this.codePreCheckInfo)
+      // console.log('updateCodePreCheck', this.codePreCheckInfo)
+    },
+    updateParamsInfo(data) {
+      this.paramsInfo = data;
     },
     handleCompareDetail() {
       this.$emit('compareDetail');
@@ -417,6 +429,13 @@ export default {
       display: flex;
       justify-content: flex-end;
       align-items: center;
+      .params-info-span {
+        padding-left: 10px;
+        flex: 1;
+        height: 23.9px;
+        display: flex;
+        align-items: center;
+      }
     }
   }
 </style>

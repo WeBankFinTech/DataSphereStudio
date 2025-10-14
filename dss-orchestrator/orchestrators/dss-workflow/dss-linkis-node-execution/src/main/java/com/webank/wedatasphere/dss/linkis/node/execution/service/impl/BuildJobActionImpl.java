@@ -22,10 +22,13 @@ import com.webank.wedatasphere.dss.linkis.node.execution.exception.LinkisJobExec
 import com.webank.wedatasphere.dss.linkis.node.execution.job.Job;
 import com.webank.wedatasphere.dss.linkis.node.execution.job.LinkisJob;
 import com.webank.wedatasphere.dss.linkis.node.execution.service.BuildJobAction;
-import com.webank.wedatasphere.dss.linkis.node.execution.utils.LinkisJobExecutionUtils;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.linkis.common.conf.CommonVars;
+import org.apache.linkis.manager.label.conf.LabelCommonConfig;
 import org.apache.linkis.manager.label.constant.LabelKeyConstant;
+import org.apache.linkis.manager.label.entity.engine.EngineType;
 import org.apache.linkis.manager.label.entity.engine.EngineTypeLabel;
 import org.apache.linkis.manager.label.utils.EngineTypeLabelCreator;
 import org.apache.linkis.protocol.constants.TaskConstant;
@@ -48,6 +51,9 @@ public class BuildJobActionImpl implements BuildJobAction {
 
     private Logger logger = LoggerFactory.getLogger(BuildJobActionImpl.class);
     private static BuildJobAction buildJobAction = new BuildJobActionImpl();
+    private static final String NEBULA = "nebula";
+    private static final CommonVars<String> NEBULA_ENGINE_VERSION =
+            CommonVars.apply("wds.linkis.nebula.engine.version", "3.0.0");
 
     private BuildJobActionImpl() {
 
@@ -76,7 +82,8 @@ public class BuildJobActionImpl implements BuildJobAction {
         String code = job.getCode();
         logger.info("The parseExecutionCode0X code for the job is {}", code);
         if (StringUtils.isEmpty(code) || code.equalsIgnoreCase("null")) {
-            code = LinkisJobExecutionUtils.gson.toJson(job.getParams());
+            Gson gson = new Gson();
+            code = gson.toJson(job.getParams());
             logger.info("The executable code for the job is {}", code);
         }
         return code;
@@ -88,7 +95,8 @@ public class BuildJobActionImpl implements BuildJobAction {
         logger.info("The parseExecutionCodeFor1X code for the job is {}", code);
         //for appconn node  in subflow  contains embeddedFlowId
         if (StringUtils.isEmpty(code) || code.equalsIgnoreCase("null") || code.contains(EMBEDDED_FLOW_ID.getValue())) {
-            code = LinkisJobExecutionUtils.gson.toJson(job.getParams());
+            Gson gson = new Gson();
+            code = gson.toJson(job.getParams());
             logger.info("The executable code for the job is {}", code);
         }
         return code;
@@ -132,14 +140,41 @@ public class BuildJobActionImpl implements BuildJobAction {
         String code = parseExecutionCodeFor1X(job);
 
         EngineTypeLabel engineTypeLabel = EngineTypeLabelCreator.createEngineTypeLabel(parseAppConnEngineType(job.getEngineType(), job));
+        //TODO 升级linkis1.7.0版本之后，这段特殊的硬编码逻辑要去掉
+        if (NEBULA.equalsIgnoreCase(engineTypeLabel.getEngineType())) {
+            engineTypeLabel.setVersion(NEBULA_ENGINE_VERSION.getValue());
+        }
 
-        labels.put(LabelKeyConstant.ENGINE_TYPE_KEY, engineTypeLabel.getStringValue());
+        String stringValue = engineTypeLabel.getStringValue();
+
+
+        //TODO 当默认引擎为spark3 可以去掉此段if代码
+        if (EngineType.SPARK().toString().equalsIgnoreCase(engineTypeLabel.getEngineType())) {
+
+            String sparkVersion = getSparkVersion(job.getParams());
+
+            // 判断sparkVersion参数为3,则使用spark3的引擎版本,否则使用spark默认引擎版本
+            if (StringUtils.isNotEmpty(sparkVersion) &&
+                    StringUtils.equalsIgnoreCase(sparkVersion.trim(), "3")) {
+
+                EngineTypeLabel sparkEngineType = new EngineTypeLabel();
+                sparkEngineType.setEngineType(engineTypeLabel.getEngineType());
+                sparkEngineType.setVersion(SPARK3_ENGINE_VERSION.getValue());
+                stringValue = sparkEngineType.getStringValue();
+                logger.info("{} job name ,spark engineType stringValue is {}", job.getJobName(), stringValue);
+            }
+
+        }
+
+        logger.info("{} job name ,engineType stringValue is {}", job.getJobName(), stringValue);
+
+        labels.put(LabelKeyConstant.ENGINE_TYPE_KEY, stringValue);
         labels.put(LabelKeyConstant.USER_CREATOR_TYPE_KEY, job.getUser() + "-" + LINKIS_JOB_CREATOR_1_X.getValue(job.getJobProps()));
         labels.put(LabelKeyConstant.CODE_TYPE_KEY, parseRunType(job.getEngineType(), job.getRunType(), job));
 
 
         //是否复用引擎，不复用就为空
-        if(!isReuseEngine(job.getParams())){
+        if (!isAppconnJob(job) && !isReuseEngine(job.getParams())) {
             labels.put("executeOnce", "");
         }
         Map<String, Object> paramMapCopy = (HashMap<String, Object>) SerializationUtils.clone(new HashMap<String, Object>(job.getParams()));
@@ -147,18 +182,15 @@ public class BuildJobActionImpl implements BuildJobAction {
 
         JobSubmitAction.Builder builder = JobSubmitAction.builder()
                 .addExecuteCode(code)
+                .setUser(job.getUser())
                 .addExecuteUser(job.getUser())
                 .setParams(paramMapCopy)
                 .setLabels(labels)
                 .setRuntimeParams(job.getRuntimeParams());
         if (job instanceof LinkisJob) {
-            LinkisJob linkisJob = (LinkisJob) job;
-            builder = builder.setUser(linkisJob.getSubmitUser());
             Map<String, Object> source = new HashMap<>();
-            source.putAll(linkisJob.getSource());
+            source.putAll(((LinkisJob) job).getSource());
             builder = builder.setSource(source);
-        }else{
-            builder = builder.setUser(job.getUser());
         }
         // 将execute接口带来的额外variable参数，带进来  todo check
         Map<String, Object> propMap = new HashMap<>();
@@ -170,6 +202,7 @@ public class BuildJobActionImpl implements BuildJobAction {
 
     /**
      * 是否复用引擎，复用返回：true，不复用：false
+     *
      * @param params
      * @return
      */
@@ -190,8 +223,15 @@ public class BuildJobActionImpl implements BuildJobAction {
     }
 
     /**
+     * 是否为appconnjob
+     */
+    private boolean isAppconnJob(Job job) {
+        return APPCONN.equals(job.getEngineType());
+    }
+
+    /**
      * spark自定义参数配置输入，例如spark.sql.shuffle.partitions=10。多个参数使用分号分隔。
-     *
+     * <p>
      * 如果节点指定了参数模板，则需要把节点内与模板相同的参数取消掉，保证模板优先级高于节点参数
      *
      * @param paramMapCopy
@@ -203,14 +243,16 @@ public class BuildJobActionImpl implements BuildJobAction {
         //如果节点指定了参数模板，则需要把节点内与模板相同的参数取消掉，保证模板优先级高于节点参数
         if (startupMap.containsKey("ec.conf.templateId")) {
             logger.info("remove keys in template");
-            logger.info("before remove startup map:{}",startupMap.keySet());
+            logger.info("before remove startup map:{}", startupMap.keySet());
             startupMap.remove("spark.driver.memory");
             startupMap.remove("spark.executor.memory");
             startupMap.remove("spark.executor.cores");
             startupMap.remove("spark.executor.instances");
             startupMap.remove("wds.linkis.engineconn.java.driver.memory");
             startupMap.remove("spark.conf");
-            logger.info("after remove startup map:{}",startupMap.keySet());
+            startupMap.remove("mapreduce.job.running.map.limit");
+            startupMap.remove("mapreduce.job.running.reduce.limit");
+            logger.info("after remove startup map:{}", startupMap.keySet());
         }
         Map<String, Object> configurationMap = TaskUtils.getMap(paramMapCopy, TaskConstant.PARAMS_CONFIGURATION);
         configurationMap.put(TaskConstant.PARAMS_CONFIGURATION_STARTUP, startupMap);
@@ -240,4 +282,19 @@ public class BuildJobActionImpl implements BuildJobAction {
     private void enrichParams(Job job) {
         job.getRuntimeParams().put("nodeType", job.getRunType());
     }
+
+    private String getSparkVersion(Map<String, Object> params) {
+        String sparkVersion = null;
+        if (params.get("configuration") instanceof Map) {
+            Map<String, Object> configurationMap = (Map<String, Object>) params.get("configuration");
+            if (configurationMap.get("runtime") instanceof Map) {
+                Map<String, Object> runtimeMap = (Map<String, Object>) configurationMap.get("runtime");
+                if (runtimeMap.get("sparkVersion") instanceof String) {
+                    sparkVersion = (String) runtimeMap.get("sparkVersion");
+                }
+            }
+        }
+        return sparkVersion;
+    }
+
 }

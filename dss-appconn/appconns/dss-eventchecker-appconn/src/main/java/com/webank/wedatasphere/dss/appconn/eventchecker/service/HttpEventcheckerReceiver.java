@@ -1,0 +1,131 @@
+package com.webank.wedatasphere.dss.appconn.eventchecker.service;
+
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.webank.wedatasphere.dss.appconn.eventchecker.entity.EventChecker;
+import com.webank.wedatasphere.dss.appconn.eventchecker.entity.HttpMsgReceiveRequest;
+import com.webank.wedatasphere.dss.appconn.eventchecker.entity.HttpMsgReceiveResponse;
+import com.webank.wedatasphere.dss.appconn.eventchecker.utils.EventCheckerHttpUtils;
+import okhttp3.Response;
+import org.slf4j.Logger;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+
+/**
+ * Author: xlinliu
+ * Date: 2024/8/1
+ */
+public class HttpEventcheckerReceiver extends AbstractEventCheckReceiver{
+    private static final String HTTP_EVENT_SIGN_KEY = "msg.eventchecker.http.sign.key";
+    private static final String HTTP_EVENT_KGAS_RECEIVE_URL = "msg.eventchecker.http.kgas.receive.url";
+
+
+
+    public HttpEventcheckerReceiver(Properties props) {
+        super(props);
+    }
+
+    @Override
+    public String[] getMsg(int jobId,Properties props, Logger log, String... params) {
+        String url=getReceiveURL(props);
+        if(url == null) {
+            url = props.getProperty(HTTP_EVENT_KGAS_RECEIVE_URL);
+        }
+        String key=props.getProperty(HTTP_EVENT_SIGN_KEY);
+        String timestamp=String.valueOf( System.currentTimeMillis());
+        String sign = EventCheckerHttpUtils.calculateSign(key,timestamp);
+        Map<String, String> header = new HashMap<>();
+        header.put("sign", sign);
+        header.put("timestamp", timestamp);
+        //params = new String[]{nowStartTime, todayEndTime, lastMsgId, useRunDateFlag.toString(), runDate}
+        boolean useRunDate=Boolean.parseBoolean(params[3]);
+        Long lastMsgId = Long.valueOf(params[2]);
+        String runDate=params[4];
+        Gson gson = new GsonBuilder().create();
+        boolean receiveTodayFlag = (null != receiveToday && "true".equalsIgnoreCase(receiveToday.trim()));
+        HttpMsgReceiveRequest message = new HttpMsgReceiveRequest(receiver, topic, msgName, runDate, receiveTodayFlag, useRunDate);
+        String[] consumedMsgInfo = null;
+        String responseBody = null;
+        String messageJson = gson.toJson(message);
+        String requestStr = EventCheckerHttpUtils.requestToString(url, "POST", header, null, messageJson);
+        log.error("receive failed,request:{}", requestStr);
+        try (Response response = EventCheckerHttpUtils.post(url, header, null, messageJson)) {
+            HttpMsgReceiveResponse msgReceiveResponse;
+            try {
+                responseBody = response.body().string();
+                msgReceiveResponse = gson.fromJson(responseBody,
+                        HttpMsgReceiveResponse.class);
+            }catch (Exception e){
+                throw new RuntimeException("请求KGAS失败，详情：" + responseBody);
+            }
+            int reCode = msgReceiveResponse.getRetCode();
+            if (reCode == 0 ) {
+                log.info("receive request successfully.jobId:{}",jobId);
+                if("SUCCESS".equalsIgnoreCase(msgReceiveResponse.getStatus())) {
+                    log.info("receive  successfully,now try to parse message.jobId:{}",jobId);
+                    String msgBodyJson = gson.toJson(msgReceiveResponse.getMsgBody());
+                    Long msgId = msgReceiveResponse.getMsgId();
+                    if (msgId > lastMsgId) {
+                        log.info("receive  new message successfully.jobId:{}", jobId);
+                        //{"msg_id", "msg_name", "receiver", "msg"};
+                        consumedMsgInfo = new String[]{msgId.toString(), msgName, receiver, msgBodyJson};
+                    }
+                }else if ("FAILED".equalsIgnoreCase(msgReceiveResponse.getStatus())){
+                    log.error("receive failed,response:{}", responseBody);
+                    String errorMsg = "信号接收失败。详情："+responseBody;
+                    throw new RuntimeException(errorMsg);
+                }else{
+                    log.info("receive failed,will try again later ,retCode:{},status:{},message:{}",
+                     msgReceiveResponse.getRetCode()
+                    ,msgReceiveResponse.getStatus()
+                    ,msgReceiveResponse.getMessage()
+                    );
+                    consumedMsgInfo = null;
+                }
+            } else if (reCode == 9998) {
+                log.info("message has not send to third system,will try again later ,retCode:{},status:{},message:{}",
+                        msgReceiveResponse.getRetCode()
+                        ,msgReceiveResponse.getStatus()
+                        ,msgReceiveResponse.getMessage()
+                );
+                consumedMsgInfo = null;
+            } else {
+                log.error("receive failed,response:{}", responseBody);
+                String errorMsg = "信号接收失败。详情："+responseBody;
+                throw new RuntimeException(errorMsg);
+            }
+            return consumedMsgInfo;
+        } catch (IOException e) {
+            String errorMsg = responseBody != null ? responseBody: "";
+            throw new RuntimeException(errorMsg,e);
+        }
+    }
+
+    /**
+     * 根据CHANNEL_TYPE来从配置文件中匹配URL
+     * @param propskey
+     * @return
+     */
+    private String getReceiveURL(Properties propskey) {
+        String channelType = propskey.getProperty(EventChecker.CHANNEL_TYPE);
+
+        String filteredValue = null;
+        for (String key : propskey.stringPropertyNames()) {
+            String value = propskey.getProperty(key);
+
+            if (channelType != null && key.toLowerCase().contains(channelType.toLowerCase()) && key.endsWith("receive.url")) {
+                filteredValue = value;
+                break;
+            }
+        }
+
+        return filteredValue;
+    }
+
+
+
+}

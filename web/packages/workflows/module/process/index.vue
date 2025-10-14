@@ -60,6 +60,10 @@
             :orchestratorId="item.data.orchestratorId"
             :orchestratorVersionId="item.data.orchestratorVersionId"
             :newTipVisible="newTipVisible"
+            :flowStatus="item.data.flowStatus"
+            :associateGit="associateGit"
+            :isMainFlow="query.appId === item.data.appId"
+            @open-subFlow="openSubFlow"
             @node-dblclick="dblclickNode(index, arguments)"
             @isChange="isChange(index, arguments)"
             @save-node="saveNode"
@@ -67,6 +71,7 @@
             @deleteNode="deleteNode"
             @saveBaseInfo="saveBaseInfo"
             @updateWorkflowList="$emit('updateWorkflowList')"
+            @updateFlowStatus="$emit('updateFlowStatus')"
             @release="release"
             @open="$emit('open')"
             @close="$emit('close')"
@@ -114,9 +119,20 @@ export default {
     query: {
       type: Object,
       default: () => {}
+    },
+    associateGit: {
+      type: Boolean,
+      default: false
     }
   },
-  computed: {},
+  watch: {
+    query : {
+      immediate: true,
+      handler: function(cur) {
+        this.tabs[0].data = {...cur}
+      }
+    }
+  },
   data() {
     return {
       defaultNodeIcon,
@@ -245,6 +261,66 @@ export default {
         return true;
       }
     },
+    openSubFlow(arg) {
+        this.getTabsAndChoose({
+          type: "Process",
+          node: {
+            title: arg.flowName,
+            type: 'workflow.subflow',
+            image: '/api/rest_j/v1/dss/workflow/nodeIcon/workflow.subflow',
+            id: arg.flowNodeId,
+            key: arg.flowNodeId,
+            supportJump: true,
+          },
+          data: {
+            appId: arg.appId,
+            id: arg.flowId,
+          }
+        });
+    },
+    removeHashParams(paramsToRemove) {
+      // 获取当前URL的哈希部分并去掉开头的 #
+      let hash = window.location.hash.slice(1);
+
+      // 如果哈希部分是空的或不存在，则直接返回
+      if (!hash) {
+          // console.log('No hash found in the URL.');
+          return;
+      }
+
+      // 尝试解析哈希部分为路径和查询字符串
+      const [path, query] = hash.split('?');
+      let queryParams = new URLSearchParams(query || '');
+
+      // 如果传入的是单个字符串，转换为数组
+      if (typeof paramsToRemove === 'string') {
+          paramsToRemove = [paramsToRemove];
+      }
+
+      // 遍历需要移除的参数列表并从URLSearchParams对象中删除
+      paramsToRemove.forEach(param => {
+          if (queryParams.has(param)) {
+              queryParams.delete(param);
+              // console.log(`Parameter "${param}" removed from hash.`);
+          } else {
+              // console.log(`Parameter "${param}" not found in the hash.`);
+          }
+      });
+
+      // 构建新的查询字符串
+      let newQuery = queryParams.toString();
+
+      // 构建新的哈希部分
+      let newHash = `${path}${newQuery ? `?${newQuery}` : ''}`;
+
+      // 更新URL的哈希部分
+      if (newHash !== hash) {
+          window.history.replaceState({}, '', `${window.location.origin}${window.location.pathname}${window.location.search}#${newHash}`);
+          console.log('Updated URL:', `${window.location.origin}${window.location.pathname}${window.location.search}#${newHash}`);
+      } else {
+          // console.log('No parameters were removed from the hash, URL remains unchanged.');
+      }
+  },
     dblclickNode(index, args) {
       if (!this.check(args[0][0])) {
         return;
@@ -331,6 +407,10 @@ export default {
         // 子流程必须已保存, 才可以被打开
         let flowId = node.jobContent ? node.jobContent.embeddedFlowId : "";
         let {orchestratorVersionId, id} = {...this.query}
+        // 双击打开子工作流时，如果有appId相关参数时去除
+        if(this.$route.query.appId || this.$route.query.nodeName) {
+          this.removeHashParams(['appId', 'nodeName']);
+        }
         this.getTabsAndChoose({
           type: "Process",
           node,
@@ -420,7 +500,7 @@ export default {
       if (Object.keys(resource).length > 0) {
         if (
           node.resources.length > 0 &&
-          node.resources[0].resourceId === resource.resourceId
+          (node.resources[0].resourceId === resource.resourceId || node.resources[0].fileName === resource.fileName)
         ) {
           // 已保存过的直接替换，没有保存的首项追加
           node.resources[0] = resource;

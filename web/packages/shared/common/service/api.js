@@ -24,34 +24,35 @@ import {
   Message,
   Notice
 } from 'iview';
-import cache from './apiCache';
+import cacheReq, { cache } from './apiCache';
 import qs from './querystring'
 import storage from "./storage"
 import i18n from '../i18n'
 
-// 什么一个数组用于存储每个请求的取消函数和标识
-let pending = [];
-let cancelConfig = null;
-let CancelToken = axios.CancelToken;
-let removePending = (config) => {
-  for (let p = 0; p < pending.length; p++) {
-    const params = JSON.stringify(config.params);
-    // 如果存在则执行取消操作
-    if (pending[p].u === config.url + '&' + config.method + '&' + params) {
-      // pending[p].f();// 执行取消操作
-      pending.splice(p, 1); // 移除记录
-    }
-  }
-};
+// isCancel-取消标识 用于判断请求是不是被AbortController取消的
+const { isCancel } = axios
+const cacheRequest = {}
 
-let cutReq = (config) => {
-  for (let p = 0; p < pending.length; p++) {
-    const params = JSON.stringify(config.params);
-    if (pending[p].u === config.url + '&' + config.method + '&' + params) {
-      return true;
-    }
+// 删除缓存队列中的请求
+function removeCacheRequest(reqKey) {
+  if (cacheRequest[reqKey]) {
+    console.log(`[API] abort cache request: ${reqKey}`)
+    // 通过AbortController实例上的abort来进行请求的取消
+    cacheRequest[reqKey].abort()
+    delete cacheRequest[reqKey]
   }
-};
+}
+
+
+let getErrorMsg = (message) => {
+  let msg;
+  if (message === 'Request failed with status code 414') {
+    msg = 'URL长度超出最大限制';
+  } else if (message === 'Request failed with status code 413') {
+    msg = '请求体内容超出最大限制';
+  }
+  return msg;
+}
 
 const instance = axios.create({
   baseURL: process.env.VUE_APP_MN_CONFIG_PREFIX || `${location.protocol}//${window.location.host}/api/rest_j/v1/`,
@@ -67,6 +68,9 @@ instance.interceptors.request.use((config) => {
   config.headers['Content-language'] = localStorage.getItem('locale') || 'zh-CN';
   config.metadata = {
     startTime: Date.now()
+  }
+  if (/\/user\/login/.test(config.url)) {
+    cache.reset();
   }
   if (/\/application\//.test(config.url)) {
     config.url = `http://${window.location.host}` + config.url
@@ -90,26 +94,22 @@ instance.interceptors.request.use((config) => {
     config.headers['Content-Type'] = 'application/x-www-form-urlencoded'
     config.data = qs(config.data)
   }
-
-  let flag = cutReq(config);
-  // 当上一次相同请求未完成时，无法进行第二次相同请求
-  if (flag === true) {
-    removePending(config);
-    return config;
-  } else {
-    const params = JSON.stringify(config.params);
-    // 用于正常请求出现错误时移除
-    cancelConfig = config;
-    config.cancelToken = new CancelToken((c) => {
-      // 添加标识和取消函数
-      pending.push({
-        u: config.url + '&' + config.method + '&' + params,
-        f: c,
-      });
-    });
-    return config;
+  // removeCache - 是config里配置的是否清除相同请求的标识，不传则默认是不需要清除
+  // 此处根据实际需求来 如果需要全部清除相同的请求功能 则默认为true 或者增加白名单
+  const { url, method, removeCache = false } = config
+  if (removeCache) {
+    // 请求地址和请求方式组成唯一标识，将这个标识作为取消函数的key，保存到请求队列中
+    const reqKey = `${url}&${method}`
+    // 如果config传了需要清除重复请求的removeCache，则如果存在重复请求，删除之前的请求
+    removeCacheRequest(reqKey)
+    // 将请求加入请求队列，通过AbortController来进行手动取消
+    const controller = new AbortController()
+    config.signal = controller.signal
+    cacheRequest[reqKey] = controller
   }
+  return config;
 }, (error) => {
+  console.log(error)
   Promise.reject(error);
 });
 
@@ -117,23 +117,35 @@ instance.interceptors.response.use((response) => {
   response.config.metadata.endTime = Date.now()
   const duration = response.config.metadata.endTime - response.config.metadata.startTime
   if (window.$Wa && duration > 2000) window.$Wa.log(`接口耗时 ${duration}: ${response.config.url}`);
-  // 在一个ajax响应成功后再执行取消操作，把已完成的请求从pending中移除
-  removePending(response.config);
-  return response;
+  // 请求成功，从队列中移除
+  const { url, method, removeCache = false } = response.config;
+  if (removeCache) removeCacheRequest(`${url}&${method}`)
+  return response
 }, (error) => {
-  error.config.metadata.endTime = Date.now()
-  const duration = error.config.metadata.endTime - error.config.metadata.sartTime
-  if (window.$Wa && duration > 2000) window.$Wa.log(`接口耗时 ${duration}: ${error.config.url}`);
+  if (isCancel(error)) {
+    // 通过CancelToken取消的请求不做任何处理
+    console.warn('重复请求，自动拦截并取消')
+    return
+  }
+  if (error.config) {
+    error.config.metadata.endTime = Date.now()
+    const duration = error.config.metadata.endTime - error.config.metadata.sartTime
+    if (window.$Wa && duration > 2000) window.$Wa.log(`接口耗时 ${duration}: ${error.config.url}`);
+  }
   // 出现接口异常或者超时时的判断
-  if ((error.message && error.message.indexOf('timeout') >= 0) || (error.request && error.request.status !== 200)) {
-    for (let p in pending) {
-      if (pending[p].u === cancelConfig.url + '&' + cancelConfig.method + '&' + JSON.stringify(cancelConfig.params)) {
-        pending.splice(p, 1); // 移除记录
-      }
+  if (error.code === 'ERR_BAD_REQUEST' && getErrorMsg(error.message)) {
+    if (!error.response) error.response = {};
+    error.response.data = {
+      message: getErrorMsg(error.message),
+      method: '',
+      status: 1,
+      data: { solution: null }
     }
+    return error.response;
+  } else if ((error.message && error.message.indexOf('timeout') >= 0) || (error.request && error.request.status !== 200)) {
     // 优先返回后台返回的错误信息，其次是接口返回
     return error.response || error;
-  } else if (axios.Cancel) {
+  } else if (axios.isCancel(error)) {
     // 如果是pengding状态，弹出提示！
     return {
       // data: { message: '接口请求中！请稍后……' },
@@ -151,9 +163,9 @@ const api = {
         return window.location.replace(res.data.SSOURL);
       }
       if (window.location.href.indexOf('/#/login') < 0) {
-        window.location.href = '/#/login'
+        return window.location.href = '/#/login'
       }
-      if (!showLoginTips && res.data.method.indexOf('jobhistory/governanceStationAdmin') < 0) {
+      if (!showLoginTips) {
         showLoginTips = true
         setTimeout(() => {
           showLoginTips = false
@@ -207,7 +219,8 @@ const success = function (response) {
         data = JSON.parse(response.data);
       } catch (e) {
         console.log(e, response.data)
-        throw new Error(API_ERR_MSG);
+//        throw new Error(API_ERR_MSG);
+        return {}
       }
     } else if (util.isObject(response.data)) {
       // 兼容ds blob流下载
@@ -220,7 +233,10 @@ const success = function (response) {
         data = response.data
       }
     } else {
-      throw new Error(API_ERR_MSG);
+        console.log(response)
+        console.log(API_ERR_MSG)
+//      throw new Error(API_ERR_MSG);
+        return {}
     }
     let res = getData(data);
     let code = res.codePath;
@@ -343,7 +359,7 @@ const param = function (url, data, option) {
   }
   // cacheOptions接口数据缓存 {time} time为0则请求之后缓存在内存里的数据不清理
   if (option.cacheOptions) {
-    option.adapter = cache(option.cacheOptions)
+    option.adapter = cacheReq(option.cacheOptions)
   }
   option.url = url;
 
@@ -363,8 +379,7 @@ const showErrMsg = function (error) {
     msg = i18n.t('message.common.apierrmsg')
   }
   let isHoverNotice = {}
-  const checkPath = !error.response || error.response.config.url.indexOf('dss/guide/solution/reportProblem') < 0
-  if (window.$APP_CONF && window.$APP_CONF.error_report && checkPath) {
+  if (window.$APP_CONF && window.$APP_CONF.error_report && error.response) {
     const noticeName = 'err_' + Date.now()
     isHoverNotice[noticeName] = false
     Notice.error({
@@ -431,7 +446,7 @@ const showErrMsg = function (error) {
     })
     setTimeout(() => {
       document.querySelectorAll('.g-err-msg-div').forEach(ele => {
-        const erritem =ele.dataset.erritem
+        const erritem = ele.dataset.erritem
         ele.parentElement.parentElement.style.textAlign = 'left'
         ele.parentElement.style.display = 'block'
         ele.parentElement.style.padding = 0
@@ -446,14 +461,20 @@ const showErrMsg = function (error) {
   } else {
     Notice.error({
       desc: msg,
-      title: i18n.t('message.common.errTitle') ,
+      title: i18n.t('message.common.errTitle'),
       duration: 4
     });
   }
 }
 // 对于某些特殊接口，接口报错时不做展示
 const isShowErr = (url) => {
-  const noShowUrlList = ['/validator/code-precheck'];
+  const noShowUrlList = [
+    '/dss/datapipe/datasource/getSchemaBaseInfo',
+    '/validator/code-precheck',
+    '/copilot/codecompletion',
+    '/copilot/codeadoption',
+    '/copilot/user/isinwhitelist',
+    '/dss/guide/solution/reportProblem'];
   if (noShowUrlList.includes(url)) {
     return false;
   }

@@ -35,12 +35,10 @@ import com.webank.wedatasphere.dss.apiservice.core.service.ApiService;
 import com.webank.wedatasphere.dss.apiservice.core.util.DateUtil;
 import com.webank.wedatasphere.dss.apiservice.core.util.SQLCheckUtil;
 import com.webank.wedatasphere.dss.apiservice.core.vo.*;
-//import com.webank.wedatasphere.dss.oneservice.core.jdbc.JdbcUtil;
 import com.webank.wedatasphere.dss.apiservice.core.exception.ApiServiceRuntimeException;
 import com.webank.wedatasphere.dss.apiservice.core.service.ApiServiceQueryService;
 import com.webank.wedatasphere.dss.apiservice.core.util.AssertUtil;
 import com.webank.wedatasphere.dss.apiservice.core.util.ModelMapperUtil;
-//import com.webank.wedatasphere.dss.oneservice.core.vo.*;
 import com.webank.wedatasphere.dss.apiservice.core.vo.ApiServiceVo;
 import org.apache.linkis.bml.client.BmlClient;
 import org.apache.linkis.bml.client.BmlClientFactory;
@@ -383,10 +381,9 @@ public class ApiServiceQueryServiceImpl implements ApiServiceQueryService {
 
                     InputStream inputStream = resource.inputStream();
 
-                    try (FileSource fileSource = FileSource.create(new FsPath(scriptPath), inputStream)) {
+                    try (FileSource fileSource = FileSource$.MODULE$.create(new FsPath(scriptPath), inputStream)) {
                         //todo   数组取了第一个
-                        Pair<Object, List<String[]>> sourcePair = fileSource.collect()[0];
-                        collect = new Pair<>(sourcePair.getKey(), new ArrayList<>(sourcePair.getValue()));
+                        collect = fileSource.collect()[0];
                         bmlCache.put(key, collect);
                     }
                 }

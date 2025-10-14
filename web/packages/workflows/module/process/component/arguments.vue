@@ -17,7 +17,7 @@
             v-model="scheduleParams.proxyuser"
             type="text"
             :placeholder="$t('message.workflow.process.arguments.inputProxyuser')"
-            @on-change="onProxyUserChange"></Input>
+            @on-blur="onProxyUserChange"></Input>
         </FormItem>
         <!--
         <h4 class="time-set-title">调度时间</h4>
@@ -167,18 +167,18 @@ export default {
     onProxyUserChange() {
       // 需要校验名字合法才能提交
       if (/^[a-zA-Z0-9_]+$/.test(this.scheduleParams.proxyuser) || this.scheduleParams.proxyuser === '') {
-        this.emitChange(this, this.$refs.dynamicForm.formDynamic.list);
+        this.emitChange(this, this.$refs.dynamicForm.formDynamic.list, true);
       }
     },
     onVariableChange(value) {
       this.emitChange(this, value);
     },
-    emitChange: debounce(function(that, value) {
+    emitChange: debounce(function(that, value, proxyUserChange) {
       const variable = util.convertArrayToMap(value);
       const props = [{
         'user.to.proxy': that.scheduleParams.proxyuser,
       }].concat(variable);
-      that.$emit('change-props', props);
+      that.$emit('change-props', props, that.scheduleParams.proxyuser, proxyUserChange);
     }, 300),
   },
 };

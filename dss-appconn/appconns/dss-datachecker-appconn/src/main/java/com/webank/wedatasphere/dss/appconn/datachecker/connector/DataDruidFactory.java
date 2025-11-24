@@ -151,7 +151,7 @@ public class DataDruidFactory {
         }
 
         ds.setUrl(url);
-        ds.setDriverClassName("com.mysql.jdbc.Driver");
+        ds.setDriverClassName("com.mysql.cj.jdbc.Driver");
         ds.setUsername(username);
         ds.setPassword(password);
         ds.setInitialSize(initialSize);

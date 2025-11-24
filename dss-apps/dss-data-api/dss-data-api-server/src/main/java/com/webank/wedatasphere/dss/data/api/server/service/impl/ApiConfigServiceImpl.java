@@ -135,7 +135,7 @@ public class ApiConfigServiceImpl extends ServiceImpl<ApiConfigMapper, ApiConfig
 
             String dataSourceType = dataSource.getType();
             if("MYSQL".equals(dataSourceType)){
-                dataSource.setClassName("com.mysql.jdbc.Driver");
+                dataSource.setClassName("com.mysql.cj.jdbc.Driver");
             }
             if(sqlText.toLowerCase().contains("select")){
                 apiExecuteInfo = this.executeSql(1, dataSource, sqlText,limitSent, jdbcParamValues,pageSize,pageNum);

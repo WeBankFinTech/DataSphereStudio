@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir:*)",
+      "Bash(npm install)",
+      "Bash(npx lerna:*)",
+      "Bash(npm run build:*)",
+      "Bash(set NODE_OPTIONS=--openssl-legacy-provider)",
+      "Bash(export NODE_OPTIONS=--openssl-legacy-provider)",
+      "Bash(npm install:*)",
+      "Bash(find:*)",
+      "Bash(npm view:*)",
+      "Bash($env:NODE_OPTIONS=\"--openssl-legacy-provider\")"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

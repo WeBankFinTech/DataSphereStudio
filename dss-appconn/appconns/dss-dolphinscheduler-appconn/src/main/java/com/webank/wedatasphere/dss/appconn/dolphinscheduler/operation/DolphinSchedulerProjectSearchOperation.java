@@ -9,6 +9,9 @@ import com.webank.wedatasphere.dss.standard.app.structure.project.ref.ProjectRes
 import com.webank.wedatasphere.dss.standard.app.structure.project.ref.RefProjectContentRequestRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 
+/**
+ * @author Administrator
+ */
 public class DolphinSchedulerProjectSearchOperation
         extends AbstractStructureOperation<RefProjectContentRequestRef.RefProjectContentRequestRefImpl, ProjectResponseRef>
         implements ProjectSearchOperation<RefProjectContentRequestRef.RefProjectContentRequestRefImpl> {

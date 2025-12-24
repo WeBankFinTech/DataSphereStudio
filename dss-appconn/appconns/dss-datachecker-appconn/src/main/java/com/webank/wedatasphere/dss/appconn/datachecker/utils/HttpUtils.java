@@ -59,8 +59,7 @@ public class HttpUtils {
 
   public static String httpClientHandle(String actionUrl, RequestBody requestBody, Map<String, String> urlMap) throws Exception{
     String returnData = "";
-    try {
-      Response response = httpClientHandleBase(actionUrl, requestBody, urlMap);
+    try (Response response = httpClientHandleBase(actionUrl, requestBody, urlMap)) {
       returnData = response.body().string();
       logger.info("mask interface return message：" + returnData);
     } catch (IOException e) {
@@ -80,8 +79,7 @@ public class HttpUtils {
         .build();
     Call call = okHttpClient.newCall(request);
     String returnData = "";
-    try {
-      Response response = call.execute();
+    try (Response response = call.execute()) {
       returnData = response.body().string();
       logger.info("interface return message：" + returnData);
     } catch (IOException e) {

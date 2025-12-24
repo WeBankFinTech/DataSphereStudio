@@ -44,7 +44,7 @@ public class DataMapTokenImpl implements TokenAuth {
 
     @Override
     public SaveTokenEnum saveTokensToDb(List<TokenManagerVo> tokenManagerVos, String approvalNo) throws ApiServiceTokenException {
-        boolean isEmptyToken = tokenManagerVos.stream().filter(tokenManagerVo -> StringUtils.isEmpty(tokenManagerVo.getToken())).count()>0;
+        boolean isEmptyToken = tokenManagerVos.stream().anyMatch(tokenManagerVo -> StringUtils.isEmpty(tokenManagerVo.getToken()));
         if(checkDuplicateAuth(approvalNo) && approvalNo != ApiCommonConstant.DEFAULT_APPROVAL_NO){
 //            throw new ApiServiceTokenException(800001,"ApprovalNo has been repeatedly authorized ");
             return SaveTokenEnum.DUPLICATE;

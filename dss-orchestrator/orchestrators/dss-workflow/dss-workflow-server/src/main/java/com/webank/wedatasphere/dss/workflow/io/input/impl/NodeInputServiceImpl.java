@@ -144,34 +144,36 @@ public class NodeInputServiceImpl implements NodeInputService {
         logger.info("nodeResourcePath:{}", nodeResourcePath);
         File file = new File(nodeResourcePath);
         if (file.exists()) {
-            InputStream resourceInputStream = bmlService.readLocalResourceFile(userName, nodeResourcePath);
-            Supplier<Map<String, Object>> bmlResourceMap = () -> {
-                BmlResource resource = bmlService.upload(userName, resourceInputStream, UUID.randomUUID().toString() + ".json",
-                        projectName);
-                return ImmutableMap.of(
-                        "resourceId", resource.getResourceId(),
-                        "version", resource.getVersion()
-                );
-            };
-            Supplier<Map<String, Object>> streamResourceMap = () -> MapUtils.newCommonMap(ImportRequestRef.INPUT_STREAM_KEY, resourceInputStream);
-            try {
-                nodeExportContent = nodeService.importNode(userName, appConnNode, bmlResourceMap, streamResourceMap, orcVersion);
-            } catch (ExternalOperationFailedException e) {
-                logger.error("failed to import node.", e);
-                throw new DSSRuntimeException(e.getErrCode(), e.getMessage());
-            } catch (Exception e) {
-                logger.error("failed to import node.", e);
-                throw new DSSRuntimeException(90011, e.getMessage());
-            }
-            if (nodeExportContent != null) {
-                if (nodeExportContent.get("project_id") != null) {
-                    Long newProjectId = Long.parseLong(nodeExportContent.get("project_id").toString());
-                    logger.warn(String.format("new appConn node add into dss,dssProjectId: %s,newProjectId: %s", appConnNode.getProjectId(), newProjectId));
-                    nodeExportContent.remove("project_id");
+            try (InputStream resourceInputStream = bmlService.readLocalResourceFile(userName, nodeResourcePath)) {
+                Supplier<Map<String, Object>> bmlResourceMap = () -> {
+                    BmlResource resource = bmlService.upload(userName, resourceInputStream, UUID.randomUUID().toString() + ".json",
+                            projectName);
+                    return ImmutableMap.of(
+                            "resourceId", resource.getResourceId(),
+                            "version", resource.getVersion()
+                    );
+                };
+
+                Supplier<Map<String, Object>> streamResourceMap = () -> MapUtils.newCommonMap(ImportRequestRef.INPUT_STREAM_KEY, resourceInputStream);
+                try {
+                    nodeExportContent = nodeService.importNode(userName, appConnNode, bmlResourceMap, streamResourceMap, orcVersion);
+                } catch (ExternalOperationFailedException e) {
+                    logger.error("failed to import node.", e);
+                    throw new DSSRuntimeException(e.getErrCode(), e.getMessage());
+                } catch (Exception e) {
+                    logger.error("failed to import node.", e);
+                    throw new DSSRuntimeException(90011, e.getMessage());
                 }
-                nodeJsonMap.replace("jobContent", nodeExportContent);
-                appConnNode.setJobContent(nodeExportContent);
-                return BDPJettyServerHelper.jacksonJson().writeValueAsString(nodeJsonMap);
+                if (nodeExportContent != null) {
+                    if (nodeExportContent.get("project_id") != null) {
+                        Long newProjectId = Long.parseLong(nodeExportContent.get("project_id").toString());
+                        logger.warn(String.format("new appConn node add into dss,dssProjectId: %s,newProjectId: %s", appConnNode.getProjectId(), newProjectId));
+                        nodeExportContent.remove("project_id");
+                    }
+                    nodeJsonMap.replace("jobContent", nodeExportContent);
+                    appConnNode.setJobContent(nodeExportContent);
+                    return BDPJettyServerHelper.jacksonJson().writeValueAsString(nodeJsonMap);
+                }
             }
         } else {
             logger.warn("appConn node resource file does not exists. nodeId: {}" + nodeId);
@@ -209,34 +211,35 @@ public class NodeInputServiceImpl implements NodeInputService {
         logger.info("nodeResourcePath:{}", nodeResourcePath);
         File file = new File(nodeResourcePath);
         if (file.exists()) {
-            InputStream resourceInputStream = bmlService.readLocalResourceFile(userName, nodeResourcePath);
-            Supplier<Map<String, Object>> bmlResourceMap = () -> {
-                BmlResource resource = bmlService.upload(userName, resourceInputStream, UUID.randomUUID().toString() + ".json",
-                        projectName);
-                return ImmutableMap.of(
-                        "resourceId", resource.getResourceId(),
-                        "version", resource.getVersion()
-                );
-            };
-            Supplier<Map<String, Object>> streamResourceMap = () -> MapUtils.newCommonMap(ImportRequestRef.INPUT_STREAM_KEY, resourceInputStream);
-            try {
-                nodeExportContent = nodeService.importNode(userName, appConnNode, bmlResourceMap, streamResourceMap, orcVersion);
-            } catch (ExternalOperationFailedException e) {
-                logger.error("failed to import node.", e);
-                throw new DSSRuntimeException(e.getErrCode(), e.getMessage());
-            } catch (Exception e) {
-                logger.error("failed to import node.", e);
-                throw new DSSRuntimeException(90011, e.getMessage());
-            }
-            if (nodeExportContent != null) {
-                if (nodeExportContent.get("project_id") != null) {
-                    Long newProjectId = Long.parseLong(nodeExportContent.get("project_id").toString());
-                    logger.warn(String.format("new appConn node add into dss,dssProjectId: %s,newProjectId: %s", appConnNode.getProjectId(), newProjectId));
-                    nodeExportContent.remove("project_id");
+            try (InputStream resourceInputStream = bmlService.readLocalResourceFile(userName, nodeResourcePath)) {
+                Supplier<Map<String, Object>> bmlResourceMap = () -> {
+                    BmlResource resource = bmlService.upload(userName, resourceInputStream, UUID.randomUUID().toString() + ".json",
+                            projectName);
+                    return ImmutableMap.of(
+                            "resourceId", resource.getResourceId(),
+                            "version", resource.getVersion()
+                    );
+                };
+                Supplier<Map<String, Object>> streamResourceMap = () -> MapUtils.newCommonMap(ImportRequestRef.INPUT_STREAM_KEY, resourceInputStream);
+                try {
+                    nodeExportContent = nodeService.importNode(userName, appConnNode, bmlResourceMap, streamResourceMap, orcVersion);
+                } catch (ExternalOperationFailedException e) {
+                    logger.error("failed to import node.", e);
+                    throw new DSSRuntimeException(e.getErrCode(), e.getMessage());
+                } catch (Exception e) {
+                    logger.error("failed to import node.", e);
+                    throw new DSSRuntimeException(90011, e.getMessage());
                 }
-                nodeJsonMap.replace("jobContent", nodeExportContent);
-                appConnNode.setJobContent(nodeExportContent);
-                return BDPJettyServerHelper.jacksonJson().writeValueAsString(nodeJsonMap);
+                if (nodeExportContent != null) {
+                    if (nodeExportContent.get("project_id") != null) {
+                        Long newProjectId = Long.parseLong(nodeExportContent.get("project_id").toString());
+                        logger.warn(String.format("new appConn node add into dss,dssProjectId: %s,newProjectId: %s", appConnNode.getProjectId(), newProjectId));
+                        nodeExportContent.remove("project_id");
+                    }
+                    nodeJsonMap.replace("jobContent", nodeExportContent);
+                    appConnNode.setJobContent(nodeExportContent);
+                    return BDPJettyServerHelper.jacksonJson().writeValueAsString(nodeJsonMap);
+                }
             }
         } else {
             logger.warn("appConn node resource file does not exists. nodeId: {}" + nodeId);

@@ -94,22 +94,24 @@ public class QualitisUtil {
         .build();
 
     Call call = okHttpClient.newCall(request);
-    Response response = call.execute();
-    String resultJson = response.body().string();
-    logger.info("Response Json: " + resultJson);
-    if (StringUtils.isNotEmpty(resultJson)) {
-      Map<String, Object> resultMap = DSSCommonUtils.COMMON_GSON.fromJson(resultJson,Map.class);
-      logger.info(String.valueOf(resultMap));
-      String code = (String) resultMap.get("code");
-      if ("200".equals(code)) {
-        applicationId = (String) ((Map<String, Object>) resultMap.get("data")).get(
-            "application_id");
-        logger.info(resultMap.get("message").toString());
-      } else {
-        throw new RuntimeException(resultMap.get("message").toString());
+    try (Response response = call.execute()) {
+      String resultJson = response.body().string();
+      logger.info("Response Json: " + resultJson);
+      if (StringUtils.isNotEmpty(resultJson)) {
+        Map<String, Object> resultMap = DSSCommonUtils.COMMON_GSON.fromJson(resultJson, Map.class);
+        logger.info(String.valueOf(resultMap));
+        String code = (String) resultMap.get("code");
+        if ("200".equals(code)) {
+          applicationId = (String) ((Map<String, Object>) resultMap.get("data")).get(
+                  "application_id");
+          logger.info(resultMap.get("message").toString());
+          return applicationId;
+        } else {
+          throw new RuntimeException(resultMap.get("message").toString());
+        }
       }
     }
-    return applicationId;
+    return null;
   }
 
   public String createAndSubmitRule(CheckDataObject dataObject,String projectName,String ruleName,String user) throws IOException {
@@ -161,24 +163,26 @@ public class QualitisUtil {
         .build();
 
     Call call = okHttpClient.newCall(request);
-    Response response = call.execute();
-    String resultJson = response.body().string();
-    logger.info("call qualitis end,Response Json:{} " , resultJson);
-    if (StringUtils.isNotEmpty(resultJson)) {
-      Map<String, Object> resultMap = DSSCommonUtils.COMMON_GSON.fromJson(resultJson,Map.class);
-      String code = (String) resultMap.get("code");
-      if ("200".equals(code)) {
-        Map<String, Object> applicationDetail = (Map<String, Object>) ((Map<String, Object>) (resultMap.get(
-            "data"))).get("application_detail");
-        Map<String, Object> project_application = ((List<Map<String, Object>>) (applicationDetail.get(
-            "project_applications"))).get(0);
-        applicationId = (String) project_application.get("application_id");
-        logger.info(resultMap.get("message").toString());
-      } else {
-        throw new RuntimeException(resultMap.get("message").toString());
+    try (Response response = call.execute()) {
+      String resultJson = response.body().string();
+      logger.info("call qualitis end,Response Json:{} ", resultJson);
+      if (StringUtils.isNotEmpty(resultJson)) {
+        Map<String, Object> resultMap = DSSCommonUtils.COMMON_GSON.fromJson(resultJson, Map.class);
+        String code = (String) resultMap.get("code");
+        if ("200".equals(code)) {
+          Map<String, Object> applicationDetail = (Map<String, Object>) ((Map<String, Object>) (resultMap.get(
+                  "data"))).get("application_detail");
+          Map<String, Object> project_application = ((List<Map<String, Object>>) (applicationDetail.get(
+                  "project_applications"))).get(0);
+          applicationId = (String) project_application.get("application_id");
+          logger.info(resultMap.get("message").toString());
+          return applicationId;
+        } else {
+          throw new RuntimeException(resultMap.get("message").toString());
+        }
       }
     }
-    return applicationId;
+    return null;
   }
 
   /**
@@ -215,11 +219,9 @@ public class QualitisUtil {
         .build();
 
     Call call = okHttpClient.newCall(request);
-    Response response = null;
     String resultJson = "";
     String status = "";
-    try {
-      response = call.execute();
+    try (Response response = call.execute()) {
       resultJson = response.body().string();
       logger.info("Response Json: " + resultJson);
       if (StringUtils.isNotEmpty(resultJson)) {

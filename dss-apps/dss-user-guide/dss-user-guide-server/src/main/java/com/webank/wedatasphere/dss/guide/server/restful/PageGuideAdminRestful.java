@@ -102,7 +102,7 @@ public class PageGuideAdminRestful {
             guideContentService.updateGuideContentById(id, map);
             return Message.ok("更新成功");
         } catch (Exception ex) {
-            logger.error("ERROR", "Error found: ", ex);
+            logger.error("ERROR Error found: ", ex);
             return Message.error(ex.getMessage());
         }
     }

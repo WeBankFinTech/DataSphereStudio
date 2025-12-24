@@ -69,7 +69,7 @@ public abstract class AbstractEventCheckReceiver extends AbstractEventCheck{
                         + ", messageBody: " + vMsg);
             }
         }catch (Exception e) {
-            log.error("Error set consumed message failed {} setConsumedMsg failed" + e);
+            log.error("Error set consumed message failed setConsumedMsg failed ", e);
             return vNewMsgID;
         }
         return vNewMsgID;
@@ -99,7 +99,7 @@ public abstract class AbstractEventCheckReceiver extends AbstractEventCheck{
                 updatePstmt.setString(4, vReceiveTime);
                 updatePstmt.setString(5, vNewMsgID);
                 int updaters = updatePstmt.executeUpdate();
-                log.info("updateMsgOffset successful {} update result is:" + updaters);
+                log.info("updateMsgOffset successful, update result is: {}", updaters);
                 if(updaters != 0){
                     log.info("Received message successfully , update message status succeeded, consumed flow execution ID: " + vProcessID);
                     //return true after update success
@@ -197,7 +197,7 @@ public abstract class AbstractEventCheckReceiver extends AbstractEventCheck{
                 }
             }
         }catch(Exception e){
-            log.error("create executeType failed {}" + e);
+            log.error("create executeType failed ", e);
         }
         return executeType;
     }

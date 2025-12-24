@@ -100,7 +100,7 @@ public class ZipHelper {
                 throw new DSSErrorException(90002,errMsg.toString());
             }
         }catch(final Exception e){
-            logger.error("{} 压缩成 zip 文件失败, reason: ", e);
+            logger.error("压缩成 zip 文件失败, reason: ", e);
             DSSErrorException exception = new DSSErrorException(90003,dirPath + " to zip file failed");
             exception.initCause(e);
             throw exception;
@@ -217,7 +217,7 @@ public class ZipHelper {
                 file.delete();
             }
         }catch(final Exception e){
-            logger.error("{} 解压缩 zip 文件失败, reason: ", e);
+            logger.error("解压缩 zip 文件失败, reason: ", e);
             DSSErrorException exception = new DSSErrorException(90009,dirPath + " to zip file failed");
             exception.initCause(e);
             throw exception;

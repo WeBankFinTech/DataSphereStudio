@@ -357,7 +357,7 @@ public class DSSWorkspaceRestful {
         try {
             workspace = dssWorkspaceService.getWorkspacesById(workspaceId, username);
         } catch (DSSErrorException e) {
-            LOGGER.error("User {} get workspace {} failed.", username, workspaceId, e);
+            LOGGER.error("User {} get workspace {} failed. {}", username, workspaceId, e);
             return Message.error(e);
         }
 
@@ -438,7 +438,7 @@ public class DSSWorkspaceRestful {
         try {
             menuAppconnVos = dssWorkspaceService.getWorkspaceAppConns(workspace, workspaceId, username, isChinese);
         } catch (DSSErrorException e) {
-            LOGGER.warn("{} get appconns from workspace {} failed.", username, workspaceId, e);
+            LOGGER.warn("{} get appconns from workspace {} failed. {}", username, workspaceId, e);
             return Message.error(e);
         }
         return Message.ok().data("menus", menuAppconnVos);

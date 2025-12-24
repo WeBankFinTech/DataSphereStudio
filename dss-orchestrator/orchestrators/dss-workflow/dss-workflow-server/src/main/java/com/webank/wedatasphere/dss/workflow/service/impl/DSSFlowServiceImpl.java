@@ -467,7 +467,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                 }
             }
         } catch (DSSErrorException e) {
-            logger.error("getProjectInfo failed by:", e);
+            logger.error("getProjectInfo failed by: ", e);
             throw new DSSRuntimeException(e.getErrCode(), "更新工作流状态失败，您可以尝试重新保存工作流！原因：" + ExceptionUtils.getRootCauseMessage(e), e);
         }
     }

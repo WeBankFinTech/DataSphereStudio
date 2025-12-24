@@ -98,11 +98,6 @@ public class ProxyUserProjectHttpRequestHook implements ProjectHttpRequestHook {
     public Message beforeModifyProject(HttpServletRequest request, ProjectModifyRequest projectModifyRequest) {
         Workspace workspace = SSOHelper.getWorkspace(request);
         return doProxyUserFunction(request, proxyUser -> {
-            ProjectQueryRequest projectQueryRequest = new ProjectQueryRequest();
-            projectQueryRequest.setId(projectModifyRequest.getId());
-            // 这里直接使用代理用户来查询
-            projectQueryRequest.setUsername(proxyUser);
-            projectQueryRequest.setWorkspaceId(workspace.getWorkspaceId());
 
             List<DSSProjectUser> dssProjectUsers = dssProjectUserService.getProjectPriv(projectModifyRequest.getId());
 

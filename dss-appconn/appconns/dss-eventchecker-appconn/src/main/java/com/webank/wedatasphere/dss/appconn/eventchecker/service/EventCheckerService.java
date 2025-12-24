@@ -49,7 +49,7 @@ public class EventCheckerService {
             }
             return eventCheck.sendMsg(jobId, props, log);
         } else {
-            log.error("create EventCheckSender failed {}");
+            log.error("create EventCheckSender failed");
             return false;
         }
     }
@@ -75,7 +75,7 @@ public class EventCheckerService {
             }
             return eventCheck.reciveMsg(jobId, props, log);
         } else {
-            log.error("create EventCheckSender failed {}");
+            log.error("create EventCheckSender failed");
             return false;
         }
     }

@@ -300,7 +300,7 @@ public class DSSMigrateRestful {
                 String flowLatestBmlVersion = getLatestFlowBmlVersion(userName, orchestratorLatestVersion.getAppId());
                 responseMsg.data(FLOW_BML_VERSION_KEY, flowLatestBmlVersion);
             } else {
-                LOG.error("Got null orchestrator version after imported. User : {}, workspace : {}, projectName : {}, projectId : {}", importOrcId, userName, workspaceName, projectName, projectVo.getId());
+                LOG.error("Got null orchestrator version after imported. ImportOrcId: {}, User : {}, workspace : {}, projectName : {}, projectId : {}", importOrcId, userName, workspaceName, projectName, projectVo.getId());
                 responseMsg.data(FLOW_ID_KEY, null);
                 responseMsg.data(FLOW_BML_VERSION_KEY, null);
             }

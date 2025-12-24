@@ -373,7 +373,7 @@ public final class HttpClientUtil {
 				//post.setEntity(new StringEntity(jsonArray.get(0).toString(), encoding));
 				post.setEntity(new StringEntity(null, encoding));
 				//logger.info("successfully  start post Json Body  url{},params ", url,jsonArray.get(0).toString());
-				logger.info("successfully  start post Json Body  url{},params ", url,null);
+				logger.info("successfully  start post Json Body  url {}", url);
 			}
 			CloseableHttpResponse response = httpclient.execute(post);
 			try {

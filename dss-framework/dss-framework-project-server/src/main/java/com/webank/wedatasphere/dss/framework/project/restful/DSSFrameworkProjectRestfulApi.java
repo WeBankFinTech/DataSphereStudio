@@ -144,7 +144,7 @@ public class DSSFrameworkProjectRestfulApi {
         try {
             dssWorkspaceService.getWorkspacesById(projectRequest.getWorkspaceId(), username);
         } catch (DSSErrorException e) {
-            LOGGER.error("User {} get workspace {} failed.", username, projectRequest.getWorkspaceId(), e);
+            LOGGER.error("User {} get workspace {} failed. {}", username, projectRequest.getWorkspaceId(), e);
             return Message.error(e);
         }
         List<String> roles = dssWorkspaceRoleService.getRoleInWorkspace(username, projectRequest.getWorkspaceId().intValue());
@@ -486,7 +486,7 @@ public class DSSFrameworkProjectRestfulApi {
         try {
             dssWorkspaceService.getWorkspacesById(projectRequest.getWorkspaceId(), username);
         } catch (DSSErrorException e) {
-            LOGGER.error("User {} get workspace {} failed.", username, projectRequest.getWorkspaceId(), e);
+            LOGGER.error("User {} get workspace {} failed. {}", username, projectRequest.getWorkspaceId(), e);
             return Message.error(e);
         }
         List<String> roles = dssWorkspaceRoleService.getRoleInWorkspace(username, projectRequest.getWorkspaceId().intValue());
@@ -570,7 +570,7 @@ public class DSSFrameworkProjectRestfulApi {
         try {
             dssWorkspaceService.getWorkspacesById(projectRequest.getWorkspaceId(), username);
         } catch (DSSErrorException e) {
-            LOGGER.error("User {} get workspace {} failed.", username, projectRequest.getWorkspaceId(), e);
+            LOGGER.error("User {} get workspace {} failed. {}", username, projectRequest.getWorkspaceId(), e);
             return Message.error(e);
         }
         List<String> roles = dssWorkspaceRoleService.getRoleInWorkspace(username, projectRequest.getWorkspaceId().intValue());
